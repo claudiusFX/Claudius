@@ -16,4 +16,4 @@ $ open _build/default/_doc/_html/index.html
 
  Claudius has been tested under macOS, Linux, and Windows via WSL, and requires that you have [SDL](https://www.libsdl.org) 2 installed.
 
- It requires OCaml 5 or newer, and relies on [tsdl](https://github.com/dbuenzli/tsdl) for talking to SDL, and [ounit2](https://opam.ocaml.org/packages/ounit2/) for unit tests.
+ It requires OCaml 5 or newer ([see here for installation instructions](https://ocaml.org/releases/5.3.0#installation-instructions)), and relies on [tsdl](https://github.com/dbuenzli/tsdl) for talking to SDL, and [ounit2](https://opam.ocaml.org/packages/ounit2/) for unit tests.
