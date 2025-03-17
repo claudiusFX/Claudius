@@ -1,7 +1,12 @@
 (* open Graphics *)
 open Tsdl
 
-module KeyCodeSet = Set.Make(Int)
+module KeyCodeSet = Set.Make(struct
+  type t = Key.t
+  let compare = compare
+end)
+
+module PlatformKey = KeySDL
 
 type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Framebuffer.t
@@ -94,8 +99,12 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
           | true -> (
             match Sdl.Event.(enum (get e typ)) with
             | `Quit -> (true, keys)
-            | `Key_down -> (false, KeyCodeSet.add Sdl.Event.(get e keyboard_keycode) keys)
-            | `Key_up -> (false, KeyCodeSet.remove Sdl.Event.(get e keyboard_keycode) keys)
+            | `Key_down -> 
+                let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+                (false, KeyCodeSet.add key keys)
+            | `Key_up -> 
+              let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+              (false, KeyCodeSet.remove key keys)
             | _ -> (false, keys)
           )
           | false -> (false, keys) in
