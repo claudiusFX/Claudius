@@ -250,18 +250,41 @@ let strand_direction (s : strand) : int =
     | x -> x
   ) s 0
 
+(* let rot l =
+   match l with
+   | [] -> []
+   | x :: [] -> [x]
+   | x :: tl -> List.rev (x :: (List.rev tl))
 
-let poly_to_strands (points : (int * int) list) : strand list =
+let points_to_lines points =
+  List.combine points (rot points) *)
+
+(* let points_to_lines points =
   match points with
   | [] | [_] -> []
   | p1 :: p2 :: ptl -> (
-
     let rec point_list_to_lines p1 p2 pl acc =
       match pl with
       | [] -> (p1, p2) :: acc
       | np :: tl -> point_list_to_lines p2 np tl ((p1, p2) :: acc)
     in
-    let lines = point_list_to_lines p1 p2 ptl [] in
+    point_list_to_lines p1 p2 ptl []
+  ) *)
+
+
+let poly_to_strands (points : (int * int) list) : strand list =
+  match points with
+  | [] | [_] -> []
+  (* | p1 :: p2 :: ptl -> ( *)
+  | points -> (
+
+    (* let rec point_list_to_lines p1 p2 pl acc =
+      match pl with
+      | [] -> (p1, p2) :: acc
+      | np :: tl -> point_list_to_lines p2 np tl ((p1, p2) :: acc)
+    in
+    let lines = point_list_to_lines p1 p2 ptl [] in *)
+    let lines = Utils.points_to_lines points in
 
     let rec loop
         (last_direction : int)
