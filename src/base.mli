@@ -1,6 +1,5 @@
 (** Main Claudius entry point. *)
-
-module KeyCodeSet : Set.S with type elt = int
+module KeyCodeSet : Set.S with type elt = Key.t
 
 type boot_func = Screen.t -> Framebuffer.t
 (** Function called once a start of run *)
