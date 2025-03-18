@@ -6,7 +6,7 @@ module KeyCodeSet = Set.Make(struct
   let compare = compare
 end)
 
-module PlatformKey = KeySDL
+module PlatformKey = Keysdl
 
 type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Framebuffer.t
