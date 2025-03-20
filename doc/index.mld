@@ -1,18 +1,18 @@
 {0 Claudius - A fantasy retro computer library.}
 
-Claudius started out trying to be a functional library that works like a fantasy console system like {{:https://tic80.com}TIC-80} or {{:https://www.lexaloffle.com/pico-8.php}PICO-8}: A way to do some retro-style demo graphics progeramming but in OCaml rather than in LUA. In its current form it doesn't do nearly as much as those fantasy consoles, instead just concentrating on enabling you to make graphical demos, and lacks things like audio, expressive input support, sprite editors and so forth. But if your goal is to enter something like {{:https://tcc.lovebyte.party}Tiny Code Christmas} or {{:https://genuary.art}Genuary}, then Claudius is designed for that use case.
+Claudius started out trying to be a functional library that works like a fantasy console system like {{:https://tic80.com}TIC-80} or {{:https://www.lexaloffle.com/pico-8.php}PICO-8}: A way to do some retro-style demo graphics programming but in OCaml rather than in LUA. In its current form, it doesn't do nearly as much as those fantasy consoles, instead just concentrating on enabling you to make graphical demos, and lacks things like audio, expressive input support, sprite editors and so forth. But if your goal is to enter something like {{:https://tcc.lovebyte.party}Tiny Code Christmas} or {{:https://genuary.art}Genuary}, then Claudius is designed for that use case.
 
 {1 Key concepts}
 
-As mentioned alread, Claudius takes inspiration from existing fantasy console environments, whilst trying to encourage a more functional approach to working within such constrains. This section covers the basic concepts that Claudius relies on.
+As mentioned already, Claudius takes inspiration from existing fantasy console environments, whilst trying to encourage a more functional approach to working within such constraints. This section covers the basic concepts that Claudius relies on.
 
 One of the main differences is that rather than work with a memory map layout of the virtual computer (e.g., see TIC-80's {{:https://tic80.com/learn}docs} where it describes the memory layout it uses), Claudius works with a {!Claudius.Framebuffer.t} type, which is an ADT that manages the pixels in a palette based colour space. You can generate new framebuffers when you like, or recycle old ones. By not treating them as memory mapped as in TIC-80, we can encourage a more functional access approach (as described below).
 
 {2 The framebuffer}
 
-Claudius is based on the concept of a framebuffer that exists in a paletted space with a fixed number of colours, similar to how early home computers worked. Every frame (or tick, see below) you will be asked to return a framebuffer to be rendered to screen. This is a nod to how fantasy-consoles like TIC-80 work, where they present a memory mapped framebuffer, but Claudius is trying to encourage more functional thinking, and so you are responsible for defining and returning framebuffers.
+Claudius is based on the concept of a framebuffer that exists in a paletted space with a fixed number of colours, similar to how early home computers worked. Every frame (or tick, see below), you will be asked to return a framebuffer to be rendered to the screen. This is a nod to how fantasy-consoles like TIC-80 work, where they present a memory mapped framebuffer, but Claudius is trying to encourage more functional thinking, and so you are responsible for defining and returning framebuffers.
 
-This mode of operation, whilst perhaps a little odd, does have some nice properties where you can write "shader" style code that operares per pixel, either creating a new framebuffer, or by mapping over an existing framebuffer.
+This mode of operation, whilst perhaps a little odd, does have some nice properties where you can write "shader" style code that operates per pixel, either creating a new framebuffer, or by mapping over an existing framebuffer.
 
 {2 Styles of working with Claudius}
 
@@ -24,7 +24,7 @@ To support this there's three primary modes of working with Claudius for generat
 
 {3 Pixel Functional}
 
-Often visual effects can be encoded as "pixel functional" - that is to draw the screen you just need to provide a function that takes the `x` and `y` coordinate of the pixel and then generates it's value. A classic example of this would be a {{:https://en.wikipedia.org/wiki/Mandelbrot_set}Mandelbrot Fractal}. To encourage this, the most common way to generate a blank canvas in Claudius is:
+Often visual effects can be encoded as "pixel functional" - that is to draw the screen you just need to provide a function that takes the `x` and `y` coordinate of the pixel and then generates its value. A classic example of this would be a {{:https://en.wikipedia.org/wiki/Mandelbrot_set}Mandelbrot Fractal}. To encourage this, the most common way to generate a blank canvas in Claudius is:
 
 {[
 let fb = Framebuffer.init (640, 480) (fun _x _y -> 0)
@@ -40,7 +40,7 @@ Done too much this can be expensive in memory allocations, and so there is also 
 
 {3 Screen Functional}
 
-Whilst pixel functional effects can be fun, they can also be quite limiting, and often you will want to build up bigger scenes to be rendered at once. For this we encourage a functional pipeline style of processing, which we refer to as "Screen Functional" - each frame is a function of time t. To support this Claudius has a primatives library, whereby you can render objects to a framebuffer:
+Whilst pixel functional effects can be fun, they can also be quite limiting, and often you will want to build up bigger scenes to be rendered at once. For this we encourage a functional pipeline style of processing, which we refer to as "Screen Functional" - each frame is a function of time t. To support this Claudius has a primitives library, whereby you can render objects to a framebuffer:
 
 {[
 let w, h = Screen.dimensions s in
@@ -48,7 +48,7 @@ let palsize = Palette.size (Screen.palette s) in
 
 (* generate some points *)
 List.init 42 (fun _ -> (Random.int w, Random.int h))
-(* Convert those circle primatives in different colours *)
+(* Convert those circle primitives in different colours *)
 |> List.mapi (fun idx (x, y) -> Primitive.Circle ({x ; y } ; 3.0 ; idx mod palsize))
 (* Draw to framebuffer *)
 |> Framebuffer.render fb
@@ -82,7 +82,7 @@ Framebuffer.draw_line x0 y0 x1 y1 col buffer
 
 {2 Tick and Boot}
 
-Similar to both TIC-80, and embedded development systems like {{:https://arduino.cc}Arduino}, Claudius programs have two main entry points, functions that you must provide to Claudius: an optional one called `boot` and a mandator one called `tick`.
+Similar to both TIC-80, and embedded development systems like {{:https://arduino.cc}Arduino}, Claudius programs have two main entry points, functions that you must provide to Claudius: an optional one called `boot` and a mandatory one called `tick`.
 
 {3 Boot}
 
@@ -90,11 +90,11 @@ This function is called once, and at its minimum is used to set an initial scree
 
 {3 Tick}
 
-the `tick` function is mandator, and will be called once per frame redraw by Claudius. This will be where you either generate a new set of screen contents of you can modify the old screen contents and provide that back to Claudius. The tick function will be provided with a monotomically incrementing counter `t` that can be used to derive a particular frame update.
+the `tick` function is mandatory, and will be called once per frame redraw by Claudius. This will be where you either generate a new set of screen contents or you can modify the old screen contents and provide that back to Claudius. The tick function will be provided with a monotomically incrementing counter `t` that can be used to derive a particular frame update.
 
 {1 Screen modes}
 
-Claudius isn't as restrictive as a dedicated fantasy console, which typically offers one or a few dedicated modes (e.g., 240x180x16 for TIC-80), but rather you specify a screen as having a resolution and palette of your choosing. Currently palettes are only configurate at start-of-day, and not yet modifiable whilst an effect is running, but the ability to have palettes of arbitary sizes does offset this limitation somewhat, but is probably something that will be addressed in a future release.
+Claudius isn't as restrictive as a dedicated fantasy console, which typically offers one or a few dedicated modes (e.g., 240x180x16 for TIC-80), but rather you specify a screen as having a resolution and palette of your choosing. Currently palettes are only configured at start-of-day, and not yet modifiable whilst an effect is running, but the ability to have palettes of arbitrary sizes does offset this limitation somewhat, but is probably something that will be addressed in a future release.
 
 {2 Palettes}
 
