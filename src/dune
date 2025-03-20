@@ -1,4 +1,5 @@
 (library
  (name claudius)
  (public_name claudius)
- (libraries tsdl))
+ (libraries tsdl)
+ (modules base font framebuffer palette primitives screen utils run_loop))

@@ -1,5 +1,8 @@
 
-type t = int array array
+type t = {
+  buffer : int array array;
+  mutable dirty : bool;
+}
 
 type shader_func = int -> int
 
@@ -12,15 +15,15 @@ let init (dimensions : int * int) (f : int -> int -> int) : t =
   let width, height = dimensions in
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
-  Array.init height (fun y ->
-    Array.init width (fun x ->
-        f x y
-      )
-  )
+  { buffer = Array.init height (fun y ->
+      Array.init width (fun x -> f x y));
+    dirty = false }
 
-let pixel_write (x : int) (y : int) (col : int) (buffer : t) =
-  if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-    buffer.(y).(x) <- col
+let pixel_write (x : int) (y : int) (col : int) (fb : t) =
+  if (x >= 0) && (x < Array.length (fb.buffer.(0))) && (y >= 0) && (y < Array.length fb.buffer) then begin
+    fb.buffer.(y).(x) <- col;
+    fb.dirty <- true  (* Mark framebuffer as dirty *)
+  end
 
 let pixel_read (x : int) (y : int) (buffer : t) : int option =
   if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
