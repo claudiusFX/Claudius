@@ -33,7 +33,7 @@ let fb = Framebuffer.init (640, 480) (fun _x _y -> 0)
 You can also modify an existing framebuffer by providing a shader style function. For example, this shader is used to fade out the previous frame:
 
 {[
-let faded_fb = Framebuffer.shader (fun pixel -> if pixel > 1 then (pixel - 1) else 0) fb
+let faded_fb = Framebuffer.map (fun pixel -> if pixel > 1 then (pixel - 1) else 0) fb
 ]}
 
 Done too much this can be expensive in memory allocations, and so there is also a `shader_inplace` variation that does an update on the provided framebuffer - this is less functional, but is sometimes a pragmatic compromise based on performance.
