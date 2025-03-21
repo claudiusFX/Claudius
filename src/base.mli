@@ -1,6 +1,10 @@
 (** Main Claudius entry point. *)
 
-module KeyCodeSet : Set.S with type elt = int
+module KeyCodeSet : Set.S with type elt = Key.t
+(** A module representing a set of key codes. *)
+
+module PlatformKey : module type of Keysdl
+(** A module that provides platform-specific key handling, based on the [Keysdl] module. *)
 
 type boot_func = Screen.t -> Framebuffer.t
 (** Function called once a start of run *)
