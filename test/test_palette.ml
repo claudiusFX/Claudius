@@ -12,6 +12,21 @@ let test_basic_palette_of_ints _ =
   let rev = Palette.to_list pal in
   assert_equal ~msg:"Back to ints" cols rev
 
+let test_generate_microsoft_vga_palette_creation _ =
+  let pal = Palette.generate_microsoft_vga_palette () in
+  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
+
+  let expected_colors =  [
+    0x000000; 0x800000; 0x008000; 0x808000;
+    0x000080; 0x800080; 0x008080; 0xc0c0c0;
+    0x808080; 0xff0000; 0x00ff00; 0xffff00;
+    0x0000ff; 0xff00ff; 0x00ffff; 0xffffff;
+  ] in
+List.iter (fun i expected -> 
+  let actual = Palette.index_to_rgb pal i |> Int32.to_int in
+  assert_equal ~msg: ("Colors should match at:" i) expected actual
+  ) expected_colors
+
 let test_plasma_palette_creation _ =
   let pal = Palette.generate_plasma_palette 16 in
   assert_equal ~msg:"Palette size" 16 (Palette.size pal);
@@ -20,6 +35,7 @@ let test_plasma_palette_creation _ =
     assert_bool "Colour not black" (0x000000 != c);
     assert_bool "Colour not white" (0xFFFFFF != c);
   ) (Palette.to_list pal)
+
 
 let test_mono_palette_creation _ =
   let pal = Palette.generate_mono_palette 16 in
