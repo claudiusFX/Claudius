@@ -12,8 +12,8 @@ val generate_mono_palette: int -> t
     [Invalid_argument] if palette size is zero or less. *)
 
 val generate_plasma_palette: int -> t
-
 (** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raisesif palette size is zero or less. *)
+
 val generate_microsoft_vga_palette : unit -> t
 (** [generate_microsoft_vga_palette ()] returns the Microsoft VGA 16-color palette,
     as defined by sources such as Lospec and Wikipedia. *)
@@ -21,7 +21,6 @@ val generate_microsoft_vga_palette : unit -> t
 val generate_classic_vga_palette : unit -> t
 (** [generate_classic_vga_palette ()] returns the classic IBM VGA 16-color palette,
     based on traditional values. *)
-
 
 val generate_sweet16_palette : unit -> t
     (** [generate_sweet16_palette ()] returns the Sweet16 color palette as defined by the widely recognized Lospec palette. *) 
