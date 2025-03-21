@@ -20,7 +20,7 @@ let generate_plasma_palette (size : int) : t =
     Int32.of_int (((int_of_float fred) * 65536) + ((int_of_float fgreen) * 256) + (int_of_float fblue))
   )
   
-let generate_vaporware_palette (size : int) : t =
+let generate_vapourwave_palette (size : int) : t =
   if size <= 0 then raise (Invalid_argument "Palette size must not be zero negative");
   Array.init size (fun index -> 
     let f = float_of_int  index /. float_of_int size in
