@@ -7,11 +7,15 @@ type t
 
 (** {1 Initializations} *)
 
+
 val generate_mono_palette: int -> t
 (** [generate_mono_palette size] Will generate a grayscale palette going from black to white with [size] number of entries. Raises
     [Invalid_argument] if palette size is zero or less. *)
 
 val generate_plasma_palette: int -> t
+(** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raisesif palette size is zero or less. *)
+
+val generate_vapourwave_palette: int -> t
 (** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raisesif palette size is zero or less. *)
 
 val generate_microsoft_vga_palette : unit -> t
