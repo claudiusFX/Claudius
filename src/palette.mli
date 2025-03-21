@@ -12,8 +12,13 @@ val generate_mono_palette: int -> t
     [Invalid_argument] if palette size is zero or less. *)
 
 val generate_plasma_palette: int -> t
-(** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raises
-    [Invalid_argument] if palette size is zero or less. *)
+(** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raisesif palette size is zero or less. *)
+
+val generate_microsoft_vga_palette : unit -> t
+    (** [generate_vga_palette ()] returns the Microsoft VGA 16-color palette, as defined by the widely recognized Lospec palette. *)
+
+val generate_sweet16_palette : unit -> t
+    (** [generate_sweet16_palette ()] returns the Sweet16 color palette as defined by the widely recognized Lospec palette. *) 
 
 val load_tic80_palette: string -> t
 (** [load_tic80_palette str] Will take a string [str] of the form found in TIC80 save files and load it as a palette.Raises

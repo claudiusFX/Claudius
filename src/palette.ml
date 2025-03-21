@@ -19,6 +19,43 @@ let generate_plasma_palette (size : int) : t =
 
     Int32.of_int (((int_of_float fred) * 65536) + ((int_of_float fgreen) * 256) + (int_of_float fblue))
   )
+  
+let generate_vaporware_palette (size : int) : t =
+  if size <= 0 then raise (Invalid_argument "Palette size must not be zero negative");
+  Array.init size (fun index -> 
+    let f = float_of_int  index /. float_of_int size in
+    let fred   = int_of_float ((sin (f *. 2. *. Float.pi) *. 0.5 +. 0.5) *. 255.) in
+    let fgreen = int_of_float ((sin (f *. 2. *. Float.pi +. 2.094) *. 0.5 +. 0.5) *. 255.) in
+    let fblue  = int_of_float ((sin (f *. 2. *. Float.pi +. 4.188) *. 0.5 +. 0.5) *. 255.) in
+    Int32.of_int (fred * 65536 + fgreen * 256 + fblue)
+    )
+
+let generate_microsoft_vga_palette () : t =
+   let colors = [
+    0x000000; 0x800000; 0x008000; 0x808000;
+    0x000080; 0x800080; 0x008080; 0xc0c0c0;
+    0x808080; 0xff0000; 0x00ff00; 0xffff00;
+    0x0000ff; 0xff00ff; 0x00ffff; 0xffffff;
+  ] in
+  of_list colors
+
+let generate_classic_vga_palette () : t =
+  let colors = [
+    0x000000; 0x0000AA; 0x00AA00; 0x00AAAA;
+    0xAA0000; 0xAA00AA; 0xAA5500; 0xAAAAAA;
+    0x555555; 0x5555FF; 0x55FF55; 0x55FFFF;
+    0xFF5555; 0xFF55FF; 0xFFFF55; 0xFFFFFF;
+  ] in
+   of_list colors
+
+let generate_sweet16_palette () : t =
+  let colors = [
+    0x1a1c2c; 0x5d275d; 0xb13e53; 0xef7d57; 
+    0xffcd75; 0xa7f070; 0x38b764; 0x257179; 
+    0x29366f; 0x3b5dc9; 0x41a6f6; 0x73eff7; 
+    0xf4f4f4; 0x94b0c2; 0x566c86; 0x333c57;
+  ]
+  of_list colors
 
 let string_to_chunks (x : string) (size : int) : string list =
   let rec loop sofar remainder =
