@@ -89,29 +89,30 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
 
         let updated_buffer = tick t s prev_buffer keys in
 
-        framebuffer_to_bigarray s updated_buffer bitmap;
+        if updated_buffer != prev_buffer then (
+          framebuffer_to_bigarray s updated_buffer bitmap;
+          match render_texture r texture s bitmap with
+          | Error (`Msg e) -> Sdl.log "Boot error: %s" e
+          | Ok () -> ()
+        );
 
-        match render_texture r texture s bitmap with
-        | Error (`Msg e) -> Sdl.log "Boot error: %s" e
-        | Ok () -> (
-          let exit, keys =
-          match Sdl.poll_event (Some e) with
-          | true -> (
-            match Sdl.Event.(enum (get e typ)) with
-            | `Quit -> (true, keys)
-            | `Key_down -> 
-                let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-                (false, KeyCodeSet.add key keys)
-            | `Key_up -> 
+        let exit, keys =
+        match Sdl.poll_event (Some e) with
+        | true -> (
+          match Sdl.Event.(enum (get e typ)) with
+          | `Quit -> (true, keys)
+          | `Key_down -> 
               let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-              (false, KeyCodeSet.remove key keys)
-            | _ -> (false, keys)
-          )
-          | false -> (false, keys) in
-          match exit with
-          | true -> ()
-          | false -> loop (t + 1) updated_buffer keys now
+              (false, KeyCodeSet.add key keys)
+          | `Key_up -> 
+            let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+            (false, KeyCodeSet.remove key keys)
+          | _ -> (false, keys)
         )
+        | false -> (false, keys) in
+        match exit with
+        | true -> ()
+        | false -> loop (t + 1) updated_buffer keys now
       ) in loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
 
 
