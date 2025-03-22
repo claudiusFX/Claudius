@@ -7,7 +7,6 @@ type t
 
 (** {1 Initializations} *)
 
-
 val generate_mono_palette: int -> t
 (** [generate_mono_palette size] Will generate a grayscale palette going from black to white with [size] number of entries. Raises
     [Invalid_argument] if palette size is zero or less. *)
