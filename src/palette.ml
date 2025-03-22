@@ -57,6 +57,15 @@ let generate_sweet16_palette () : t =
   ]
   of_list colors
 
+let generate_mac_palette () : t =
+  let colors = [
+    0xffffff; 0xfcf400; 0xff6400; 0xdd0202;
+    0xf00285; 0x4600a5; 0x0000d5; 0x00aee9;
+    0x1ab90c; 0x006407; 0x572800; 0x917135;
+    0xc1c1c1; 0x818181; 0x3e3e3e; 0x000000;
+  ]
+  of_list colors
+
 let string_to_chunks (x : string) (size : int) : string list =
   let rec loop sofar remainder =
     let length_left = String.length remainder in
