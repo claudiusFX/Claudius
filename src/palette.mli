@@ -29,6 +29,11 @@ val generate_classic_vga_palette : unit -> t
 val generate_sweet16_palette : unit -> t
     (** [generate_sweet16_palette ()] returns the Sweet16 color palette as defined by the widely recognized Lospec palette. *) 
 
+val generate_mac_palette : unit -> t
+(** [generate_mac_palette ()] returns the Macintosh 16-color palette,
+    as defined by sources such as Wikipedia. *)
+
+
 val load_tic80_palette: string -> t
 (** [load_tic80_palette str] Will take a string [str] of the form found in TIC80 save files and load it as a palette.Raises
     [Invalid_argument] if palette size is zero or less, or if the data string is not correct. *)
