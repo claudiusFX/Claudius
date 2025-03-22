@@ -12,6 +12,26 @@ let test_basic_palette_of_ints _ =
   let rev = Palette.to_list pal in
   assert_equal ~msg:"Back to ints" cols rev
 
+let test_generate_mac_palette_creation =
+  let pal = Palette.generate_mac_palette() in
+  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
+
+let test_generate_vapour_wave_creation = 
+  let pal Palette.generate_vapourwave_palette 16 in
+  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
+  List.iter (fun c ->
+    assert_bool "Colour not black" (0x000000 != c);
+    assert_bool "Colour not white" (0xFFFFFF != c);
+  ) (Palette.to_list pal)
+
+let test_generate_microsoft_vga_palette_creation _ =
+  let pal = Palette.generate_microsoft_vga_palette () in
+  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
+
+let test_generate_microsoft_vga_palette_creation _ =
+  let pal = Palette.generate_microsoft_vga_palette () in
+  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
+  
 let test_plasma_palette_creation _ =
   let pal = Palette.generate_plasma_palette 16 in
   assert_equal ~msg:"Palette size" 16 (Palette.size pal);
@@ -20,6 +40,7 @@ let test_plasma_palette_creation _ =
     assert_bool "Colour not black" (0x000000 != c);
     assert_bool "Colour not white" (0xFFFFFF != c);
   ) (Palette.to_list pal)
+
 
 let test_mono_palette_creation _ =
   let pal = Palette.generate_mono_palette 16 in
