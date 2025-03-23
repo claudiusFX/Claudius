@@ -94,6 +94,12 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
           match render_texture r texture s bitmap with
           | Error (`Msg e) -> Sdl.log "Boot error: %s" e
           | Ok () -> ()
+        ) else if Framebuffer.is_dirty updated_buffer then (
+          framebuffer_to_bigarray s updated_buffer bitmap;
+          match render_texture r texture s bitmap with
+          | Error (`Msg e) -> Sdl.log "Boot error: %s" e
+          | Ok () -> ();
+          Framebuffer.clear_dirty updated_buffer
         );
 
         let exit, keys =

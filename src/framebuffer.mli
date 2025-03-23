@@ -1,9 +1,8 @@
-
 (** Provides the simulated framebuffer for Claudius.
 
 The framebuffer is logically an array of memory in which you draw using palette entries, similar to say how VGA worked on old PCs. *)
 
-type t
+type t = { data : int array array; mutable dirty : bool }
 
 (** {1 Initializations} *)
 
@@ -159,3 +158,9 @@ val pixel_read: int -> int -> t -> int option
 val to_array: t -> int array array
 (** [to_array framebuffer] converts the framebuffer into a 2D array. The top level array is an array
     of rows, and each row is an array of palette entry colours. *)
+
+(** {2 Dirty-bit support} *)
+
+val is_dirty: t -> bool
+val set_dirty: t -> unit
+val clear_dirty: t -> unit

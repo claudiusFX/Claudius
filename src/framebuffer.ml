@@ -1,34 +1,36 @@
-
-type t = int array array
+type t = { data : int array array; mutable dirty : bool }
 
 type shader_func = int -> int
 
 type shaderi_func = int -> int -> t -> int
 
 let to_array (buffer : t) : int array array =
-  buffer
+  buffer.data
 
 let init (dimensions : int * int) (f : int -> int -> int) : t =
   let width, height = dimensions in
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
-  Array.init height (fun y ->
+  { data = Array.init height (fun y ->
     Array.init width (fun x ->
         f x y
       )
-  )
+  );
+    dirty = true }
 
 let pixel_write (x : int) (y : int) (col : int) (buffer : t) =
-  if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-    buffer.(y).(x) <- col
+  if (x >= 0) && (x < Array.length (buffer.data.(0))) && (y >= 0) && (y < Array.length buffer.data) then
+    buffer.data.(y).(x) <- col;
+  buffer.dirty <- true
 
 let pixel_read (x : int) (y : int) (buffer : t) : int option =
-  if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-    Some buffer.(y).(x)
+  if (x >= 0) && (x < Array.length (buffer.data.(0))) && (y >= 0) && (y < Array.length buffer.data) then
+    Some buffer.data.(y).(x)
   else
     None
 
 let draw_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   let fx = Float.of_int x
   and fy = Float.of_int y in
 
@@ -50,15 +52,16 @@ let draw_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
   done
 
 let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   let fx = Float.of_int x and fy = Float.of_int y in
-  let my = Float.of_int ((Array.length buffer) - 1)
-  and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
+  let my = Float.of_int ((Array.length buffer.data) - 1)
+  and mx = Float.of_int ((Array.length buffer.data.(0)) - 1) in
   let pminy = fy -. r
   and pmaxy = fy +. r in
   let miny = if (pminy < 0.) then 0. else pminy
   and maxy = if (pmaxy > my) then my else pmaxy in
   for yi = (Int.of_float miny) to (Int.of_float maxy) do
-    let row = buffer.(yi) in
+    let row = buffer.data.(yi) in
     let a = acos ((Float.of_int (yi - y)) /. r) in
     let xw = (sin a) *. r in
     let pminx = fx -. xw
@@ -72,6 +75,7 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
   done
 
 let draw_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   let dx = abs (x1 - x0)
   and sx = if x0 < x1 then 1 else -1
   and dy = (abs (y1 - y0)) * -1
@@ -79,8 +83,8 @@ let draw_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) (col : int) (buffer : 
   let initial_error = dx + dy in
 
   let rec loop (x : int) (y : int) (error : int) =
-    if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-      buffer.(y).(x) <- col;
+    if (x >= 0) && (x < Array.length (buffer.data.(0))) && (y >= 0) && (y < Array.length buffer.data) then
+      buffer.data.(y).(x) <- col;
     match (x == x1) && (y == y1) with
     | true -> ()
     | false -> (
@@ -102,6 +106,7 @@ let draw_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) (col : int) (buffer : 
   in loop x0 y0 initial_error
 
 let draw_polygon (points : (int * int) list) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   match points with
   | [] -> ()
   | hd :: tl -> (
@@ -175,8 +180,7 @@ let interpolate_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) : span array =
           | Only (a) -> (if a == nx then Only(a) else (if (a > nx) then Pair(nx, a) else (Pair(a, nx))))
           | Pair (a, b) -> (if nx <= a then Pair(nx, b) else Pair(a, nx))
         )
-      )
-      ;
+      );
       loop nx ny (error + nex + ney)
     )
   in loop x0 y0 initial_error;
@@ -197,6 +201,7 @@ let rightmost span =
   | Pair (_, x1) -> x1
 
 let filled_triangle (x0 : int) (y0 : int) (x1 : int) (y1 : int) (x2 : int) (y2 : int) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   let points = [(x0, y0) ; (x1, y1) ; (x2, y2)] in
   let sorted_points = List.sort (fun a b ->
     let _, ay = a and _, by = b in
@@ -222,8 +227,8 @@ let filled_triangle (x0 : int) (y0 : int) (x1 : int) (y1 : int) (x2 : int) (y2 :
   let spans = Array.map2 (fun a b -> (a, b)) long_edge other_edge in
   Array.iteri (fun i s ->
     let index = y0 + i in
-    if (index >= 0) && (index < Array.length buffer) then (
-      let row = buffer.(y0 + i) in
+    if (index >= 0) && (index < Array.length buffer.data) then (
+      let row = buffer.data.(y0 + i) in
       let stride = Array.length row in
       let p, q = s in
       let p0, p1 = if (leftmost p <= leftmost q) then p, q else q, p in
@@ -354,6 +359,7 @@ let interpolate_strand (strand : ((int * int) * (int * int)) list) : (int * span
   )
 
 let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   match points with
   | [] | [_] -> ()
   | _ -> (
@@ -419,6 +425,7 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
 (* ----- *)
 
 let draw_char (x : int) (y : int) (f : Font.t) (c : char) (col : int) (buffer : t) : int =
+  buffer.dirty <- true;
   match Font.glyph_of_char f (Uchar.of_char c) with
   | None -> 0
   | Some glyph -> (
@@ -445,6 +452,7 @@ let draw_char (x : int) (y : int) (f : Font.t) (c : char) (col : int) (buffer : 
   )
 
 let draw_string (x : int) (y : int) (f : Font.t) (s : string) (col : int) (buffer : t) =
+  buffer.dirty <- true;
   let sl = List.init (String.length s) (String.get s) in
   let rec loop offset remaining =
     match remaining with
@@ -471,13 +479,15 @@ let map_inplace (f: shader_func) (buffer : t) =
   Array.iter (fun row ->
     Array.iteri (fun i v -> row.(i) <- f v) row
     (* Array.map_inplace f row*)
-  ) buffer
+  ) buffer;
+  buffer.dirty <- true
 
 let mapi_inplace (f: shaderi_func) (buffer : t) =
   Array.iteri (fun y row ->
     Array.iteri (fun x _v -> row.(x) <- f x y buffer) row
     (* Array.mapi_inplace (fun x _p -> f x y buffer) row*)
-  ) buffer
+  ) buffer;
+  buffer.dirty <- true
 
 (* ---- *)
 
