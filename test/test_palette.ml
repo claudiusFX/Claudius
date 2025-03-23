@@ -45,7 +45,6 @@ let test_plasma_palette_creation _ =
     assert_bool "Colour not white" (0xFFFFFF != c);
   ) (Palette.to_list pal)
 
-
 let test_mono_palette_creation _ =
   let pal = Palette.generate_mono_palette 16 in
   assert_equal ~msg:"Palette size" 16 (Palette.size pal);
