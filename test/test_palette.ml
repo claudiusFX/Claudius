@@ -16,7 +16,7 @@ let test_generate_mac_palette_creation =
   let pal = Palette.generate_mac_palette() in
   assert_equal ~msg: "Palette size" 16 (Palette.size pal)
 
-let test_generate_sweet16_palette = 
+let test_generate_sweetie16_palette = 
   let pal = Palette.generate_sweet16_palette()
   assert_equal ~msg: "Palette size" 16 (Palette.size pal)
 

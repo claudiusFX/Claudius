@@ -22,15 +22,31 @@ let generate_plasma_palette (size : int) : t =
   
 let generate_vapourwave_palette (size : int) : t =
   if size <= 0 then raise (Invalid_argument "Palette size must not be zero negative");
-  Array.init size (fun index -> 
-    let f = float_of_int  index /. float_of_int size in
-    let fred   = int_of_float ((sin (f *. 2. *. Float.pi) *. 0.5 +. 0.5) *. 255.) in
-    let fgreen = int_of_float ((sin (f *. 2. *. Float.pi +. 2.094) *. 0.5 +. 0.5) *. 255.) in
-    let fblue  = int_of_float ((sin (f *. 2. *. Float.pi +. 4.188) *. 0.5 +. 0.5) *. 255.) in
-    Int32.of_int (fred * 65536 + fgreen * 256 + fblue)
-    )
-
+  let color1 = 0x7f3b8f (* Pastel purple *)
+  and color2 = 0x80cfcf (* Pastel cyan *) in
+  
+  Array.init size (fun index ->
+    let ratio = float_of_int index /. float_of_int (size - 1) in
+      
+    let red1 = (color1 / 65536) land 0xFF in
+    let green1 = (color1 / 256)  land 0xFF in
+    let blue1 = color1 land 0xFF in
+      
+    let red2 = (color2 / 65536) land 0xFF in
+    let green2 = (color2 / 256)  land 0xFF in
+    let blue2 = color2 land 0xFF in
+      
+    let red = int_of_float (float red1 +. (float (red2 - red1) *. ratio)) in
+    let green = int_of_float (float green1 +. (float (green2 - green1) *. ratio)) in
+    let blue = int_of_float (float blue1 +. (float (blue2 - blue1) *. ratio)) in
+      
+    Int32.of_int (red * 65536 + green * 256 + blue)
+    )  
+     
 let generate_microsoft_vga_palette () : t =
+  (* This palette is by SZIEBERTH Ádám, found on Lospec:
+     https://lospec.com/palette-list/microsoft-vga
+     Renamed here to match the original name: "MICROSOFT VGA Palette". *)
    let colors = [
     0x000000; 0x800000; 0x008000; 0x808000;
     0x000080; 0x800080; 0x008080; 0xc0c0c0;
@@ -48,7 +64,10 @@ let generate_classic_vga_palette () : t =
   ] in
    of_list colors
 
-let generate_sweet16_palette () : t =
+let generate_sweetie16_palette () : t =
+  (* This palette is by GrafxKid, found on Lospec:
+     https://lospec.com/palette-list/sweetie-16
+     Renamed here to match the original name: "Sweetie 16". *)
   let colors = [
     0x1a1c2c; 0x5d275d; 0xb13e53; 0xef7d57; 
     0xffcd75; 0xa7f070; 0x38b764; 0x257179; 

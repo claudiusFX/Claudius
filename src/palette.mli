@@ -25,8 +25,9 @@ val generate_classic_vga_palette : unit -> t
 (** [generate_classic_vga_palette ()] returns the classic IBM VGA 16-color palette,
     based on traditional values. *)
 
-val generate_sweet16_palette : unit -> t
-    (** [generate_sweet16_palette ()] returns the Sweet16 color palette as defined by the widely recognized Lospec palette. *) 
+val generate_sweetie16_palette : unit -> t
+    (** [generate_sweet16_palette ()] returns the Sweet16 color palette as defined by the widely recognized Lospec palette  by GrafxKid, found on Lospec:
+     https://lospec.com/palette-list/sweetie-16*) 
 
 val generate_mac_palette : unit -> t
 (** [generate_mac_palette ()] returns the Macintosh 16-color palette,
