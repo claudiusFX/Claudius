@@ -50,17 +50,14 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
 
   let s = match make_full with
   | false -> s
-  | true -> (
-    let w, h = Screen.dimensions s
-    and p = Screen.palette s in
-    match (Screen.font s) with
-    | None -> Screen.create w h 1 p
-    | Some f -> Screen.create_with_font w h 1 f p
-  )
+  | true ->
+      let w, h = Screen.dimensions s and p = Screen.palette s in
+      (match Screen.font s with
+       | None -> Screen.create w h 1 p
+       | Some f -> Screen.create_with_font w h 1 f p)
   in
 
-  let width, height = Screen.dimensions s
-  and scale = Screen.scale s in
+  let width, height = Screen.dimensions s and scale = Screen.scale s in
 
   match sdl_init (width * scale) (height * scale) title make_full with
   | Error (`Msg e) -> Sdl.log "Init error: %s" e; exit 1
@@ -79,49 +76,38 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
 
       let e = Sdl.Event.create () in
 
-      let rec loop (t : int) (prev_buffer : Framebuffer.t) (keys : KeyCodeSet.t) last_t = (
-
+      let rec loop (t : int) (prev_buffer : Framebuffer.t) (keys : KeyCodeSet.t) last_t =
         let now = Sdl.get_ticks () in
-        let diff = Int32.(sub (of_int(1000 / 60)) (sub now last_t)) in
-        if Int32.(compare diff zero) > 0 then (
-          Sdl.delay diff
-        );
+        let diff = Int32.(sub (of_int (1000 / 60)) (sub now last_t)) in
+        if Int32.(compare diff zero) > 0 then Sdl.delay diff;
 
         let updated_buffer = tick t s prev_buffer keys in
 
-        if updated_buffer != prev_buffer then (
+        if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
           framebuffer_to_bigarray s updated_buffer bitmap;
-          match render_texture r texture s bitmap with
-          | Error (`Msg e) -> Sdl.log "Boot error: %s" e
-          | Ok () -> ()
-        ) else if Framebuffer.is_dirty updated_buffer then (
-          framebuffer_to_bigarray s updated_buffer bitmap;
-          match render_texture r texture s bitmap with
-          | Error (`Msg e) -> Sdl.log "Boot error: %s" e
-          | Ok () -> ();
+          (match render_texture r texture s bitmap with
+           | Error (`Msg e) -> Sdl.log "Boot error: %s" e
+           | Ok () -> ());
           Framebuffer.clear_dirty updated_buffer
         );
 
         let exit, keys =
-        match Sdl.poll_event (Some e) with
-        | true -> (
-          match Sdl.Event.(enum (get e typ)) with
-          | `Quit -> (true, keys)
-          | `Key_down -> 
-              let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-              (false, KeyCodeSet.add key keys)
-          | `Key_up -> 
-            let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-            (false, KeyCodeSet.remove key keys)
-          | _ -> (false, keys)
-        )
-        | false -> (false, keys) in
-        match exit with
-        | true -> ()
-        | false -> loop (t + 1) updated_buffer keys now
-      ) in loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
-
-
+          match Sdl.poll_event (Some e) with
+          | true ->
+              (match Sdl.Event.(enum (get e typ)) with
+               | `Quit -> (true, keys)
+               | `Key_down ->
+                   let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+                   (false, KeyCodeSet.add key keys)
+               | `Key_up ->
+                   let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+                   (false, KeyCodeSet.remove key keys)
+               | _ -> (false, keys))
+          | false -> (false, keys)
+        in
+        if exit then () else loop (t + 1) updated_buffer keys now
+      in
+      loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
       Sdl.destroy_texture texture;
       Sdl.destroy_renderer r;
       Sdl.destroy_window w;

@@ -162,5 +162,10 @@ val to_array: t -> int array array
 (** {2 Dirty-bit support} *)
 
 val is_dirty: t -> bool
+(** [is_dirty framebuffer] returns [true] if the framebuffer has been marked as 'dirty'. *)
+
 val set_dirty: t -> unit
+(** [set_dirty framebuffer] marks the framebuffer as dirty. *)
+
 val clear_dirty: t -> unit
+(** [clear_dirty framebuffer] resets the dirty bit to false. *)
