@@ -71,6 +71,53 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
       done
   done
 
+
+  let draw_ellipse (x : int) (y : int) (a : float) (b : float) (col : int) (buffer : t) =
+    let fx = Float.of_int x
+    and fy = Float.of_int y in
+  
+    
+    let perimeter = 2.0 *. Float.pi *. sqrt ((a *. a +. b *. b) /. 2.0) in
+    let steps = max 50 (Int.of_float (perimeter /. 1.02)) in  
+  
+    for i = 0 to steps do
+      let rad = (Float.of_int i /. Float.of_int steps) *. 2.0 *. Float.pi in
+      let xw = a *. cos rad in
+      let yw = b *. sin rad in
+  
+      pixel_write (Int.of_float (fx +. xw)) (Int.of_float (fy +. yw)) col buffer;
+    done
+  
+  
+  let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : t) =
+    let fx = Float.of_int x and fy = Float.of_int y in
+    let my = Float.of_int ((Array.length buffer) - 1)
+    and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
+    
+    let pminy = fy -. ry
+    and pmaxy = fy +. ry in
+    let miny = if (pminy < 0.) then 0. else pminy
+    and maxy = if (pmaxy > my) then my else pmaxy in
+    
+    for yi = (Int.of_float miny) to (Int.of_float maxy) do
+      let row = buffer.(yi) in
+      let dy = Float.of_int (yi - y) in
+      
+      let term = 1. -. ((dy *. dy) /. (ry *. ry)) in
+      if term >= 0. then
+        let xw = rx *. sqrt(term) in
+        
+        let pminx = fx -. xw
+        and pmaxx = fx +. xw in
+        let minx = if (pminx < 0.) then 0. else pminx
+        and maxx = if (pmaxx > mx) then mx else pmaxx in
+        
+        if (maxx > 0.0) && (minx < mx) then
+          for xi = (Int.of_float minx) to (Int.of_float maxx) do
+            row.(xi) <- col
+          done
+      done
+
 let draw_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) (col : int) (buffer : t) =
   let dx = abs (x1 - x0)
   and sx = if x0 < x1 then 1 else -1
