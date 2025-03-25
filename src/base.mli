@@ -9,7 +9,7 @@ module PlatformKey : module type of Keysdl
 type boot_func = Screen.t -> Framebuffer.t
 (** Function called once a start of run *)
 
-type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Framebuffer.t
+type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Mouse.t option -> Framebuffer.t
 (** Function called once a frame during run *)
 
 val run: string -> boot_func option -> tick_func -> Screen.t -> unit
