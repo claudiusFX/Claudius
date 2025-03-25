@@ -20,28 +20,29 @@ let generate_plasma_palette (size : int) : t =
     Int32.of_int (((int_of_float fred) * 65536) + ((int_of_float fgreen) * 256) + (int_of_float fblue))
   )
   
-let generate_vapourwave_palette (size : int) : t =
+let generate_linear_palette (color1 : int) (color2 : int) (size : int) : t =
   if size <= 0 then raise (Invalid_argument "Palette size must not be zero negative");
-  let color1 = 0x7f3b8f (* Pastel purple *)
-  and color2 = 0x80cfcf (* Pastel cyan *) in
-  
+  let red1   = (color1 / 65536) land 0xFF in
+  let green1 = (color1 / 256)  land 0xFF in
+  let blue1  = color1 land 0xFF in
+
+  let red2   = (color2 / 65536) land 0xFF in
+  let green2 = (color2 / 256)   land 0xFF in
+  let blue2  = color2 land 0xFF in
   Array.init size (fun index ->
     let ratio = float_of_int index /. float_of_int (size - 1) in
-      
-    let red1 = (color1 / 65536) land 0xFF in
-    let green1 = (color1 / 256)  land 0xFF in
-    let blue1 = color1 land 0xFF in
-      
-    let red2 = (color2 / 65536) land 0xFF in
-    let green2 = (color2 / 256)  land 0xFF in
-    let blue2 = color2 land 0xFF in
-      
-    let red = int_of_float (float red1 +. (float (red2 - red1) *. ratio)) in
+
+    let red   = int_of_float (float red1   +. (float (red2 - red1)   *. ratio)) in
     let green = int_of_float (float green1 +. (float (green2 - green1) *. ratio)) in
-    let blue = int_of_float (float blue1 +. (float (blue2 - blue1) *. ratio)) in
-      
-    Int32.of_int (red * 65536 + green * 256 + blue)
-    )  
+    let blue  = int_of_float (float blue1  +. (float (blue2 - blue1)  *. ratio)) in
+
+    Int32.of_int ((red * 65536) lor (green * 256) lor blue)
+  )
+
+let generate_vapourwave_palette (size : int) : t =
+  let pastel_purple = 0x7f3b8f in  (* Pastel purple *)
+  let pastel_cyan   = 0x80cfcf in  (* Pastel cyan *)
+  generate_linear_palette pastel_purple pastel_cyan size 
      
 let generate_microsoft_vga_palette () : t =
   (* This palette is by SZIEBERTH Ádám, found on Lospec:
@@ -107,6 +108,9 @@ let load_tic80_palette (raw : string) : t =
     chunks_to_colors strchunks
   else
     raise (Invalid_argument "Palette size must not be zero or negative")
+
+let load_lospec_palette (raw: string): t =
+
 
 let size (palette : t) : int =
     Array.length palette

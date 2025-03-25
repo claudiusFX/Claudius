@@ -11,11 +11,16 @@ val generate_mono_palette: int -> t
 (** [generate_mono_palette size] Will generate a grayscale palette going from black to white with [size] number of entries. Raises
     [Invalid_argument] if palette size is zero or less. *)
 
-val generate_plasma_palette: int -> t
-(** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raisesif palette size is zero or less. *)
-
-val generate_vapourwave_palette: int -> t
-(** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raisesif palette size is zero or less. *)
+val generate_linear_palette : int -> int -> int -> t
+(** [generate_linear_palette color1 color2 size] returns a palette (of type [t])
+that linearly interpolates between [color1] and [color2] over [size] entries.
+Raises [Invalid_argument] if [size] is less than or equal to zero. *)
+    
+val generate_vapourwave_palette : int -> t
+ (** [generate_vapourwave_palette size] returns a vapourwave palette with [size] entries.
+ Internally, it calls [generate_linear_palette] using pastel purple (0x7f3b8f) 
+ and pastel cyan (0x80cfcf) as endpoints.
+ Raises [Invalid_argument] if [size] is less than or equal to zero. *)
 
 val generate_microsoft_vga_palette : unit -> t
 (** [generate_microsoft_vga_palette ()] returns the Microsoft VGA 16-color palette,
