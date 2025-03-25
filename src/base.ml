@@ -7,9 +7,10 @@ module KeyCodeSet = Set.Make(struct
 end)
 
 module PlatformKey = Keysdl
+module PlatformMouse = Mousesdl
 
 type boot_func = Screen.t -> Framebuffer.t
-type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Framebuffer.t
+type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Mouse.t option -> Framebuffer.t
 
 type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
@@ -75,13 +76,14 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       in
 
       let e = Sdl.Event.create () in
+      let mouse = Mouse.create () in
 
-      let rec loop (t : int) (prev_buffer : Framebuffer.t) (keys : KeyCodeSet.t) last_t =
+      let rec loop (t : int) (prev_buffer : Framebuffer.t) (keys : KeyCodeSet.t) (mouse : Mouse.t) last_t = (
         let now = Sdl.get_ticks () in
         let diff = Int32.(sub (of_int (1000 / 60)) (sub now last_t)) in
         if Int32.(compare diff zero) > 0 then Sdl.delay diff;
 
-        let updated_buffer = tick t s prev_buffer keys in
+        let updated_buffer = tick t s prev_buffer keys (Some mouse) in
 
         if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
           framebuffer_to_bigarray s updated_buffer bitmap;
@@ -91,23 +93,32 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
           Framebuffer.clear_dirty updated_buffer
         );
 
-        let exit, keys =
+        match render_texture r texture s bitmap with
+        | Error (`Msg e) -> Sdl.log "Boot error: %s" e
+        | Ok () -> (
+          let exit, keys, mouse =
           match Sdl.poll_event (Some e) with
-          | true ->
-              (match Sdl.Event.(enum (get e typ)) with
-               | `Quit -> (true, keys)
-               | `Key_down ->
-                   let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-                   (false, KeyCodeSet.add key keys)
-               | `Key_up ->
-                   let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-                   (false, KeyCodeSet.remove key keys)
-               | _ -> (false, keys))
-          | false -> (false, keys)
-        in
-        if exit then () else loop (t + 1) updated_buffer keys now
-      in
-      loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
+          | true -> (
+            match Sdl.Event.(enum (get e typ)) with
+            | `Quit -> (true, keys, mouse)
+            | `Key_down -> 
+                let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+                (false, KeyCodeSet.add key keys, mouse)
+            | `Key_up -> 
+              let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+              (false, KeyCodeSet.remove key keys, mouse)
+            | `Mouse_button_down | `Mouse_button_up | `Mouse_motion | `Mouse_wheel ->
+                let mouse = PlatformMouse.handle_event e mouse in
+                (false, keys, mouse)
+            | _ -> (false, keys, mouse)
+          )
+          | false -> (false, keys, mouse) in
+          match exit with
+          | true -> ()
+          | false -> loop (t + 1) updated_buffer keys mouse now
+        )
+      ) in loop 0 initial_buffer KeyCodeSet.empty mouse Int32.zero;
+
       Sdl.destroy_texture texture;
       Sdl.destroy_renderer r;
       Sdl.destroy_window w;
