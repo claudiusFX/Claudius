@@ -418,12 +418,12 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
 
 (* ----- *)
 
-let draw_char (x : int) (y : int) (f : Font.t) (c : char) (col : int) (buffer : t) : int =
-  match Font.glyph_of_char f (Uchar.of_char c) with
+let draw_char (x : int) (y : int) (f : Fontv2.t) (c : char) (col : int) (buffer : t) : int =
+  match Fontv2.glyph_of_char f (Uchar.of_char c) with
   | None -> 0
   | Some glyph -> (
-    let gw, gh, _, _ = Font.Glyph.dimensions glyph in
-    let bmp = Font.Glyph.bitmap glyph in
+    let gw, gh, _, _ = Fontv2.glyph_dimensions glyph in
+    let bmp = Fontv2.glyph_bitmap glyph in
     let bytes_per_line = (Bytes.length bmp) / gh in
     for h = 0 to (gh - 1) do
       for w = 0 to (bytes_per_line - 1) do
@@ -444,7 +444,7 @@ let draw_char (x : int) (y : int) (f : Font.t) (c : char) (col : int) (buffer : 
     done; gw
   )
 
-let draw_string (x : int) (y : int) (f : Font.t) (s : string) (col : int) (buffer : t) =
+let draw_string (x : int) (y : int) (f : Fontv2.t) (s : string) (col : int) (buffer : t) =
   let sl = List.init (String.length s) (String.get s) in
   let rec loop offset remaining =
     match remaining with
