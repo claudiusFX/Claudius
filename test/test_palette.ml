@@ -39,8 +39,9 @@ let test_generate_vapour_wave_creation _ =
   let pastel_cyan   = 0x80cfcf in
   let first_color = Int32.to_int (Palette.index_to_rgb pal 0) in
   let last_color  = Int32.to_int (Palette.index_to_rgb pal (size - 1)) in
-  assert_equal ~msg:"First color should be pastel purple" pastel_purple first_color
+  assert_equal ~msg:"First color should be pastel purple" pastel_purple first_color;
   assert_equal ~msg:"Last color should be pastel cyan" pastel_cyan last_color
+  
   
 let test_generate_classic_vga_palette_creation _ =
   let pal = Palette.generate_classic_vga_palette () in
