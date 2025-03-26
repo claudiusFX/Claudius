@@ -50,11 +50,11 @@ val filled_circle: int -> int -> float -> int -> t -> unit
     in the specified [colour] into [framebuffer]. *)
 
 val draw_ellipse: int -> int -> float -> float -> int -> t -> unit
-(** [draw_ellipse x0 y0 a b colour framebuffer] Draws the outline of an ellipse centred at ([x0], [y0]) with horizontal radius [rx] and vertical radius [ry]
+(** [draw_ellipse x0 y0 a b colour framebuffer] Draws the outline of an ellipse centred at ([x0], [y0]) with horizontal radius [a] and vertical radius [b]
     in the specified [colour] into [framebuffer]. *)
 
 val filled_ellipse: int -> int -> float -> float -> int -> t -> unit
-(** [filled_ellipse x0 y0 a b colour framebuffer] Draws a filled ellipse centred at ([x0], [y0]) with horizontal radius [rx] and vertical radius [ry]
+(** [filled_ellipse x0 y0 a b colour framebuffer] Draws a filled ellipse centred at ([x0], [y0]) with horizontal radius [a] and vertical radius [b]
     in the specified [colour] into [framebuffer]. *) 
 
 val draw_rect: int -> int -> int -> int -> int -> t -> unit

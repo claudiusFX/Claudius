@@ -71,23 +71,63 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
       done
   done
 
+let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buffer : t) =
+  let width = Array.length buffer.(0) in
+  let height = Array.length buffer in
 
-  let draw_ellipse (x : int) (y : int) (a : float) (b : float) (col : int) (buffer : t) =
-    let fx = Float.of_int x
-    and fy = Float.of_int y in
+  let set_pixel x y =
+    if x >= 0 && y >= 0 && x < width && y < height then
+      buffer.(y).(x) <- col
+  in
   
-    
-    let perimeter = 2.0 *. Float.pi *. sqrt ((a *. a +. b *. b) /. 2.0) in
-    let steps = max 50 (Int.of_float (perimeter /. 1.02)) in  
+  let x = ref 0 in
+  let y = ref (int_of_float b) in
   
-    for i = 0 to steps do
-      let rad = (Float.of_int i /. Float.of_int steps) *. 2.0 *. Float.pi in
-      let xw = a *. cos rad in
-      let yw = b *. sin rad in
+  let d1 = ref ((b *. b) -. (a *. a *. b) +. (0.25 *. a *. a)) in
+  let dx = ref (2. *. b *. b *. float_of_int !x) in
+  let dy = ref (2. *. a *. a *. float_of_int !y) in
   
-      pixel_write (Int.of_float (fx +. xw)) (Int.of_float (fy +. yw)) col buffer;
-    done
+  while !dx < !dy do
+    set_pixel (x0 + !x) (y0 + !y);
+    set_pixel (x0 - !x) (y0 + !y);
+    set_pixel (x0 + !x) (y0 - !y);
+    set_pixel (x0 - !x) (y0 - !y);
   
+    if !d1 < 0. then begin
+      incr x;
+      dx := !dx +. (2. *. b *. b);
+      d1 := !d1 +. !dx +. (b *. b);
+    end else begin
+      incr x;
+      decr y;
+      dx := !dx +. (2. *. b *. b);
+      dy := !dy -. (2. *. a *. a);
+      d1 := !d1 +. !dx -. !dy +. (b *. b);
+    end
+  done;
+  
+  let d2 = ref ((b *. b *. float_of_int (!x + 1) ** 2.) +.
+                (a *. a *. float_of_int (!y - 1) ** 2.) -.
+                (a *. a *. b *. b)) in
+  
+  while !y >= 0 do
+    set_pixel (x0 + !x) (y0 + !y);
+    set_pixel (x0 - !x) (y0 + !y);
+    set_pixel (x0 + !x) (y0 - !y);
+    set_pixel (x0 - !x) (y0 - !y);
+  
+    if !d2 > 0. then begin
+      decr y;
+      dy := !dy -. (2. *. a *. a);
+      d2 := !d2 +. (a *. a) -. !dy;
+    end else begin
+      decr y;
+      incr x;
+      dx := !dx +. (2. *. b *. b);
+      dy := !dy -. (2. *. a *. a);
+      d2 := !d2 +. !dx -. !dy +. (a *. a);
+    end
+  done
   
   let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : t) =
     let fx = Float.of_int x and fy = Float.of_int y in
@@ -539,6 +579,8 @@ let render (buffer : t) (draw : Primitives.t list) =
     match prim with
     | Primitives.Circle (point, r, col) -> draw_circle point.x point. y r col buffer
     | Primitives.FilledCircle (point, r, col) -> filled_circle point.x point.y r col buffer
+    | Primitives.Ellipse (point, a, b, col) -> draw_ellipse point.x point.y a b col buffer
+    | Primitives.FilledEllipse (point, a, b, col) -> filled_ellipse point.x point.y a b col buffer
     | Primitives.Line (p1, p2, col) -> draw_line p1.x p1.y p2.x p2.y col buffer
     | Primitives.Pixel (p, col) -> pixel_write p.x p.y col buffer
     | Primitives.Polygon (plist, col) -> draw_polygon (List.map (fun (p : Primitives.point) -> (p.x, p.y)) plist) col buffer
