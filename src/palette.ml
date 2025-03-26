@@ -53,7 +53,7 @@ let generate_microsoft_vga_palette () : t =
   (* This palette is by SZIEBERTH Ádám, found on Lospec:
      https://lospec.com/palette-list/microsoft-vga
      Renamed here to match the original name: "MICROSOFT VGA Palette". *)
-   let colors = [
+   Array.of_list [
     0x000000; 0x800000; 0x008000; 0x808000;
     0x000080; 0x800080; 0x008080; 0xc0c0c0;
     0x808080; 0xff0000; 0x00ff00; 0xffff00;
@@ -62,7 +62,7 @@ let generate_microsoft_vga_palette () : t =
   of_list colors
 
 let generate_classic_vga_palette () : t =
-  let colors = [
+  Array.of_list [
     0x000000; 0x0000AA; 0x00AA00; 0x00AAAA;
     0xAA0000; 0xAA00AA; 0xAA5500; 0xAAAAAA;
     0x555555; 0x5555FF; 0x55FF55; 0x55FFFF;
@@ -74,7 +74,7 @@ let generate_sweetie16_palette () : t =
   (* This palette is by GrafxKid, found on Lospec:
      https://lospec.com/palette-list/sweetie-16
      Renamed here to match the original name: "Sweetie 16". *)
-  let colors = [
+  Array.of_list [
     0x1a1c2c; 0x5d275d; 0xb13e53; 0xef7d57; 
     0xffcd75; 0xa7f070; 0x38b764; 0x257179; 
     0x29366f; 0x3b5dc9; 0x41a6f6; 0x73eff7; 
@@ -83,7 +83,7 @@ let generate_sweetie16_palette () : t =
   of_list colors
 
 let generate_mac_palette () : t =
-  let colors = [
+  Array.of_list [
     0xffffff; 0xfcf400; 0xff6400; 0xdd0202;
     0xf00285; 0x4600a5; 0x0000d5; 0x00aee9;
     0x1ab90c; 0x006407; 0x572800; 0x917135;
