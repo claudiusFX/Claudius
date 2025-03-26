@@ -30,7 +30,6 @@ let test_generate_linear_palette _ =
   assert_equal ~msg:"First color should be color1" color1 first_color;
   let last_color = Int32.to_int (Palette.index_to_rgb pal (size - 1)) in
   assert_equal ~msg:"Last color should be color2" color2 last_color
-;;
   
 let test_generate_vapour_wave_creation _ =
   let size = 16 in
