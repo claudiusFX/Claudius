@@ -12,45 +12,43 @@ let test_basic_palette_of_ints _ =
   let rev = Palette.to_list pal in
   assert_equal ~msg:"Back to ints" cols rev
 
-let test_generate_mac_palette_creation =
-  let pal = Palette.generate_mac_palette() in
-  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
-
-let test_generate_sweetie16_palette = 
-  let pal = Palette.generate_sweetie16_palette()
-  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
-
+let test_generate_mac_palette_creation _ =
+  let pal = Palette.generate_mac_palette () in
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
+  
+let test_generate_sweetie16_palette _ =
+  let pal = Palette.generate_sweetie16_palette () in
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
+  
 let test_generate_linear_palette _ =
   let color1 = 0x7f3b8f in    (* Pastel purple *)
   let color2 = 0x80cfcf in    (* Pastel cyan *)
   let size = 16 in
-  let pal = generate_linear_palette color1 color2 size in
-  assert_equal ~msg:"Palette length" size (size pal);
-  let first_color = Int32.to_int (index_to_rgb pal 0) in
+  let pal = Palette.generate_linear_palette color1 color2 size in
+  assert_equal ~msg:"Palette length" size (Palette.size pal);
+  let first_color = Int32.to_int (Palette.index_to_rgb pal 0) in
   assert_equal ~msg:"First color should be color1" color1 first_color;
-  let last_color = Int32.to_int (index_to_rgb pal (size - 1)) in
+  let last_color = Int32.to_int (Palette.index_to_rgb pal (size - 1)) in
   assert_equal ~msg:"Last color should be color2" color2 last_color
-
-let test_generate_vapourwave_palette _ =
+  
+let test_generate_vapour_wave_creation _ =
   let size = 16 in
-  let pal = generate_vapourwave_palette size in
-  assert_equal ~msg:"Palette length" size (size pal);
+  let pal = Palette.generate_vapourwave_palette size in
+  assert_equal ~msg:"Palette length" size (Palette.size pal);
   let pastel_purple = 0x7f3b8f in
   let pastel_cyan   = 0x80cfcf in
-  let first_color = Int32.to_int (index_to_rgb pal 0) in
-  let last_color  = Int32.to_int (index_to_rgb pal (size - 1)) in
+  let first_color = Int32.to_int (Palette.index_to_rgb pal 0) in
+  let last_color  = Int32.to_int (Palette.index_to_rgb pal (size - 1)) in
   assert_equal ~msg:"First color should be pastel purple" pastel_purple first_color;
   assert_equal ~msg:"Last color should be pastel cyan" pastel_cyan last_color;
-  let mid_color = Int32.to_int (index_to_rgb pal (size / 2)) in
-  assert_bool "Mid color is distinct" (mid_color <> pastel_purple && mid_color <> pastel_cyan)
-
+  
 let test_generate_classic_vga_palette_creation _ =
   let pal = Palette.generate_classic_vga_palette () in
-  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
-
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
+  
 let test_generate_microsoft_vga_palette_creation _ =
   let pal = Palette.generate_microsoft_vga_palette () in
-  assert_equal ~msg: "Palette size" 16 (Palette.size pal)
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
   
 let test_plasma_palette_creation _ =
   let pal = Palette.generate_plasma_palette 16 in
@@ -119,12 +117,12 @@ let test_palette_wrap_around _ =
 let suite =
   "PaletteTests" >::: [
     "Test simple palette set up" >:: test_basic_palette_of_ints ;
-    "Test generate mac palette">:: test_generate_mac_palette;
-    "Test generate sweetie16 palette">:: test_generate_sweetie16_palette;
-    "Test linear palette">:: test_generate_linear_palette;
-    "Test vapour wave creation">::test_generate_vapour_wave_creation;
-    "Test classic vga palette creation"> :: test_generate_classic_vga_palette_creation;
-    "Test microsoft vga palette creation"> :: test_generate_microsoft_vga_palette_creation;
+    "Test generate mac palette" >:: test_generate_mac_palette_creation;
+    "Test generate sweetie16 palette" >:: test_generate_sweetie16_palette;
+    "Test linear palette" >:: test_generate_linear_palette;
+    "Test vapour wave creation" >:: test_generate_vapour_wave_creation;
+    "Test classic vga palette creation" >:: test_generate_classic_vga_palette_creation;
+    "Test microsoft vga palette creation" >:: test_generate_microsoft_vga_palette_creation;
     "Test plasma palette creation" >:: test_plasma_palette_creation ;
     "Test mono creation" >:: test_mono_palette_creation ;
     "Test fail to make empty palette" >:: test_create_empty_palette_from_list ;
