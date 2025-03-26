@@ -1,6 +1,5 @@
 type t = int32 array
 
-
 let generate_mono_palette (size : int) : t =
   if size <= 0 then raise (Invalid_argument "Palette size must not be zero or negative");
   Array.init size (fun (index : int): int32 ->
@@ -42,8 +41,14 @@ let generate_linear_palette (color1 : int) (color2 : int) (size : int) : t =
 let generate_vapourwave_palette (size : int) : t =
   let pastel_purple = 0x7f3b8f in  (* Pastel purple *)
   let pastel_cyan   = 0x80cfcf in  (* Pastel cyan *)
-  generate_linear_palette pastel_purple pastel_cyan size 
-     
+  generate_linear_palette pastel_purple pastel_cyan size
+
+let of_list (rgb_list : int list) : t =
+  if List.length rgb_list > 0 then
+    Array.of_list (List.map Int32.of_int rgb_list)
+    else
+      raise (Invalid_argument "Palette size must not be zero or negative")
+    
 let generate_microsoft_vga_palette () : t =
   (* This palette is by SZIEBERTH Ádám, found on Lospec:
      https://lospec.com/palette-list/microsoft-vga
@@ -119,9 +124,3 @@ let index_to_rgb (palette : t) (index : int) : int32 =
 
 let to_list (palette : t) : int list =
     List.map Int32.to_int (Array.to_list palette)
-
-let of_list (rgb_list : int list) : t =
-  if List.length rgb_list > 0 then
-    Array.of_list (List.map Int32.of_int rgb_list)
-  else
-    raise (Invalid_argument "Palette size must not be zero or negative")
