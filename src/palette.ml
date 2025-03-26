@@ -74,7 +74,7 @@ let generate_sweetie16_palette () : t =
     0xffcd75; 0xa7f070; 0x38b764; 0x257179; 
     0x29366f; 0x3b5dc9; 0x41a6f6; 0x73eff7; 
     0xf4f4f4; 0x94b0c2; 0x566c86; 0x333c57;
-  ]
+  ] in
   of_list colors
 
 let generate_mac_palette () : t =
@@ -83,7 +83,7 @@ let generate_mac_palette () : t =
     0xf00285; 0x4600a5; 0x0000d5; 0x00aee9;
     0x1ab90c; 0x006407; 0x572800; 0x917135;
     0xc1c1c1; 0x818181; 0x3e3e3e; 0x000000;
-  ]
+  ] in
   of_list colors
 
 let string_to_chunks (x : string) (size : int) : string list =
