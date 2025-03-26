@@ -98,47 +98,46 @@ let test_draw_filled_circle_with_primitive _ =
 let test_draw_ellipse_direct _ =
   let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
   assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
-  Framebuffer.draw_ellipse 5 5 4.0 2.0 1 fb;
+  Framebuffer.draw_ellipse 5 5 3.0 2.0 1 fb;
   assert_equal ~msg:"after center" (Some 0) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge horizontal" (Some 1) (Framebuffer.pixel_read 9 5 fb);
-  assert_equal ~msg:"after edge vertical" (Some 1) (Framebuffer.pixel_read 5 3 fb)
+  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
 
 let test_draw_ellipse_direct_off_framebuffer _ =
   let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
   assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
-  Framebuffer.draw_ellipse (-1) (-1) 3.0 2.0 1 fb;
-  assert_equal ~msg:"after" (Some 1) (Framebuffer.pixel_read 1 1 fb)
+  Framebuffer.draw_ellipse (-5) (-5) 4.0 3.0 1 fb;
+  assert_equal ~msg:"after" (Some 0) (Framebuffer.pixel_read 0 0 fb) 
 
 let test_draw_ellipse_with_primitive _ =
   let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  let prim = Primitives.Ellipse ({x = 5; y = 5}, 4.0, 2.0, 1) in
+  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let prim = Primitives.Ellipse ({x = 5; y = 5}, 3.0, 2.0, 1) in
   Framebuffer.render fb [prim];
-  assert_equal ~msg:"after edge horizontal" (Some 1) (Framebuffer.pixel_read 9 5 fb);
-  assert_equal ~msg:"after edge vertical" (Some 1) (Framebuffer.pixel_read 5 3 fb)
+  assert_equal ~msg:"after center" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
 
-(* Filled Ellipse *)
+(* Filled ellipse *)
 
 let test_draw_filled_ellipse_direct _ =
   let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  Framebuffer.filled_ellipse 5 5 4.0 2.0 1 fb;
+  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  Framebuffer.filled_ellipse 5 5 3.0 2.0 1 fb;
   assert_equal ~msg:"after center" (Some 1) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge horizontal" (Some 1) (Framebuffer.pixel_read 9 5 fb);
-  assert_equal ~msg:"after edge vertical" (Some 1) (Framebuffer.pixel_read 5 3 fb)
+  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
 
 let test_draw_filled_ellipse_direct_off_framebuffer _ =
   let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
   assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
-  Framebuffer.filled_ellipse (-1) (-1) 3.0 2.0 1 fb;
+  Framebuffer.filled_ellipse 0 0 4.0 3.0 1 fb;
   assert_equal ~msg:"after" (Some 1) (Framebuffer.pixel_read 1 1 fb)
 
 let test_draw_filled_ellipse_with_primitive _ =
   let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  let prim = Primitives.FilledEllipse ({x = 5; y = 5}, 4.0, 2.0, 1) in
+  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let prim = Primitives.FilledEllipse ({x = 5; y = 5}, 3.0, 2.0, 1) in
   Framebuffer.render fb [prim];
   assert_equal ~msg:"after center" (Some 1) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge horizontal" (Some 1) (Framebuffer.pixel_read 9 5 fb);
-  assert_equal ~msg:"after edge vertical" (Some 1) (Framebuffer.pixel_read 5 3 fb)
-
+  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
 
 
 
