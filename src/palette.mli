@@ -11,6 +11,10 @@ val generate_mono_palette: int -> t
 (** [generate_mono_palette size] Will generate a grayscale palette going from black to white with [size] number of entries. Raises
     [Invalid_argument] if palette size is zero or less. *)
 
+val generate_plasma_palette: int -> t
+(** [generate_plasma_palette size] Will generate a plasma colour palette with [size] number of entries. Raises
+[Invalid_argument] if palette size is zero or less. *)        
+
 val generate_linear_palette : int -> int -> int -> t
 (** [generate_linear_palette color1 color2 size] returns a palette (of type [t])
 that linearly interpolates between [color1] and [color2] over [size] entries.
