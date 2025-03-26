@@ -109,9 +109,6 @@ let load_tic80_palette (raw : string) : t =
   else
     raise (Invalid_argument "Palette size must not be zero or negative")
 
-let load_lospec_palette (raw: string): t =
-
-
 let size (palette : t) : int =
     Array.length palette
 
