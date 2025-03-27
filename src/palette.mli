@@ -19,6 +19,10 @@ val load_tic80_palette: string -> t
 (** [load_tic80_palette str] Will take a string [str] of the form found in TIC80 save files and load it as a palette.Raises
     [Invalid_argument] if palette size is zero or less, or if the data string is not correct. *)
 
+val load_lospec_palette : string -> t
+(** [load_lospec_palette str] Loads a palette from a Lospec-style HEX string (with or without leading #).
+    Raises [Invalid_argument] if no valid colors are found. *)
+
 (** {1 Conversion} *)
 
 val to_list: t -> int list
