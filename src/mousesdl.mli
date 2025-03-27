@@ -20,4 +20,4 @@ val handle_mouse_wheel_event : Sdl.event -> t -> t
 (** Handle an SDL mouse wheel event and update the scroll state. *)
 
 val handle_event : Sdl.event -> t -> t 
-(** Process any SDL mouse-related event and update the mouse state. 
+(** Process any SDL mouse-related event and update the mouse state. *)
