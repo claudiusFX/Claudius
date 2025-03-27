@@ -23,7 +23,7 @@ let create () = {
   buttons = [(Left, false); (Middle, false); (Right, false)];
 }
 
-let clear t = {
+let clear_event t = {
   t with
   events = [];
 }
