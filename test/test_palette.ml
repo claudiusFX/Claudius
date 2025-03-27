@@ -14,11 +14,11 @@ let test_basic_palette_of_ints _ =
 
 let test_generate_mac_palette_creation _ =
   let pal = Palette.generate_mac_palette () in
-  assert_equal ~msg:"Palette size" 16 (Palette.size pal);
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
   
 let test_generate_sweetie16_palette _ =
   let pal = Palette.generate_sweetie16_palette () in
-  assert_equal ~msg:"Palette size" 16 (Palette.size pal);
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
   
 let test_generate_linear_palette _ =
   let color1 = 0x7f3b8f in    (* Pastel purple *)
@@ -46,11 +46,11 @@ let test_generate_vapour_wave_creation _ =
   
 let test_generate_classic_vga_palette_creation _ =
   let pal = Palette.generate_classic_vga_palette () in
-  assert_equal ~msg:"Palette size" 16 (Palette.size pal);
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
   
 let test_generate_microsoft_vga_palette_creation _ =
   let pal = Palette.generate_microsoft_vga_palette () in
-  assert_equal ~msg:"Palette size" 16 (Palette.size pal);
+  assert_equal ~msg:"Palette size" 16 (Palette.size pal)
   
 let test_plasma_palette_creation _ =
   let pal = Palette.generate_plasma_palette 16 in
