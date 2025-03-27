@@ -14,7 +14,7 @@ type event =
 type t
 
 val create : unit -> t
-val clear : t -> t
+val clear_event : t -> t
 val add_event : t -> event -> t
 val update_position : t -> (int * int) -> t
 val update_button : t -> button -> bool -> t
