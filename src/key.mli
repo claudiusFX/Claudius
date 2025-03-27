@@ -75,35 +75,35 @@ type t =
   | X
   | Y
   | Z
-  (** Alphabet keys (uppercase) *)
-
-  | A_lower
-  | B_lower
-  | C_lower
-  | D_lower
-  | E_lower
-  | F_lower
-  | G_lower
-  | H_lower
-  | I_lower
-  | J_lower
-  | K_lower
-  | L_lower
-  | M_lower
-  | N_lower
-  | O_lower
-  | P_lower
-  | Q_lower
-  | R_lower
-  | S_lower
-  | T_lower
-  | U_lower
-  | V_lower
-  | W_lower
-  | X_lower
-  | Y_lower
-  | Z_lower
   (** Alphabet keys (lowercase) *)
+
+  | A_upper
+  | B_upper
+  | C_upper
+  | D_upper
+  | E_upper
+  | F_upper
+  | G_upper
+  | H_upper
+  | I_upper
+  | J_upper
+  | K_upper
+  | L_upper
+  | M_upper
+  | N_upper
+  | O_upper
+  | P_upper
+  | Q_upper
+  | R_upper
+  | S_upper
+  | T_upper
+  | U_upper
+  | V_upper
+  | W_upper
+  | X_upper
+  | Y_upper
+  | Z_upper
+  (** Alphabet keys (uppercase) *)
 
   | Num0
   | Num1
