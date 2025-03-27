@@ -183,4 +183,3 @@ let to_backend_keycode (key: Key.t) : int =
 
   (* Unknown Key *)
   | Key.Unknown -> -1
-  | _ -> -1
