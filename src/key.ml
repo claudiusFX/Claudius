@@ -49,7 +49,7 @@ type t =
   | PrintScreen
   | Pause
 
-  (* Alphabet keys (uppercase) *)
+  (* Alphabet keys (lowercase) *)
   | A
   | B
   | C
@@ -76,34 +76,6 @@ type t =
   | X
   | Y
   | Z
-
-  (* Alphabet keys (lowercase) *)
-  | A_lower
-  | B_lower
-  | C_lower
-  | D_lower
-  | E_lower
-  | F_lower
-  | G_lower
-  | H_lower
-  | I_lower
-  | J_lower
-  | K_lower
-  | L_lower
-  | M_lower
-  | N_lower
-  | O_lower
-  | P_lower
-  | Q_lower
-  | R_lower
-  | S_lower
-  | T_lower
-  | U_lower
-  | V_lower
-  | W_lower
-  | X_lower
-  | Y_lower
-  | Z_lower
 
   (* Number keys *)
   | Num0

@@ -48,61 +48,33 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x40000046 -> Key.PrintScreen
   | 0x40000048 -> Key.Pause
 
-  (* Alphabet Keys (Uppercase) *)
-  | 0x00000041 -> Key.A
-  | 0x00000042 -> Key.B
-  | 0x00000043 -> Key.C
-  | 0x00000044 -> Key.D
-  | 0x00000045 -> Key.E
-  | 0x00000046 -> Key.F
-  | 0x00000047 -> Key.G
-  | 0x00000048 -> Key.H
-  | 0x00000049 -> Key.I
-  | 0x0000004A -> Key.J
-  | 0x0000004B -> Key.K
-  | 0x0000004C -> Key.L
-  | 0x0000004D -> Key.M
-  | 0x0000004E -> Key.N
-  | 0x0000004F -> Key.O
-  | 0x00000050 -> Key.P
-  | 0x00000051 -> Key.Q
-  | 0x00000052 -> Key.R
-  | 0x00000053 -> Key.S
-  | 0x00000054 -> Key.T
-  | 0x00000055 -> Key.U
-  | 0x00000056 -> Key.V
-  | 0x00000057 -> Key.W
-  | 0x00000058 -> Key.X
-  | 0x00000059 -> Key.Y
-  | 0x0000005A -> Key.Z
-
   (* Alphabet Keys (Lowercase) *)
-  | 0x00000061 -> Key.A_lower
-  | 0x00000062 -> Key.B_lower
-  | 0x00000063 -> Key.C_lower
-  | 0x00000064 -> Key.D_lower
-  | 0x00000065 -> Key.E_lower
-  | 0x00000066 -> Key.F_lower
-  | 0x00000067 -> Key.G_lower
-  | 0x00000068 -> Key.H_lower
-  | 0x00000069 -> Key.I_lower
-  | 0x0000006A -> Key.J_lower
-  | 0x0000006B -> Key.K_lower
-  | 0x0000006C -> Key.L_lower
-  | 0x0000006D -> Key.M_lower
-  | 0x0000006E -> Key.N_lower
-  | 0x0000006F -> Key.O_lower
-  | 0x00000070 -> Key.P_lower
-  | 0x00000071 -> Key.Q_lower
-  | 0x00000072 -> Key.R_lower
-  | 0x00000073 -> Key.S_lower
-  | 0x00000074 -> Key.T_lower
-  | 0x00000075 -> Key.U_lower
-  | 0x00000076 -> Key.V_lower
-  | 0x00000077 -> Key.W_lower
-  | 0x00000078 -> Key.X_lower
-  | 0x00000079 -> Key.Y_lower
-  | 0x0000007A -> Key.Z_lower
+  | 0x00000061 -> Key.A
+  | 0x00000062 -> Key.B
+  | 0x00000063 -> Key.C
+  | 0x00000064 -> Key.D
+  | 0x00000065 -> Key.E
+  | 0x00000066 -> Key.F
+  | 0x00000067 -> Key.G
+  | 0x00000068 -> Key.H
+  | 0x00000069 -> Key.I
+  | 0x0000006A -> Key.J
+  | 0x0000006B -> Key.K
+  | 0x0000006C -> Key.L
+  | 0x0000006D -> Key.M
+  | 0x0000006E -> Key.N
+  | 0x0000006F -> Key.O
+  | 0x00000070 -> Key.P
+  | 0x00000071 -> Key.Q
+  | 0x00000072 -> Key.R
+  | 0x00000073 -> Key.S
+  | 0x00000074 -> Key.T
+  | 0x00000075 -> Key.U
+  | 0x00000076 -> Key.V
+  | 0x00000077 -> Key.W
+  | 0x00000078 -> Key.X
+  | 0x00000079 -> Key.Y
+  | 0x0000007A -> Key.Z
 
   (* Number Keys *)
   | 0x00000030 -> Key.Num0
@@ -169,61 +141,33 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.PrintScreen -> 0x40000046
   | Key.Pause -> 0x40000048
 
-  (* Alphabet Keys (Uppercase) *)
-  | Key.A -> 0x00000041
-  | Key.B -> 0x00000042
-  | Key.C -> 0x00000043
-  | Key.D -> 0x00000044
-  | Key.E -> 0x00000045
-  | Key.F -> 0x00000046
-  | Key.G -> 0x00000047
-  | Key.H -> 0x00000048
-  | Key.I -> 0x00000049
-  | Key.J -> 0x0000004A
-  | Key.K -> 0x0000004B
-  | Key.L -> 0x0000004C
-  | Key.M -> 0x0000004D
-  | Key.N -> 0x0000004E
-  | Key.O -> 0x0000004F
-  | Key.P -> 0x00000050
-  | Key.Q -> 0x00000051
-  | Key.R -> 0x00000052
-  | Key.S -> 0x00000053
-  | Key.T -> 0x00000054
-  | Key.U -> 0x00000055
-  | Key.V -> 0x00000056
-  | Key.W -> 0x00000057
-  | Key.X -> 0x00000058
-  | Key.Y -> 0x00000059
-  | Key.Z -> 0x0000005A
-
   (* Alphabet Keys (Lowercase) *)
-  | Key.A_lower -> 0x00000061
-  | Key.B_lower -> 0x00000062
-  | Key.C_lower -> 0x00000063
-  | Key.D_lower -> 0x00000064
-  | Key.E_lower -> 0x00000065
-  | Key.F_lower -> 0x00000066
-  | Key.G_lower -> 0x00000067
-  | Key.H_lower -> 0x00000068
-  | Key.I_lower -> 0x00000069
-  | Key.J_lower -> 0x0000006A
-  | Key.K_lower -> 0x0000006B
-  | Key.L_lower -> 0x0000006C
-  | Key.M_lower -> 0x0000006D
-  | Key.N_lower -> 0x0000006E
-  | Key.O_lower -> 0x0000006F
-  | Key.P_lower -> 0x00000070
-  | Key.Q_lower -> 0x00000071
-  | Key.R_lower -> 0x00000072
-  | Key.S_lower -> 0x00000073
-  | Key.T_lower -> 0x00000074
-  | Key.U_lower -> 0x00000075
-  | Key.V_lower -> 0x00000076
-  | Key.W_lower -> 0x00000077
-  | Key.X_lower -> 0x00000078
-  | Key.Y_lower -> 0x00000079
-  | Key.Z_lower -> 0x0000007A
+  | Key.A -> 0x00000061
+  | Key.B -> 0x00000062
+  | Key.C -> 0x00000063
+  | Key.D -> 0x00000064
+  | Key.E -> 0x00000065
+  | Key.F -> 0x00000066
+  | Key.G -> 0x00000067
+  | Key.H -> 0x00000068
+  | Key.I -> 0x00000069
+  | Key.J -> 0x0000006A
+  | Key.K -> 0x0000006B
+  | Key.L -> 0x0000006C
+  | Key.M -> 0x0000006D
+  | Key.N -> 0x0000006E
+  | Key.O -> 0x0000006F
+  | Key.P -> 0x00000070
+  | Key.Q -> 0x00000071
+  | Key.R -> 0x00000072
+  | Key.S -> 0x00000073
+  | Key.T -> 0x00000074
+  | Key.U -> 0x00000075
+  | Key.V -> 0x00000076
+  | Key.W -> 0x00000077
+  | Key.X -> 0x00000078
+  | Key.Y -> 0x00000079
+  | Key.Z -> 0x0000007A
 
   (* Number Keys *)
   | Key.Num0 -> 0x00000030
