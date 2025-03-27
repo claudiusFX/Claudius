@@ -74,11 +74,11 @@ val filled_polygon: (int * int) list -> int -> t -> unit
 (** [filled_polygon points colour framebuffer] Draws a filled polygon made from the list of [points]
     in the specified [colour] into [framebuffer]. *)
 
-val draw_char: int -> int -> Font.t -> char -> int -> t -> int
+val draw_char: int -> int -> Fontv2.t -> char -> int -> t -> int
 (** [draw_char x y font c colour framebuffer] Draws a single character [c] in the specified [colour] using [font]. The top left of
     the charcter is the point specified by position ([x], [y]). The return value is the number of pixels wide the character was. *)
 
-val draw_string: int -> int -> Font.t -> string -> int -> t -> int
+val draw_string: int -> int -> Fontv2.t -> string -> int -> t -> int
 (** [draw_string x y font s colour framebuffer] Draws the string [s] in the specified [colour] using [font]. The top left of
     the first charcter is the point specified by position ([x], [y]). The return value is the number of pixels wide the string was. *)
 
