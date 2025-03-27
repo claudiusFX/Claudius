@@ -40,7 +40,7 @@ let test_generate_vapour_wave_creation _ =
   let first_color = Int32.to_int (Palette.index_to_rgb pal 0) in
   let last_color  = Int32.to_int (Palette.index_to_rgb pal (size - 1)) in
   assert_equal ~msg:"First color should be pastel purple" pastel_purple first_color;
-  assert_equal ~msg:"Last color should be pastel cyan" pastel_cyan last_color
+  assert_equal ~msg:"Last color should be pastel cyan" pastel_cyan last_color;
   let mid_color = Int32.to_int (Palette.index_to_rgb pal (size / 2)) in
   assert_bool "Mid color is distinct" (mid_color <> pastel_purple && mid_color <> pastel_cyan)
   
