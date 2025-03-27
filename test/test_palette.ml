@@ -75,6 +75,24 @@ let test_palette_wrap_around _ =
     assert_equal ~msg:"Colour match" (Int32.of_int c) v
   done
 
+(* Tests for load_lospec_palette *)
+
+let test_valid_lospec_palette _ =
+  let input = "#FF0000\n00FF00\n0000FF" in
+  let palette = Palette.load_lospec_palette input in
+  assert_equal 3 (Palette.size palette);
+  assert_equal (Int32.of_int 0xFF0000) (Palette.index_to_rgb palette 0);
+  assert_equal (Int32.of_int 0x00FF00) (Palette.index_to_rgb palette 1);
+  assert_equal (Int32.of_int 0x0000FF) (Palette.index_to_rgb palette 2)
+
+let test_invalid_lospec_palette _ =
+  let input = "#FF0000\nGGGGGG\n00FF00" in
+  assert_raises (Invalid_argument "Failed to parse hex color: \"GGGGGG\"")
+    (fun () -> ignore (Palette.load_lospec_palette input))
+
+let test_empty_lospec_palette _ =
+  assert_raises (Invalid_argument "Palette size must not be zero or invalid HEX values")
+    (fun () -> ignore (Palette.load_lospec_palette ""))
 
 let suite =
   "PaletteTests" >::: [
@@ -88,7 +106,14 @@ let suite =
     "Test fail invalid tic80 palette" >:: test_fail_with_invalid_palette_byte_count ;
     "Test fail empty tic80 palette" >:: test_fail_load_empty_tic80_palette ;
     "Test palette wrap around" >:: test_palette_wrap_around ;
+    "Valid Lospec palette" >:: test_valid_lospec_palette;
+    "Invalid Lospec palette" >:: test_invalid_lospec_palette;
+    "Empty Lospec palette" >:: test_empty_lospec_palette;
+
   ]
 
 let () =
   run_test_tt_main suite
+
+
+
