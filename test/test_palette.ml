@@ -27,7 +27,7 @@ let test_generate_linear_palette _ =
   let pal = Palette.generate_linear_palette color1 color2 size in
   assert_equal ~msg:"Palette length" size (Palette.size pal);
   let first_color = Int32.to_int (Palette.index_to_rgb pal 0) in
-  assert_equal ~msg:"First color should be color1" color1 first_color
+  assert_equal ~msg:"First color should be color1" color1 first_color;
   let last_color = Int32.to_int (Palette.index_to_rgb pal (size - 1)) in
   assert_equal ~msg:"Last color should be color2" color2 last_color
   
