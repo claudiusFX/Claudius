@@ -1,4 +1,4 @@
 (library
  (name claudius)
  (public_name claudius)
- (libraries tsdl uutf))
+ (libraries tsdl))
