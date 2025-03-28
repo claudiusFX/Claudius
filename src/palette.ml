@@ -42,13 +42,7 @@ let generate_vapourwave_palette (size : int) : t =
   let pastel_purple = 0x7f3b8f in  (* Pastel purple *)
   let pastel_cyan   = 0x80cfcf in  (* Pastel cyan *)
   generate_linear_palette pastel_purple pastel_cyan size
-
-let of_list (rgb_list : int list) : t =
-  if List.length rgb_list > 0 then
-    Array.of_list (List.map Int32.of_int rgb_list)
-    else
-      raise (Invalid_argument "Palette size must not be zero or negative")
-    
+ 
 let generate_microsoft_vga_palette () : t =
   (* This palette is by SZIEBERTH Ádám, found on Lospec:
      https://lospec.com/palette-list/microsoft-vga
