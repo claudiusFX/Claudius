@@ -11,6 +11,9 @@ val create: int -> int -> int -> Palette.t -> t
     used when running will be indexed into the [palette] provided here. Raises [Invalid_argument] if
    the dimensions or scale are either zero or negative. *)
 
+val update: t -> Palette.t -> t
+(**[update screen new_palette] creates a new screen with updated palette*)
+
 val create_with_font: int -> int -> int -> Font.t -> Palette.t -> t
 (** [create width height scale font palette] Creates a new screen of the specified size [width] x [height],
     and it will be rendered in a window scaled up by the [scale] factor provided. A font to be
