@@ -138,4 +138,23 @@ let index_to_rgb (palette : t) (index : int) : int32 =
   palette.(if index >= 0 then index else index + palsize)
 
 let to_list (palette : t) : int list =
+<<<<<<< HEAD
     List.map Int32.to_int (Array.to_list palette)
+=======
+    List.map Int32.to_int (Array.to_list palette)
+
+let circle_palette (pal : t) (offset : int) : int32 =
+  let size = Array.length pal in
+  Array.init size (fun index ->
+    let new_index = (index + offset) mod size in
+    pal.(new_index)
+  )
+
+let updated_entry (pal : t) (index : init) (new_colors : new_index) : int32 =
+  let new_pal = Array.copy pal in
+  if index < 0 || index >= Array.length new_pal then
+    raise [Invalid_argument "This palette is longer than expected or invalid Palette Index"]
+  else
+    new_pal.(index) <- new_colors;
+  new_pal
+>>>>>>> 0dabb1a (feat(screen, palette): enable dynamic palette updates for retro effects)
