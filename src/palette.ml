@@ -110,19 +110,19 @@ let load_tic80_palette (raw : string) : t =
   else
     raise (Invalid_argument "Palette size must not be zero or negative")
 
-(* New function for Task #27 *)
 let of_list (rgb_list : int list) : t =
   if List.length rgb_list > 0 then
     Array.of_list (List.map Int32.of_int rgb_list)
   else
     raise (Invalid_argument "Palette size must not be zero or negative")
+
 let load_lospec_palette (s : string) : t =
   let lines = String.split_on_char '\n' s in
   let parse_hex line =
     let line = String.trim line in
     let hex =
       match String.length line, line with
-      | 6, _ -> line
+      | 6, l -> l
       | 7, l when l.[0] = '#' -> String.sub l 1 6
       | _ -> raise (Invalid_argument "Palette size must not be zero or invalid HEX values")
     in
