@@ -227,6 +227,21 @@ let test_draw_filled_polygon_with_primitive _ =
   assert_equal ~msg:"after center" (Some 1) (Framebuffer.pixel_read 5 5 fb);
   assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 3 fb)
 
+  let test_dirty_bit_draw_line _ =
+    let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
+    Framebuffer.clear_dirty fb;
+    assert_equal ~msg:"dirty bit should be false after clear" false (Framebuffer.is_dirty fb);
+    Framebuffer.draw_line 3 3 7 7 1 fb;
+    assert_equal ~msg:"dirty bit should be set after draw_line" true (Framebuffer.is_dirty fb)
+  
+  let test_dirty_bit_render_primitive _ =
+    let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
+    Framebuffer.clear_dirty fb;
+    assert_equal ~msg:"dirty bit should be false after clear" false (Framebuffer.is_dirty fb);
+    let prim = Primitives.Pixel ({x = 5; y = 5}, 1) in
+    Framebuffer.render fb [prim];
+    assert_equal ~msg:"dirty bit should be set after render" true (Framebuffer.is_dirty fb)
+
 let suite =
   "Primitives tests" >::: [
     "Test draw line direct" >:: test_draw_line_direct ;
@@ -257,6 +272,8 @@ let suite =
     "Test filled polygon direct" >:: test_draw_filled_polygon_direct ;
     "Test filled polygon direct off framebuffer" >:: test_draw_filled_polygon_direct_off_framebuffer ;
     "Test filled polygon with primative" >:: test_draw_filled_polygon_with_primitive ;
+    "Test dirty bit after draw_line" >:: test_dirty_bit_draw_line;
+    "Test dirty bit after render primitive" >:: test_dirty_bit_render_primitive;
   ]
 
 let () =
