@@ -150,7 +150,7 @@ let circle_palette (pal : t) (offset : int) : t =
     pal.(new_index)
   )
 
-let updated_entry (pal : t) (index : int) (new_colors : new_index) : t =
+let updated_entry (pal : t) (index : int) (new_colors : int32) : t =
   let new_pal = Array.copy pal in
   if index < 0 || index >= Array.length new_pal then
     raise [Invalid_argument "This palette is longer than expected or invalid Palette Index"]
