@@ -84,12 +84,12 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       let input = { keys = KeyCodeSet.empty; mouse = Mouse.create () } in
 
       let rec loop (t : int) (prev_buffer : Framebuffer.t) (input : input_state) last_t = (
-        let input = { input with mouse = Mouse.clear_event input.mouse } in
         let now = Sdl.get_ticks () in
         let diff = Int32.(sub (of_int (1000 / 60)) (sub now last_t)) in
         if Int32.(compare diff zero) > 0 then Sdl.delay diff;
 
         let updated_buffer = tick t s prev_buffer input in
+        let input = { input with mouse = Mouse.clear_event input.mouse } in
 
         if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
           framebuffer_to_bigarray s updated_buffer bitmap;
