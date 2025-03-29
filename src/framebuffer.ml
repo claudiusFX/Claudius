@@ -1,30 +1,31 @@
-
-type t = int array array
+type t = { data : int array array; mutable dirty : bool }
 
 type shader_func = int -> int
 
 type shaderi_func = int -> int -> t -> int
 
 let to_array (buffer : t) : int array array =
-  buffer
+  buffer.data
 
 let init (dimensions : int * int) (f : int -> int -> int) : t =
   let width, height = dimensions in
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
-  Array.init height (fun y ->
+  { data = Array.init height (fun y ->
     Array.init width (fun x ->
         f x y
       )
-  )
+  );
+    dirty = true }
 
 let pixel_write (x : int) (y : int) (col : int) (buffer : t) =
-  if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-    buffer.(y).(x) <- col
+  if (x >= 0) && (x < Array.length (buffer.data.(0))) && (y >= 0) && (y < Array.length buffer.data) then
+    buffer.data.(y).(x) <- col;
+  buffer.dirty <- true
 
 let pixel_read (x : int) (y : int) (buffer : t) : int option =
-  if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-    Some buffer.(y).(x)
+  if (x >= 0) && (x < Array.length (buffer.data.(0))) && (y >= 0) && (y < Array.length buffer.data) then
+    Some buffer.data.(y).(x)
   else
     None
 
@@ -51,14 +52,13 @@ let draw_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
 
 let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
   let fx = Float.of_int x and fy = Float.of_int y in
-  let my = Float.of_int ((Array.length buffer) - 1)
-  and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
+  let my = Float.of_int ((Array.length buffer.data) - 1)
+  and mx = Float.of_int ((Array.length buffer.data.(0)) - 1) in
   let pminy = fy -. r
   and pmaxy = fy +. r in
   let miny = if (pminy < 0.) then 0. else pminy
   and maxy = if (pmaxy > my) then my else pmaxy in
   for yi = (Int.of_float miny) to (Int.of_float maxy) do
-    let row = buffer.(yi) in
     let a = acos ((Float.of_int (yi - y)) /. r) in
     let xw = (sin a) *. r in
     let pminx = fx -. xw
@@ -67,7 +67,7 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
     and maxx = if (pmaxx > mx) then mx else pmaxx in
     if (maxx > 0.0) && (minx < mx) then
       for xi = (Int.of_float minx) to (Int.of_float maxx) do
-        row.(xi) <- col
+        pixel_write xi yi col buffer
       done
   done
 
@@ -79,8 +79,7 @@ let draw_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) (col : int) (buffer : 
   let initial_error = dx + dy in
 
   let rec loop (x : int) (y : int) (error : int) =
-    if (x >= 0) && (x < Array.length (buffer.(0))) && (y >= 0) && (y < Array.length buffer) then
-      buffer.(y).(x) <- col;
+    pixel_write x y col buffer;
     match (x == x1) && (y == y1) with
     | true -> ()
     | false -> (
@@ -175,8 +174,7 @@ let interpolate_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) : span array =
           | Only (a) -> (if a == nx then Only(a) else (if (a > nx) then Pair(nx, a) else (Pair(a, nx))))
           | Pair (a, b) -> (if nx <= a then Pair(nx, b) else Pair(a, nx))
         )
-      )
-      ;
+      );
       loop nx ny (error + nex + ney)
     )
   in loop x0 y0 initial_error;
@@ -222,8 +220,8 @@ let filled_triangle (x0 : int) (y0 : int) (x1 : int) (y1 : int) (x2 : int) (y2 :
   let spans = Array.map2 (fun a b -> (a, b)) long_edge other_edge in
   Array.iteri (fun i s ->
     let index = y0 + i in
-    if (index >= 0) && (index < Array.length buffer) then (
-      let row = buffer.(y0 + i) in
+    if (index >= 0) && (index < Array.length buffer.data) then (
+      let row = buffer.data.(index) in
       let stride = Array.length row in
       let p, q = s in
       let p0, p1 = if (leftmost p <= leftmost q) then p, q else q, p in
@@ -231,7 +229,9 @@ let filled_triangle (x0 : int) (y0 : int) (x1 : int) (y1 : int) (x2 : int) (y2 :
       if ((r1 > 0) && (r0 < (stride - 1))) then (
         let x0 = if (r0 < 0) then 0 else (if (r0 >= stride) then (stride - 1) else r0)
         and x1 = if (r1 < 0) then 0 else (if (r1 >= stride) then (stride - 1) else r1) in
-        Array.fill row x0 ((x1 - x0) + 1) col
+        for x = x0 to x1 do
+          pixel_write x index col buffer
+        done
       )
     )
   ) spans
@@ -375,12 +375,12 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
       ) points
     ) rendered_strands;
 
-    let height = Array.length buffer in
+    let height = Array.length buffer.data in
     Array.iteri (fun i row ->
       let index = min_y + i in
       if ((index >= 0) && (index < height)) then (
 
-        let brow = buffer.(index) in
+        let brow = buffer.data.(index) in
         let stride = Array.length brow in
         let sorted_row = List.sort (fun a b -> (leftmost a) - (leftmost b)) row in
 
@@ -397,7 +397,7 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
               let x0 = if (raw_x0 < 0) then 0 else (if (raw_x0 >= stride) then (stride - 1) else raw_x0)
               and x1 = if (raw_x1 < 0) then 0 else (if (raw_x1 >= stride) then (stride - 1) else raw_x1) in
               let dist = (x1 - x0) + 1 in
-              Array.fill brow x0 dist col;
+              if dist > 0 then Array.fill brow x0 dist col;
             )
           )
           | raw_x0 :: raw_x1 :: tl -> (
@@ -413,7 +413,8 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
           )
         in loop sorted_row
       )
-    ) map
+    ) map;
+    buffer.dirty <- true
   )
 
 (* ----- *)
@@ -458,26 +459,31 @@ let draw_string (x : int) (y : int) (f : Font.t) (s : string) (col : int) (buffe
 (* ----- *)
 
 let map (f: shader_func) (buffer : t) : t =
-  Array.map (fun row ->
-    Array.map f row
-  ) buffer
+  { data = Array.map (fun row ->
+      Array.map f row
+    ) buffer.data;
+    dirty = true }
+
 
 let mapi (f: shaderi_func) (buffer : t) : t =
-  Array.mapi (fun y row ->
-    Array.mapi (fun x _p -> f x y buffer) row
-  ) buffer
+  { data = Array.mapi (fun y row ->
+      Array.mapi (fun x _p -> f x y buffer) row
+    ) buffer.data;
+    dirty = true }
 
-let map_inplace (f: shader_func) (buffer : t) =
-  Array.iter (fun row ->
-    Array.iteri (fun i v -> row.(i) <- f v) row
-    (* Array.map_inplace f row*)
-  ) buffer
+    let map_inplace (f: shader_func) (buffer : t) =
+      Array.iter (fun row ->
+        Array.iteri (fun i v -> row.(i) <- f v) row
+      ) buffer.data;
+      buffer.dirty <- true
+    
 
 let mapi_inplace (f: shaderi_func) (buffer : t) =
   Array.iteri (fun y row ->
     Array.iteri (fun x _v -> row.(x) <- f x y buffer) row
     (* Array.mapi_inplace (fun x _p -> f x y buffer) row*)
-  ) buffer
+  ) buffer.data;
+  buffer.dirty <- true
 
 (* ---- *)
 
@@ -502,20 +508,34 @@ let render (buffer : t) (draw : Primitives.t list) =
 
 let map2 (f : int -> int -> int) (origin : t) (delta : t) : t =
   try
-    Array.map2 (fun o_row d_row ->
-      Array.map2 (fun o_pixel d_pixel ->
-        f o_pixel d_pixel
-      ) o_row d_row
-    ) origin delta
+    { data = Array.map2 (fun o_row d_row ->
+                Array.map2 (fun o_pixel d_pixel ->
+                  f o_pixel d_pixel
+                ) o_row d_row
+             ) origin.data delta.data;
+      dirty = true }
   with
   | Invalid_argument _ -> raise (Invalid_argument "Merging framebuffers requires both to have same dimensions")
 
-let map2_inplace (f : int -> int -> int) (origin : t) (delta : t) =
-  try
-    Array.iter2 (fun o_row d_row ->
-      Array.iteri (fun index d_pixel ->
-        o_row.(index) <- f o_row.(index) d_pixel
-      ) d_row
-    ) origin delta
-  with
-  | Invalid_argument _ -> raise (Invalid_argument "Merging framebuffers requires both to have same dimensions")
+  let map2_inplace (f : int -> int -> int) (origin : t) (delta : t) =
+    try
+      Array.iter2 (fun o_row d_row ->
+        Array.iteri (fun index d_pixel ->
+          o_row.(index) <- f o_row.(index) d_pixel
+        ) d_row
+      ) origin.data delta.data;
+      origin.dirty <- true
+    with
+    | Invalid_argument _ ->
+        raise (Invalid_argument "Merging framebuffers requires both to have same dimensions")
+  
+
+
+let is_dirty (buffer : t) : bool =
+  buffer.dirty
+
+let set_dirty (buffer : t) : unit =
+  buffer.dirty <- true
+
+let clear_dirty (buffer : t) : unit =
+  buffer.dirty <- false
