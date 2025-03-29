@@ -16,17 +16,17 @@ type event =
 type t
 (** Abstract type representing the mouse state. *)
 
-val create : unit -> t
-(** [create ()] initializes a new mouse state. *)
+val create : int -> t
+(** [create scale] initializes a new mouse state with a given scale factor. *)
 
 val clear_event : t -> t
 (** [clear_event t] clears all stored mouse events. This is called every tick to prevent memory issues. *)
 
 val add_event : t -> event -> t
-(** [add_event t e] adds a new event [e] to the mouse state [t]. *)
+(** [add_event t e] adds a new event [e] to the mouse state [t], applying coordinate scaling. *)
 
 val update_position : t -> (int * int) -> t
-(** [update_position t (x, y)] updates the mouse position to [(x, y)]. *)
+(** [update_position t (x, y)] updates the mouse position to [(x / scale, y / scale)]. *)
 
 val update_button : t -> button -> bool -> t
 (** [update_button t b state] updates the state of button [b] (pressed or released). *)

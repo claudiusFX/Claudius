@@ -3,7 +3,7 @@ open Claudius
 open Tsdl
 
 let setup () =
-  (Sdl.Event.create (), Mouse.create ())
+  (Sdl.Event.create (), Mouse.create 1)
 
 let test_of_sdl_button _ =
   assert_equal Mouse.Left (Mousesdl.of_sdl_button 1);

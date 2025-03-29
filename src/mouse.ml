@@ -14,13 +14,15 @@ type event =
 type t = {
   events: event list;
   position: (int * int);
-  buttons: (button * bool) list;  (* current state of each button *)
+  buttons: (button * bool) list;         (* current state of each button *)
+  scale: int;                            (* scale factor for coordinates *)
 }
 
-let create () = {
+let create scale = {
   events = [];
   position = (0, 0);
   buttons = [(Left, false); (Middle, false); (Right, false)];
+  scale;
 }
 
 let clear_event t = {
@@ -28,14 +30,22 @@ let clear_event t = {
   events = [];
 }
 
-let add_event t event = {
+let add_event t event = 
+  let scale_coords (x, y) = (x / t.scale, y / t.scale) in
+  let scaled_event = match event with
+    | Button_down (b, (x, y)) -> Button_down (b, scale_coords (x, y))
+    | Button_up (b, (x, y)) -> Button_up (b, scale_coords (x, y))
+    | Motion (x, y) -> Motion (scale_coords (x, y))
+    | Wheel _ as e -> e                   (* Wheel events remain unchanged *)
+  in
+{
   t with
-  events = event :: t.events;
+  events = scaled_event :: t.events;
 }
 
 let update_position t (x, y) = {
   t with
-  position = (x, y);
+  position = (x / t.scale, y / t.scale);
 }
 
 let update_button t button pressed = {
