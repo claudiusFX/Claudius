@@ -76,15 +76,15 @@ let test_mono_palette_creation _ =
   ) (Palette.to_list pal)
 
 let test_create_empty_palette_from_list _ =
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.of_list [])
+  assert_raises (Invalid_argument "Palette size must not be zero or negativelyative") (fun _ -> Palette.of_list [])
 
 let test_create_empty_plasma _ =
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.generate_plasma_palette 0);
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.generate_plasma_palette (-1))
+  assert_raises (Invalid_argument "Palette size must not be zero or negativelyative") (fun _ -> Palette.generate_plasma_palette 0);
+  assert_raises (Invalid_argument "Palette size must not be zero or negativelyative") (fun _ -> Palette.generate_plasma_palette (-1))
 
 let test_create_empty_mono _ =
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.generate_mono_palette 0);
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.generate_mono_palette (-1))
+  assert_raises (Invalid_argument "Palette size must not be zero or negativelyative") (fun _ -> Palette.generate_mono_palette 0);
+  assert_raises (Invalid_argument "Palette size must not be zero or negativelyative") (fun _ -> Palette.generate_mono_palette (-1))
 
 let test_load_tic80_palette _ =
   let cols = [0x000000 ; 0xFF0000 ; 0x00FF00 ; 0x0000FF ; 0xFFFFFF] in
@@ -99,7 +99,7 @@ let test_fail_with_invalid_palette_byte_count _ =
   assert_raises (Invalid_argument "String size not a multiple of 6 chars per colour") (fun _ -> Palette.load_tic80_palette "000:000000FF000000FF000000FFFFFFF")
 
 let test_fail_load_empty_tic80_palette _ =
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.load_tic80_palette "000:")
+  assert_raises (Invalid_argument "Palette size must not be zero or negativelyative") (fun _ -> Palette.load_tic80_palette "000:")
 
 let test_palette_wrap_around _ =
   let cols = [0x000000 ; 0xFF0000 ; 0x00FF00 ; 0x0000FF ; 0xFFFFFF] in
@@ -133,6 +133,30 @@ let test_invalid_lospec_palette _ =
 let test_empty_lospec_palette _ =
   assert_raises (Invalid_argument "Palette size must not be zero or invalid HEX values")
     (fun () -> ignore (Palette.load_lospec_palette ""))
+
+let test_circle_palette_valid _ =
+  let original = [| 0x000000l; 0x111111l; 0x222222l; 0x333333l |] in
+  let rotated_positively = circle_palette original 1 in
+  assert_equal ~msg:"Rotated palette (positively offset) size" (Array.length original) (Array.length rotated_positively);
+  assert_equal ~msg:"Positively offset, element 0" original.(1) rotated_positively.(0);
+  assert_equal ~msg:"Positively offset, element 1" original.(2) rotated_positively.(1);
+  assert_equal ~msg:"Positively offset, element 2" original.(3) rotated_positively.(2);
+  assert_equal ~msg:"Positively offset, element 3" original.(0) rotated_positively.(3);
+  let rotated_negatively = circle_palette original (-1) in
+  assert_equal ~msg:"Rotated palette (negatively offset) size" (Array.length original) (Array.length rotated_negatively);
+  assert_equal ~msg:"negatively offset, element 0" original.(3) rotated_negatively.(0);
+  assert_equal ~msg:"negatively offset, element 1" original.(0) rotated_negatively.(1);
+  assert_equal ~msg:"negatively offset, element 2" original.(1) rotated_negatively.(2);
+  assert_equal ~msg:"negatively offset, element 3" original.(2) rotated_negatively.(3)
+    
+let test_updated_entry_valid _ =
+  let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
+  let new_palette = updated_entry original 2 (0x12, 0x34, 0x56) in
+  let expected_color = Int32.of_int ((0x12 lsl 16) lor (0x34 lsl 8) lor 0x56) in
+  assert_equal ~msg:"Updated entry at index 2" expected_color new_palette.(2);
+  assert_equal ~msg:"Index 0 unchanged" original.(0) new_palette.(0);
+  assert_equal ~msg:"Index 1 unchanged" original.(1) new_palette.(1);
+  assert_equal ~msg:"Index 3 unchanged" original.(3) new_palette.(3)
 
 let suite =
   "PaletteTests" >::: [
