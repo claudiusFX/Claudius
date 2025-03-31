@@ -67,7 +67,7 @@ val size: t -> int
 val index_to_rgb: t -> int -> int32
 (** [index_to_rgb palette index] Will return the 24bpp RGB prepesentation of a [palette] entry at position [index]. As per other fantasy console systems, the index value will be wrapped if it is above or below the palette size. *)
 
-val circle_palette: t -> int -> int32
+val circle_palette: t -> int -> t
 (**[circle_palette pal offset] returns a new palette with entries rotated to offset*)
 
 val updated_entry : t -> int -> int32 -> t
