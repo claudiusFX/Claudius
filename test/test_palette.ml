@@ -158,6 +158,13 @@ let test_updated_entry_valid _ =
   assert_equal ~msg:"Index 1 unchanged" original.(1) new_palette.(1);
   assert_equal ~msg:"Index 3 unchanged" original.(3) new_palette.(3)
 
+let test_updated_entry_invalid _ =
+  let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
+  assert_raises (Invalid_argument "Invalid palette index")
+  (fun () -> updated_entry original (-1) (0x12, 0x34, 0x56));
+  assert_raises (Invalid_argument "Invalid palette index")
+  (fun () -> updated_entry original 4 (0x12, 0x34, 0x56))
+
 let suite =
   "PaletteTests" >::: [
     "Test simple palette set up" >:: test_basic_palette_of_ints ;
@@ -179,7 +186,9 @@ let suite =
     "Valid Lospec palette" >:: test_valid_lospec_palette;
     "Invalid Lospec palette" >:: test_invalid_lospec_palette;
     "Empty Lospec palette" >:: test_empty_lospec_palette;
-
+    "Test circle_palette (valid)" >:: test_circle_palette_valid;
+    "Test updated_entry (valid)" >:: test_updated_entry_valid;
+    "Test updated_entry (invalid)" >:: test_updated_entry_invalid;
   ]
 
 let () =
