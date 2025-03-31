@@ -25,7 +25,7 @@ let create scale = {
   scale;
 }
 
-let clear_event t = {
+let clear_events t = {
   t with
   events = [];
 }
