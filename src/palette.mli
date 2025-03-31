@@ -70,5 +70,5 @@ val index_to_rgb: t -> int -> int32
 val circle_palette: t -> int -> t
 (**[circle_palette pal offset] returns a new palette with entries rotated to offset*)
 
-val updated_entry : t -> int -> int32 -> t
+val updated_entry : t -> int -> (int * int * int) -> t
 (** [updated_entry pal index new_color] checks for the index then returns a new palette with the entry at [index] updated to [new_color]. *)
