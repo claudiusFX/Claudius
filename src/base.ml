@@ -9,10 +9,18 @@ end)
 module PlatformKey = Keysdl
 
 type boot_func = Screen.t -> Framebuffer.t
-type tick_func = int -> Screen.t -> Framebuffer.t -> KeyCodeSet.t -> Framebuffer.t
 
-type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
+(* New types to provide both raw key state and key events *)
+type key_event =
+  | KeyDown of Key.t
+  | KeyUp of Key.t
 
+type input_state = {
+  pressed : KeyCodeSet.t;
+  events : key_event list;
+}
+
+type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
 
 (* ----- *)
 
@@ -25,7 +33,8 @@ let sdl_init (width : int) (height : int) (title : string) (make_fullscreen : bo
   Sdl.create_renderer ~flags:Sdl.Renderer.(accelerated + presentvsync) w >>= fun r ->
   Sdl.show_cursor (not make_fullscreen) >|= fun _ -> (w, r)
 
-let framebuffer_to_bigarray (s : Screen.t) (buffer : Framebuffer.t) (bitmap : bitmap_t) =
+let framebuffer_to_bigarray (s : Screen.t) (buffer : Framebuffer.t)
+    (bitmap : (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t) =
   let palette = Screen.palette s in
   Array.iteri (fun y row ->
     Array.iteri (fun x pixel ->
@@ -33,7 +42,8 @@ let framebuffer_to_bigarray (s : Screen.t) (buffer : Framebuffer.t) (bitmap : bi
     ) row
   ) (Framebuffer.to_array buffer)
 
-let render_texture (r : Sdl.renderer) (texture : Sdl.texture) (s : Screen.t) (bitmap : bitmap_t) =
+let render_texture (r : Sdl.renderer) (texture : Sdl.texture)
+    (s : Screen.t) (bitmap : (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t) =
   let width, height = Screen.dimensions s in
   let scale = Screen.scale s in
   Sdl.render_clear r >>= fun () ->
@@ -42,6 +52,23 @@ let render_texture (r : Sdl.renderer) (texture : Sdl.texture) (s : Screen.t) (bi
   let dst = Sdl.Rect.create ~x:((ow - (width * scale)) / 2) ~y:((oh - (height * scale)) / 2) ~w:(width * scale) ~h:(height * scale) in
   Sdl.render_copy ~dst:dst r texture >|= fun () ->
   Sdl.render_present r
+
+(* A helper function that polls all pending SDL events,
+   updates the key set, and accumulates a list of key events. *)
+let rec poll_all_events keys events =
+  let e = Sdl.Event.create () in
+  match Sdl.poll_event (Some e) with
+  | true ->
+      (match Sdl.Event.(enum (get e typ)) with
+       | `Quit -> (true, keys, events)
+       | `Key_down ->
+           let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+           poll_all_events (KeyCodeSet.add key keys) (KeyDown key :: events)
+       | `Key_up ->
+           let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+           poll_all_events (KeyCodeSet.remove key keys) (KeyUp key :: events)
+       | _ -> poll_all_events keys events)
+  | false -> (false, keys, List.rev events)
 
 (* ----- *)
 
@@ -74,14 +101,18 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       | Some bfunc -> bfunc s
       in
 
-      let e = Sdl.Event.create () in
 
       let rec loop (t : int) (prev_buffer : Framebuffer.t) (keys : KeyCodeSet.t) last_t =
         let now = Sdl.get_ticks () in
         let diff = Int32.(sub (of_int (1000 / 60)) (sub now last_t)) in
         if Int32.(compare diff zero) > 0 then Sdl.delay diff;
 
-        let updated_buffer = tick t s prev_buffer keys in
+            (* Process all events this frame *)
+            let exit, new_keys, events = poll_all_events keys [] in
+            let input_state = { pressed = new_keys; events = events } in
+
+            (* Call the tick function with the current input state *)
+            let updated_buffer = tick t s prev_buffer input_state in
 
         if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
           framebuffer_to_bigarray s updated_buffer bitmap;
@@ -91,24 +122,11 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
           Framebuffer.clear_dirty updated_buffer
         );
 
-        let exit, keys =
-          match Sdl.poll_event (Some e) with
-          | true ->
-              (match Sdl.Event.(enum (get e typ)) with
-               | `Quit -> (true, keys)
-               | `Key_down ->
-                   let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-                   (false, KeyCodeSet.add key keys)
-               | `Key_up ->
-                   let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-                   (false, KeyCodeSet.remove key keys)
-               | _ -> (false, keys))
-          | false -> (false, keys)
-        in
-        if exit then () else loop (t + 1) updated_buffer keys now
-      in
-      loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
-      Sdl.destroy_texture texture;
-      Sdl.destroy_renderer r;
-      Sdl.destroy_window w;
-      Sdl.quit ()
+            if exit then ()
+            else loop (t + 1) updated_buffer new_keys now
+          in
+          loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
+          Sdl.destroy_texture texture;
+          Sdl.destroy_renderer r;
+          Sdl.destroy_window w;
+          Sdl.quit ()
