@@ -18,7 +18,10 @@ type t = {
   scale: int;                            (* scale factor for coordinates *)
 }
 
-let create scale = {
+let create scale = 
+  if scale <= 0 then
+    invalid_arg "Invalid scale";
+{
   events = [];
   position = (0, 0);
   buttons = [(Left, false); (Middle, false); (Right, false)];

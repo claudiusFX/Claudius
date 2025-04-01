@@ -17,7 +17,7 @@ type t
 (** Abstract type representing the mouse state. *)
 
 val create : int -> t
-(** [create scale] initializes a new mouse state with a given scale factor. *)
+(** [create scale] initializes a new mouse state with a given scale factor after sanity check. *)
 
 val clear_events : t -> t
 (** [clear_event t] clears all stored mouse events. This is called every tick to prevent memory issues. *)
