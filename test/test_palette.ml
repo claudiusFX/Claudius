@@ -136,13 +136,13 @@ let test_empty_lospec_palette _ =
 
 let test_circle_palette_valid _ =
   let original = [| 0x000000l; 0x111111l; 0x222222l; 0x333333l |] in
-  let rotated_positively = circle_palette original 1 in
+  let rotated_positively = Palette.circle_palette original 1 in
   assert_equal ~msg:"Rotated palette (positively offset) size" (Array.length original) (Array.length rotated_positively);
   assert_equal ~msg:"Positively offset, element 0" original.(1) rotated_positively.(0);
   assert_equal ~msg:"Positively offset, element 1" original.(2) rotated_positively.(1);
   assert_equal ~msg:"Positively offset, element 2" original.(3) rotated_positively.(2);
   assert_equal ~msg:"Positively offset, element 3" original.(0) rotated_positively.(3);
-  let rotated_negatively = circle_palette original (-1) in
+  let rotated_negatively = Palette.circle_palette original (-1) in
   assert_equal ~msg:"Rotated palette (negatively offset) size" (Array.length original) (Array.length rotated_negatively);
   assert_equal ~msg:"negatively offset, element 0" original.(3) rotated_negatively.(0);
   assert_equal ~msg:"negatively offset, element 1" original.(0) rotated_negatively.(1);
@@ -151,7 +151,7 @@ let test_circle_palette_valid _ =
     
 let test_updated_entry_valid _ =
   let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
-  let new_palette = updated_entry original 2 (0x12, 0x34, 0x56) in
+  let new_palette = Palette.updated_entry original 2 (0x12, 0x34, 0x56) in
   let expected_color = Int32.of_int ((0x12 lsl 16) lor (0x34 lsl 8) lor 0x56) in
   assert_equal ~msg:"Updated entry at index 2" expected_color new_palette.(2);
   assert_equal ~msg:"Index 0 unchanged" original.(0) new_palette.(0);
@@ -161,9 +161,9 @@ let test_updated_entry_valid _ =
 let test_updated_entry_invalid _ =
   let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
   assert_raises (Invalid_argument "Invalid palette index")
-  (fun () -> updated_entry original (-1) (0x12, 0x34, 0x56));
+  (fun () -> Palette.updated_entry original (-1) (0x12, 0x34, 0x56));
   assert_raises (Invalid_argument "Invalid palette index")
-  (fun () -> updated_entry original 4 (0x12, 0x34, 0x56))
+  (fun () -> Palette.updated_entry original 4 (0x12, 0x34, 0x56))
 
 let suite =
   "PaletteTests" >::: [
