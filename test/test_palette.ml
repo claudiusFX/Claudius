@@ -135,19 +135,29 @@ let test_empty_lospec_palette _ =
     (fun () -> ignore (Palette.load_lospec_palette ""))
 
 let test_circle_palette_valid _ =
-  let original = Palette.of_list [0x000000; 0x111111; 0x222222; 0x333333]
+  let original = Palette.of_list [0x000000; 0x111111; 0x222222; 0x333333] in
   let rotated_positively = Palette.circle_palette original 1 in
-  assert_equal ~msg:"Rotated palette (positively offset) size" (Array.length original) (Array.length rotated_positively);
-  assert_equal ~msg:"Positively offset, element 0" original.(1) rotated_positively.(0);
-  assert_equal ~msg:"Positively offset, element 1" original.(2) rotated_positively.(1);
-  assert_equal ~msg:"Positively offset, element 2" original.(3) rotated_positively.(2);
-  assert_equal ~msg:"Positively offset, element 3" original.(0) rotated_positively.(3);
+
+  assert_equal ~msg:"Rotated palette (positively offset) size" (Palette.size original) (Palette.size rotated_positively);
+  assert_equal ~msg:"Positively offset, element 0" 
+  (Palette.index_to_rgb original 1) (Palette.index_to_rgb rotated_positively 0);
+  assert_equal ~msg:"Positively offset, element 1" 
+  (Palette.index_to_rgb original 2) (Palette.index_to_rgb rotated_positively 1);
+  assert_equal ~msg:"Positively offset, element 2" 
+  (Palette.index_to_rgb original 3) (Palette.index_to_rgb rotated_positively 2);
+  assert_equal ~msg:"Positively offset, element 3" 
+  (Palette.index_to_rgb original 0) (Palette.index_to_rgb rotated_positively 3);
+
   let rotated_negatively = Palette.circle_palette original (-1) in
-  assert_equal ~msg:"Rotated palette (negatively offset) size" (Array.length original) (Array.length rotated_negatively);
-  assert_equal ~msg:"negatively offset, element 0" original.(3) rotated_negatively.(0);
-  assert_equal ~msg:"negatively offset, element 1" original.(0) rotated_negatively.(1);
-  assert_equal ~msg:"negatively offset, element 2" original.(1) rotated_negatively.(2);
-  assert_equal ~msg:"negatively offset, element 3" original.(2) rotated_negatively.(3)
+  assert_equal ~msg:"Rotated palette (positively offset) size" (Palette.size original) (Palette.size rotated_negatively);
+  assert_equal ~msg:"negatively offset, element 0" 
+  (Palette.index_to_rgb original 3) (Palette.index_to_rgb rotated_negatively 0);
+  assert_equal ~msg:"negatively offset, element 1" 
+  (Palette.index_to_rgb original 0) (Palette.index_to_rgb rotated_negatively 1);
+  assert_equal ~msg:"negatively offset, element 2" 
+  (Palette.index_to_rgb original 1) (Palette.index_to_rgb rotated_negatively 2);
+  assert_equal ~msg:"negatively offset, element 3"
+  (Palette.index_to_rgb original 2) (Palette.index_to_rgb rotated_negatively 3);
     
 let test_updated_entry_valid _ =
   let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
