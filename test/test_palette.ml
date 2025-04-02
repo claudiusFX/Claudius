@@ -160,16 +160,16 @@ let test_circle_palette_valid _ =
   (Palette.index_to_rgb original 2) (Palette.index_to_rgb rotated_negatively 3);
     
 let test_updated_entry_valid _ =
-  let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
+  let original = Palette.of_list [ 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl ] in
   let new_palette = Palette.updated_entry original 2 (0x12, 0x34, 0x56) in
   let expected_color = Int32.of_int ((0x12 lsl 16) lor (0x34 lsl 8) lor 0x56) in
   assert_equal ~msg:"Updated entry at index 2" expected_color new_palette.(2);
   assert_equal ~msg:"Index 0 unchanged" original.(0) new_palette.(0);
   assert_equal ~msg:"Index 1 unchanged" original.(1) new_palette.(1);
-  assert_equal ~msg:"Index 3 unchanged" original.(3) new_palette.(3)
+  assert_equal ~msg:"Index 3 unchanged" original.(3) new_palette.(3);
 
 let test_updated_entry_invalid _ =
-  let original = [| 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl |] in
+  let original = Palette.of_list [ 0xAAAAAAl; 0xBBBBBBl; 0xCCCCCCl; 0xDDDDDDl ] in
   assert_raises (Invalid_argument "Invalid palette index")
   (fun () -> Palette.updated_entry original (-1) (0x12, 0x34, 0x56));
   assert_raises (Invalid_argument "Invalid palette index")
