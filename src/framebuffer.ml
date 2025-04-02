@@ -129,32 +129,26 @@ let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buff
     end
   done
   
-let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : t) =
-  let fx = Float.of_int x and fy = Float.of_int y in
-  let my = Float.of_int ((Array.length buffer) - 1)
-  and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
+  let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : int array array) =
+    let fx = Float.of_int x and fy = Float.of_int y in
+    let my = Float.of_int ((Array.length buffer) - 1)
+    and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
     
-  let pminy = fy -. ry
-  and pmaxy = fy +. ry in
-  let miny = if (pminy < 0.) then 0. else pminy
-  and maxy = if (pmaxy > my) then my else pmaxy in
+    let pminy = fy -. ry
+    and pmaxy = fy +. ry in
+    let miny = max 0 (Int.of_float pminy)
+    and maxy = min (Int.of_float my) (Int.of_float pmaxy) in
     
-  for yi = (Int.of_float miny) to (Int.of_float maxy) do
-    let row = buffer.(yi) in
-    let dy = Float.of_int (yi - y) in
-      
-    let term = 1. -. ((dy *. dy) /. (ry *. ry)) in
-    if term >= 0. then
-      let xw = rx *. sqrt(term) in
+    for yi = miny to maxy do
+      let dy = Float.of_int (yi - y) in
+      let term = 1. -. ((dy *. dy) /. (ry *. ry)) in
+      if term >= 0. then
+        let xw = rx *. sqrt term in
+        let minx = max 0 (Int.of_float (fx -. xw))
+        and maxx = min (Int.of_float mx) (Int.of_float (fx +. xw)) in
         
-      let pminx = fx -. xw
-      and pmaxx = fx +. xw in
-      let minx = if (pminx < 0.) then 0. else pminx
-      and maxx = if (pmaxx > mx) then mx else pmaxx in
-        
-      if (maxx > 0.0) && (minx < mx) then
-        for xi = (Int.of_float minx) to (Int.of_float maxx) do
-          row.(xi) <- col
+        for xi = minx to maxx do
+          pixel_write xi yi col buffer
         done
     done
 
