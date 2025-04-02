@@ -50,6 +50,7 @@ let draw_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
 
   done
 
+<<<<<<< HEAD
 let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
   let fx = Float.of_int x and fy = Float.of_int y in
   let my = Float.of_int ((Array.length buffer.data) - 1)
@@ -69,6 +70,27 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
       for xi = (Int.of_float minx) to (Int.of_float maxx) do
         pixel_write xi yi col buffer
       done
+=======
+let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : int array array) =
+  let fx = Float.of_int x and fy = Float.of_int y in
+  let my = Float.of_int ((Array.length buffer) - 1)
+  and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
+  let pminy = fy -. r
+  and pmaxy = fy +. r in
+  let miny = max 0 (Int.of_float pminy)
+  and maxy = min (Int.of_float my) (Int.of_float pmaxy) in
+
+  for yi = miny to maxy do
+    let dy = Float.of_int (yi - y) in
+    let a = acos (dy /. r) in
+    let xw = (sin a) *. r in
+    let minx = max 0 (Int.of_float (fx -. xw))
+    and maxx = min (Int.of_float mx) (Int.of_float (fx +. xw)) in
+
+    for xi = minx to maxx do
+      pixel_write xi yi col buffer
+>>>>>>> 0750f06 (Updated)
+    done
   done
 
 let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buffer : t) =
