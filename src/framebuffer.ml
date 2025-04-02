@@ -69,7 +69,7 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
       for xi = (Int.of_float minx) to (Int.of_float maxx) do
         pixel_write xi yi col buffer
       done
-    done
+  done
 
 let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buffer : t) =
   let width = Array.length buffer.(0) in
