@@ -1,5 +1,3 @@
-(* overlay.mli *)
-
 (* Calculate and update the FPS counter *)
 val calculate_fps : unit -> unit
 
