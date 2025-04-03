@@ -11,7 +11,7 @@ val create: int -> int -> int -> Palette.t -> t
     used when running will be indexed into the [palette] provided here. Raises [Invalid_argument] if
    the dimensions or scale are either zero or negative. *)
 
-val create_with_font: int -> int -> int -> Font.t -> Palette.t -> t
+val create_with_font: int -> int -> int -> Fontv2.t -> Palette.t -> t
 (** [create width height scale font palette] Creates a new screen of the specified size [width] x [height],
     and it will be rendered in a window scaled up by the [scale] factor provided. A font to be
     used for future rendering of characters is provided here. The framebuffers  used when running
@@ -29,5 +29,5 @@ val palette: t -> Palette.t
 val scale : t -> int
 (** [scale screen] Returns the scaling factor used when drawing [screen] to a window. *)
 
-val font : t -> Font.t option
+val font : t -> Fontv2.t option
 (** [font screen] Returns the font associated with the [screen] if one was provided, or [None] otherwise. *)

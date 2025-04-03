@@ -31,3 +31,6 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/mdales/claudius.git"
+pin-depends: [
+  ["bdfparser.dev" "git+https://github.com/claudiusFX/bdfparser.git#main"]
+]
