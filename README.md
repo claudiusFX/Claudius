@@ -31,3 +31,19 @@ $ open _build/default/_doc/_html/index.html
  Claudius has been tested under macOS, Linux, and Windows via WSL, and requires that you have [SDL](https://www.libsdl.org) 2 installed.
 
  It requires OCaml 5 or newer ([see here for installation instructions](https://ocaml.org/releases/5.3.0#installation-instructions)), and relies on [tsdl](https://github.com/dbuenzli/tsdl) for talking to SDL, and [ounit2](https://opam.ocaml.org/packages/ounit2/) for unit tests.
+
+# Troubleshooting
+
+Some users running programs built with Claudius on Ubuntu via WSL may experience a segmentation fault causing the SDL window to crash. It can be fixed with adding the following environment variable before running your program. In your terminal enter the following commands:
+
+```shell
+$ export LIBGL_ALWAYS_SOFTWARE=1
+$ dune exec myprogram
+ ```
+If you are using bash, you can add the above environment variable to your bashrc file: 
+
+```shell
+$ echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
+$ source ~/.bashrc
+$ dune exec myprogram
+ ```
