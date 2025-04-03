@@ -34,9 +34,16 @@ $ open _build/default/_doc/_html/index.html
 
 # Troubleshooting
 
-Some users running programs built with Claudius on Ubuntu via WSL may experience a segmentation fault causing the SDL window to crash. It can be fixed with adding the following environment variable to your bashrc file. In your terminal enter the following commands:
+Some users running programs built with Claudius on Ubuntu via WSL may experience a segmentation fault causing the SDL window to crash. It can be fixed with adding the following environment variable before running your program. In your terminal enter the following commands:
+
+```shell
+$ export LIBGL_ALWAYS_SOFTWARE=1
+$ dune exec myprogram
+ ```
+If you are using bash, you can add the above environment variable to your bashrc file: 
 
 ```shell
 $ echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
 $ source ~/.bashrc
+$ dune exec myprogram
  ```
