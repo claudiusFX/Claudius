@@ -7,20 +7,25 @@ module KeyCodeSet = Set.Make(struct
 end)
 
 module PlatformKey = Keysdl
+module PlatformMouse = Mousesdl
 
-type boot_func = Screen.t -> Framebuffer.t
-
-(* New types to provide both raw key state and key events *)
+(* New types for layered keyboard handling *)
 type key_event =
-  | KeyDown of Key.t
-  | KeyUp of Key.t
+  | KeyDown of Key.t  (* A key was pressed *)
+  | KeyUp of Key.t    (* A key was released *)
 
+(* The complete input state now includes both keys and events, along with mouse state *)
 type input_state = {
-  pressed : KeyCodeSet.t;
-  events : key_event list;
+  keys: KeyCodeSet.t;
+  events: key_event list;
+  mouse: Mouse.t;
 }
 
+type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
+
+type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
+
 
 (* ----- *)
 
@@ -33,8 +38,7 @@ let sdl_init (width : int) (height : int) (title : string) (make_fullscreen : bo
   Sdl.create_renderer ~flags:Sdl.Renderer.(accelerated + presentvsync) w >>= fun r ->
   Sdl.show_cursor (not make_fullscreen) >|= fun _ -> (w, r)
 
-let framebuffer_to_bigarray (s : Screen.t) (buffer : Framebuffer.t)
-    (bitmap : (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t) =
+let framebuffer_to_bigarray (s : Screen.t) (buffer : Framebuffer.t) (bitmap : bitmap_t) =
   let palette = Screen.palette s in
   Array.iteri (fun y row ->
     Array.iteri (fun x pixel ->
@@ -42,8 +46,7 @@ let framebuffer_to_bigarray (s : Screen.t) (buffer : Framebuffer.t)
     ) row
   ) (Framebuffer.to_array buffer)
 
-let render_texture (r : Sdl.renderer) (texture : Sdl.texture)
-    (s : Screen.t) (bitmap : (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t) =
+let render_texture (r : Sdl.renderer) (texture : Sdl.texture) (s : Screen.t) (bitmap : bitmap_t) =
   let width, height = Screen.dimensions s in
   let scale = Screen.scale s in
   Sdl.render_clear r >>= fun () ->
@@ -54,21 +57,26 @@ let render_texture (r : Sdl.renderer) (texture : Sdl.texture)
   Sdl.render_present r
 
 (* A helper function that polls all pending SDL events,
-   updates the key set, and accumulates a list of key events. *)
-let rec poll_all_events keys events =
+   updating the keys set, the mouse state, and accumulating key events. *)
+let rec poll_all_events keys mouse key_events =
   let e = Sdl.Event.create () in
   match Sdl.poll_event (Some e) with
   | true ->
-      (match Sdl.Event.(enum (get e typ)) with
-       | `Quit -> (true, keys, events)
+      let typ = Sdl.Event.(enum (get e typ)) in
+      (match typ with
+       | `Quit -> (true, keys, mouse, List.rev key_events)
        | `Key_down ->
            let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-           poll_all_events (KeyCodeSet.add key keys) (KeyDown key :: events)
+           poll_all_events (KeyCodeSet.add key keys) mouse (KeyDown key :: key_events)
        | `Key_up ->
            let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-           poll_all_events (KeyCodeSet.remove key keys) (KeyUp key :: events)
-       | _ -> poll_all_events keys events)
-  | false -> (false, keys, List.rev events)
+           poll_all_events (KeyCodeSet.remove key keys) mouse (KeyUp key :: key_events)
+       | `Mouse_button_down | `Mouse_button_up | `Mouse_motion | `Mouse_wheel ->
+           let new_mouse = PlatformMouse.handle_event e mouse in
+           poll_all_events keys new_mouse key_events
+       | _ ->
+           poll_all_events keys mouse key_events)
+  | false -> (false, keys, mouse, List.rev key_events)
 
 (* ----- *)
 
@@ -101,31 +109,32 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       | Some bfunc -> bfunc s
       in
 
+          let initial_input = { keys = KeyCodeSet.empty; events = []; mouse = Mouse.create scale } in
 
-      let rec loop (t : int) (prev_buffer : Framebuffer.t) (keys : KeyCodeSet.t) last_t =
-        let now = Sdl.get_ticks () in
-        let diff = Int32.(sub (of_int (1000 / 60)) (sub now last_t)) in
-        if Int32.(compare diff zero) > 0 then Sdl.delay diff;
+          let rec loop (t : int) (prev_buffer : Framebuffer.t) (input : input_state) last_t =
+            let now = Sdl.get_ticks () in
+            let diff = Int32.sub (Int32.of_int (1000 / 60)) (Int32.sub now last_t) in
+            if Int32.compare diff Int32.zero > 0 then Sdl.delay diff;
 
-            (* Process all events this frame *)
-            let exit, new_keys, events = poll_all_events keys [] in
-            let input_state = { pressed = new_keys; events = events } in
-
-            (* Call the tick function with the current input state *)
-            let updated_buffer = tick t s prev_buffer input_state in
-
-        if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
-          framebuffer_to_bigarray s updated_buffer bitmap;
-          (match render_texture r texture s bitmap with
-           | Error (`Msg e) -> Sdl.log "Boot error: %s" e
-           | Ok () -> ());
-          Framebuffer.clear_dirty updated_buffer
-        );
+            let exit, new_keys, new_mouse, key_events =
+              poll_all_events input.keys input.mouse []
+            in
+            let current_input = { keys = new_keys; events = key_events; mouse = new_mouse } in
 
             if exit then ()
-            else loop (t + 1) updated_buffer new_keys now
+            else
+              let updated_buffer = tick t s prev_buffer current_input in
+
+              if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
+                framebuffer_to_bigarray s updated_buffer bitmap;
+                (match render_texture r texture s bitmap with
+                 | Error (`Msg e) -> Sdl.log "Render error: %s" e
+                 | Ok () -> ());
+                Framebuffer.clear_dirty updated_buffer
+              );
+              loop (t + 1) updated_buffer current_input now
           in
-          loop 0 initial_buffer KeyCodeSet.empty Int32.zero;
+          loop 0 initial_buffer initial_input Int32.zero;
           Sdl.destroy_texture texture;
           Sdl.destroy_renderer r;
           Sdl.destroy_window w;
