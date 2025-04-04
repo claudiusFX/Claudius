@@ -75,7 +75,7 @@ let test_mono_palette_creation _ =
   ) (Palette.to_list pal)
 
 let test_create_empty_palette_from_list _ =
-  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun () -> Palette.of_list [])
+  assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun _ -> Palette.of_list [])
 
 let test_create_empty_plasma _ =
   assert_raises (Invalid_argument "Palette size must not be zero or negative") (fun () -> Palette.generate_plasma_palette 0);

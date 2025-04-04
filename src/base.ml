@@ -51,7 +51,7 @@ let render_texture (r : Sdl.renderer) (texture : Sdl.texture) (s : Screen.t) (bi
 (* ----- *)
 
 let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Screen.t) =
-  let make_full = Array.to_list Sys.argv |> List.exists (fun a -> (String.compare a "-f") = 0) in
+  let make_full = Array.to_list Sys.argv |> List.exists (fun a -> (String.compare a "-f") == 0) in
 
   let s = match make_full with
   | false -> s
