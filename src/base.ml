@@ -19,7 +19,6 @@ type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.
 
 type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
-
 (* ----- *)
 
 let (>>=) = Result.bind
@@ -72,7 +71,7 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
     | Error (`Msg e) -> Sdl.log "texture error: %s" e; exit 1
     | Ok texture ->
       (* This is a conversion layer, but allocaing bigarrays frequently is frowned upon
-         so we allocate it once here and re-use it. *)
+        so we allocate it once here and re-use it. *)
       let bitmap = (Bigarray.Array1.create Bigarray.int32 Bigarray.c_layout (width * height)) in
 
       let initial_buffer = match boot with
@@ -91,12 +90,13 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
         let updated_buffer = tick t s prev_buffer input in
         let input = { input with mouse = Mouse.clear_events input.mouse } in
 
-        if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) then (
+        if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) || (Screen.is_dirty s) then (
           framebuffer_to_bigarray s updated_buffer bitmap;
           (match render_texture r texture s bitmap with
            | Error (`Msg e) -> Sdl.log "Boot error: %s" e
            | Ok () -> ());
-          Framebuffer.clear_dirty updated_buffer
+          Framebuffer.clear_dirty updated_buffer;
+          Screen.clear_dirty s
         );
 
         match render_texture r texture s bitmap with
