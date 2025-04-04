@@ -9,12 +9,18 @@ module PlatformKey : module type of Keysdl
 module PlatformMouse : module type of Mousesdl
 (** A module that provides platform-specific mouse handling, based on the {!Mousesdl} module. *)
 
+type key_event =
+  | KeyDown of Key.t  (** A key was pressed. *)
+  | KeyUp of Key.t    (** A key was released. *)
+
 type input_state = {
   keys: KeyCodeSet.t;
+  events: key_event list;
   mouse: Mouse.t;
 }
 (** Represents the current state of user input, including:
     - [keys]: The set of currently pressed keys.
+    - [events]: The list of keyboard events that occurred this frame.
     - [mouse]: The current state of the mouse, including position and button presses. *)
 
 type boot_func = Screen.t -> Framebuffer.t
