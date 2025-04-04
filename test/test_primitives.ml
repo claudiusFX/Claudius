@@ -96,48 +96,55 @@ let test_draw_filled_circle_with_primitive _ =
 (* Ellipse *)
 
 let test_draw_ellipse_direct _ =
-  let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let fb = prepare_fb (10, 10) (fun _ _ -> 0) in
+  assert_equal ~msg:"before (ellipse direct)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
   Framebuffer.draw_ellipse 5 5 3.0 2.0 1 fb;
-  assert_equal ~msg:"after center" (Some 0) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
+  assert_equal ~msg:"after center (ellipse direct)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  assert_equal ~msg:"after edge (ellipse direct)" (Some 1) (Framebuffer.pixel_read 5 7 fb);
+  assert_equal ~msg:"dirty bit should be set after draw_ellipse" true (Framebuffer.is_dirty fb)
+
 
 let test_draw_ellipse_direct_off_framebuffer _ =
-  let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let fb = prepare_fb (10, 10) (fun _ _ -> 0) in
+  assert_equal ~msg:"before (ellipse off)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
   Framebuffer.draw_ellipse (-5) (-5) 4.0 3.0 1 fb;
-  assert_equal ~msg:"after" (Some 0) (Framebuffer.pixel_read 0 0 fb) 
+  assert_equal ~msg:"after (ellipse off)" (Some 0) (Framebuffer.pixel_read 0 0 fb);
+  assert_equal ~msg:"dirty bit should be set after draw_ellipse (off)" true (Framebuffer.is_dirty fb)
 
 let test_draw_ellipse_with_primitive _ =
-  let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let fb = prepare_fb (10, 10) (fun _ _ -> 0) in
+  assert_equal ~msg:"before (ellipse prim)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
   let prim = Primitives.Ellipse ({x = 5; y = 5}, 3.0, 2.0, 1) in
   Framebuffer.render fb [prim];
-  assert_equal ~msg:"after center" (Some 0) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
+  assert_equal ~msg:"after center (ellipse prim)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  assert_equal ~msg:"after edge (ellipse prim)" (Some 1) (Framebuffer.pixel_read 5 7 fb);
+  assert_equal ~msg:"dirty bit should be set after render (ellipse)" true (Framebuffer.is_dirty fb)
 
 (* Filled ellipse *)
 
 let test_draw_filled_ellipse_direct _ =
-  let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let fb = prepare_fb (10, 10) (fun _ _ -> 0) in
+  assert_equal ~msg:"before (filled ellipse direct)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
   Framebuffer.filled_ellipse 5 5 3.0 2.0 1 fb;
-  assert_equal ~msg:"after center" (Some 1) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
+  assert_equal ~msg:"after center (filled ellipse direct)" (Some 1) (Framebuffer.pixel_read 5 5 fb);
+  assert_equal ~msg:"after edge (filled ellipse direct)" (Some 1) (Framebuffer.pixel_read 5 7 fb);
+  assert_equal ~msg:"dirty bit should be set after filled_ellipse" true (Framebuffer.is_dirty fb)
 
 let test_draw_filled_ellipse_direct_off_framebuffer _ =
-  let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let fb = prepare_fb (10, 10) (fun _ _ -> 0) in
+  assert_equal ~msg:"before (filled ellipse off)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
   Framebuffer.filled_ellipse 0 0 4.0 3.0 1 fb;
-  assert_equal ~msg:"after" (Some 1) (Framebuffer.pixel_read 1 1 fb)
+  assert_equal ~msg:"after (filled ellipse off)" (Some 1) (Framebuffer.pixel_read 1 1 fb);
+  assert_equal ~msg:"dirty bit should be set after filled_ellipse (off)" true (Framebuffer.is_dirty fb)
 
 let test_draw_filled_ellipse_with_primitive _ =
-  let fb = Framebuffer.init (10, 10) (fun _ _ -> 0) in
-  assert_equal ~msg:"before" (Some 0) (Framebuffer.pixel_read 5 5 fb);
+  let fb = prepare_fb (10, 10) (fun _ _ -> 0) in
+  assert_equal ~msg:"before (filled ellipse prim)" (Some 0) (Framebuffer.pixel_read 5 5 fb);
   let prim = Primitives.FilledEllipse ({x = 5; y = 5}, 3.0, 2.0, 1) in
   Framebuffer.render fb [prim];
-  assert_equal ~msg:"after center" (Some 1) (Framebuffer.pixel_read 5 5 fb);
-  assert_equal ~msg:"after edge" (Some 1) (Framebuffer.pixel_read 5 7 fb)
+  assert_equal ~msg:"after center (filled ellipse prim)" (Some 1) (Framebuffer.pixel_read 5 5 fb);
+  assert_equal ~msg:"after edge (filled ellipse prim)" (Some 1) (Framebuffer.pixel_read 5 7 fb);
+  assert_equal ~msg:"dirty bit should be set after render (filled ellipse)" true (Framebuffer.is_dirty fb)
 
 
 
@@ -315,6 +322,8 @@ let test_dirty_bit_render_primitive _ =
     Primitives.Line ({x = 2; y = 2}, {x = 5; y = 5}, 1);
     Primitives.Circle ({x = 5; y = 5}, 4.0, 1);
     Primitives.FilledCircle ({x = 5; y = 5}, 4.0, 1);
+    Primitives.Ellipse ({x = 5; y = 5}, 4.0, 3.0, 1);
+    Primitives.FilledEllipse ({x = 5; y = 5}, 4.0, 3.0, 1);
     Primitives.Rect ({x = 3; y = 3}, {x = 6; y = 6}, 1);
     Primitives.FilledRect ({x = 3; y = 3}, {x = 6; y = 6}, 1);
     Primitives.Triangle ({x = 3; y = 3}, {x = 5; y = 8}, {x = 8; y = 3}, 1);

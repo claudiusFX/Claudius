@@ -50,7 +50,6 @@ let draw_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
 
   done
 
-<<<<<<< HEAD
 let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
   let fx = Float.of_int x and fy = Float.of_int y in
   let my = Float.of_int ((Array.length buffer.data) - 1)
@@ -70,36 +69,15 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
       for xi = (Int.of_float minx) to (Int.of_float maxx) do
         pixel_write xi yi col buffer
       done
-=======
-let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : int array array) =
-  let fx = Float.of_int x and fy = Float.of_int y in
-  let my = Float.of_int ((Array.length buffer) - 1)
-  and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
-  let pminy = fy -. r
-  and pmaxy = fy +. r in
-  let miny = max 0 (Int.of_float pminy)
-  and maxy = min (Int.of_float my) (Int.of_float pmaxy) in
-
-  for yi = miny to maxy do
-    let dy = Float.of_int (yi - y) in
-    let a = acos (dy /. r) in
-    let xw = (sin a) *. r in
-    let minx = max 0 (Int.of_float (fx -. xw))
-    and maxx = min (Int.of_float mx) (Int.of_float (fx +. xw)) in
-
-    for xi = minx to maxx do
-      pixel_write xi yi col buffer
->>>>>>> 0750f06 (Updated)
-    done
   done
 
 let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buffer : t) =
-  let width = Array.length buffer.(0) in
-  let height = Array.length buffer in
+  let width = Array.length buffer.data.(0) in
+  let height = Array.length buffer.data in
   
   let pixel_write x y =
     if x >= 0 && y >= 0 && x < width && y < height then
-      buffer.(y).(x) <- col
+      buffer.data.(y).(x) <- col
   in
     
   let x = ref 0 in
@@ -115,8 +93,8 @@ let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buff
     pixel_write (x0 + !x) (y0 - !y);
     pixel_write (x0 - !x) (y0 - !y);
     
-    incr x;
-    if !d1 < 0. then begin
+    incr x; 
+   if !d1 < 0. then begin
       dx := !dx +. (2. *. b *. b);
       d1 := !d1 +. !dx +. (b *. b);
     end else begin
@@ -124,8 +102,7 @@ let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buff
       dx := !dx +. (2. *. b *. b);
       dy := !dy -. (2. *. a *. a);
       d1 := !d1 +. !dx -. !dy +. (b *. b);
-    end
-      
+    end  
   done;
     
   let d2 = ref ((b *. b *. float_of_int (!x + 1) ** 2.) +.
@@ -149,30 +126,33 @@ let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buff
       dy := !dy -. (2. *. a *. a);
       d2 := !d2 +. !dx -. !dy +. (a *. a);
     end
-  done
+done
+
+let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : t) =
+  let fx = Float.of_int x and fy = Float.of_int y in
+  let my = Float.of_int ((Array.length buffer.data) - 1)
+  and mx = Float.of_int ((Array.length buffer.data.(0)) - 1) in
   
-  let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : int array array) =
-    let fx = Float.of_int x and fy = Float.of_int y in
-    let my = Float.of_int ((Array.length buffer) - 1)
-    and mx = Float.of_int ((Array.length buffer.(0)) - 1) in
-    
-    let pminy = fy -. ry
-    and pmaxy = fy +. ry in
-    let miny = max 0 (Int.of_float pminy)
-    and maxy = min (Int.of_float my) (Int.of_float pmaxy) in
-    
-    for yi = miny to maxy do
-      let dy = Float.of_int (yi - y) in
-      let term = 1. -. ((dy *. dy) /. (ry *. ry)) in
-      if term >= 0. then
-        let xw = rx *. sqrt term in
-        let minx = max 0 (Int.of_float (fx -. xw))
-        and maxx = min (Int.of_float mx) (Int.of_float (fx +. xw)) in
-        
-        for xi = minx to maxx do
+  let pminy = fy -. ry
+  and pmaxy = fy +. ry in
+  let miny = if pminy < 0. then 0. else pminy
+  and maxy = if pmaxy > my then my else pmaxy in
+  
+  for yi = (Int.of_float miny) to (Int.of_float maxy) do
+    let dy = Float.of_int (yi - y) in
+    let term = 1. -. ((dy *. dy) /. (ry *. ry)) in
+    if term >= 0. then
+      let xw = rx *. sqrt term in
+      let pminx = fx -. xw
+      and pmaxx = fx +. xw in
+      let minx = if pminx < 0. then 0. else pminx
+      and maxx = if pmaxx > mx then mx else pmaxx in
+      
+      if (maxx > 0.0) && (minx < mx) then
+        for xi = (Int.of_float minx) to (Int.of_float maxx) do
           pixel_write xi yi col buffer
         done
-    done
+  done
 
 let draw_line (x0 : int) (y0 : int) (x1 : int) (y1 : int) (col : int) (buffer : t) =
   let dx = abs (x1 - x0)
