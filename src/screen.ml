@@ -3,9 +3,9 @@ type t = {
   width           : int ;
   height          : int ;
   scale           : int ;
-  palette         : Palette.t ;
+  mutable palette         : Palette.t ;
   font            : Font.t option;
-  dirty           : bool;
+  mutable dirty           : bool;
 }
 
 
@@ -15,8 +15,9 @@ let create (width : int) (height : int) (scale : int) (palette : Palette.t) : t 
   if height <= 0 then raise (Invalid_argument "Invalid height");
   { width ; height ; scale ; palette ; font = None; dirty = true}
 
-let update_palette (screen : t) (new_palette : Palette.t) : t =
-  { screen with palette = new_palette; dirty = true }
+  let update_palette (screen : t) (new_palette : Palette.t) : unit =
+    screen.palette <- new_palette;
+    screen.dirty <- true  
 
 let create_with_font (width : int) (height : int) (scale : int) (font : Font.t) (palette : Palette.t) : t =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
@@ -39,5 +40,5 @@ let scale (screen : t) : int =
 let is_dirty (screen : t) : bool =
   screen.dirty
 
-let clear_dirty (screen : t) : t =
-  { screen with dirty = false }
+let clear_dirty (screen : t) : unit =
+  screen.dirty <- false
