@@ -8,7 +8,6 @@ type t = {
   mutable dirty           : bool;
 }
 
-
 let create (width : int) (height : int) (scale : int) (palette : Palette.t) : t =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
