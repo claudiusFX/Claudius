@@ -72,29 +72,21 @@ let filled_circle (x : int) (y : int) (r : float) (col : int) (buffer : t) =
   done
 
 let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buffer : t) =
-  let width = Array.length buffer.data.(0) in
-  let height = Array.length buffer.data in
-  
-  let pixel_write x y =
-    if x >= 0 && y >= 0 && x < width && y < height then
-      buffer.data.(y).(x) <- col
-  in
-    
   let x = ref 0 in
   let y = ref (int_of_float b) in
-    
+
   let d1 = ref ((b *. b) -. (a *. a *. b) +. (0.25 *. a *. a)) in
   let dx = ref (2. *. b *. b *. float_of_int !x) in
   let dy = ref (2. *. a *. a *. float_of_int !y) in
-    
+
   while !dx < !dy do
-    pixel_write (x0 + !x) (y0 + !y);
-    pixel_write (x0 - !x) (y0 + !y);
-    pixel_write (x0 + !x) (y0 - !y);
-    pixel_write (x0 - !x) (y0 - !y);
-    
-    incr x; 
-   if !d1 < 0. then begin
+    pixel_write (x0 + !x) (y0 + !y) col buffer;
+    pixel_write (x0 - !x) (y0 + !y) col buffer;
+    pixel_write (x0 + !x) (y0 - !y) col buffer;
+    pixel_write (x0 - !x) (y0 - !y) col buffer;
+
+    incr x;
+    if !d1 < 0. then begin
       dx := !dx +. (2. *. b *. b);
       d1 := !d1 +. !dx +. (b *. b);
     end else begin
@@ -102,19 +94,19 @@ let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buff
       dx := !dx +. (2. *. b *. b);
       dy := !dy -. (2. *. a *. a);
       d1 := !d1 +. !dx -. !dy +. (b *. b);
-    end  
+    end
   done;
-    
+
   let d2 = ref ((b *. b *. float_of_int (!x + 1) ** 2.) +.
                 (a *. a *. float_of_int (!y - 1) ** 2.) -.
                 (a *. a *. b *. b)) in
-    
+
   while !y >= 0 do
-    pixel_write (x0 + !x) (y0 + !y);
-    pixel_write (x0 - !x) (y0 + !y);
-    pixel_write (x0 + !x) (y0 - !y);
-    pixel_write (x0 - !x) (y0 - !y);
-    
+    pixel_write (x0 + !x) (y0 + !y) col buffer;
+    pixel_write (x0 - !x) (y0 + !y) col buffer;
+    pixel_write (x0 + !x) (y0 - !y) col buffer;
+    pixel_write (x0 - !x) (y0 - !y) col buffer;
+
     if !d2 > 0. then begin
       decr y;
       dy := !dy -. (2. *. a *. a);
@@ -126,7 +118,7 @@ let draw_ellipse (x0 : int) (y0 : int) (a : float) (b : float) (col : int) (buff
       dy := !dy -. (2. *. a *. a);
       d2 := !d2 +. !dx -. !dy +. (a *. a);
     end
-done
+  done
 
 let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (buffer : t) =
   let fx = Float.of_int x and fy = Float.of_int y in
