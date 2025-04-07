@@ -131,8 +131,7 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       Sdl.destroy_renderer r;
       Sdl.destroy_window w;
       Sdl.quit ()
-
-
+      
 let run_functional (title : string) (tick_f : functional_tick_func) (s : Screen.t) =
   let wrap_tick (t : int) (screen : Screen.t) (_prev_fb : Framebuffer.t) (input : input_state) : Framebuffer.t =
     let primitives : Primitives.t list = tick_f t screen input.keys in
