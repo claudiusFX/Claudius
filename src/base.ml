@@ -19,6 +19,8 @@ type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.
 
 type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+type functional_tick_func = int -> Screen.t -> KeyCodeSet.t -> Primitives.t list
+
 (* ----- *)
 
 let (>>=) = Result.bind
@@ -129,3 +131,15 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       Sdl.destroy_renderer r;
       Sdl.destroy_window w;
       Sdl.quit ()
+
+
+let run_functional (title : string) (tick_f : functional_tick_func) (s : Screen.t) =
+  let wrap_tick (t : int) (screen : Screen.t) (_prev_fb : Framebuffer.t) (input : input_state) : Framebuffer.t =
+    let primitives : Primitives.t list = tick_f t screen input.keys in
+    let width, height = Screen.dimensions screen in
+    let new_framebuffer = Framebuffer.init (width, height) (fun _x _y -> 0) in
+    Framebuffer.render new_framebuffer primitives;
+    new_framebuffer
+  in
+  run title None wrap_tick s
+      
