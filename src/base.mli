@@ -29,5 +29,11 @@ type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
 (** Function called once a frame during run *)
 
+type functional_tick_func = int -> Screen.t -> KeyCodeSet.t -> Primitives.t list
+
 val run: string -> boot_func option -> tick_func -> Screen.t -> unit
 (** [run title boot tick screen] Creates the runloop *)
+
+val run_functional : string -> functional_tick_func -> Screen.t -> unit
+(** [run_functional title tick_f screen] runs Claudius in a functional style. 
+- [tick_f] screen returns a list of primitives rather than a complete framebuffer.*)

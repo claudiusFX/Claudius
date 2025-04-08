@@ -139,3 +139,22 @@ let index_to_rgb (palette : t) (index : int) : int32 =
 
 let to_list (palette : t) : int list =
     List.map Int32.to_int (Array.to_list palette)
+
+let circle_palette (pal : t) (offset : int) : t =
+  let size = Array.length pal in
+  Array.init size (fun index ->
+    (* Calculate new index ensuring it is positive *)
+    let raw = index + offset in
+    let new_index = if raw < 0 then (raw mod size) + size else raw mod size in
+    pal.(new_index)
+  )
+
+let updated_entry (pal : t) (index : int) (new_color : int * int * int) : t =
+  if index < 0 || index >= Array.length pal then
+    raise (Invalid_argument "Invalid palette index")
+  else
+    let (r, g, b) = new_color in
+    let new_int = Int32.of_int ((r * 65536) lor (g * 256) lor b) in
+    let new_pal = Array.copy pal in
+    new_pal.(index) <- new_int;
+    new_pal

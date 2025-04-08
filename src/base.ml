@@ -26,6 +26,7 @@ type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.
 
 type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
 
+type functional_tick_func = int -> Screen.t -> KeyCodeSet.t -> Primitives.t list
 
 (* ----- *)
 
@@ -101,7 +102,7 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
     | Error (`Msg e) -> Sdl.log "texture error: %s" e; exit 1
     | Ok texture ->
       (* This is a conversion layer, but allocaing bigarrays frequently is frowned upon
-         so we allocate it once here and re-use it. *)
+        so we allocate it once here and re-use it. *)
       let bitmap = (Bigarray.Array1.create Bigarray.int32 Bigarray.c_layout (width * height)) in
 
       let initial_buffer = match boot with
@@ -139,3 +140,56 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
           Sdl.destroy_renderer r;
           Sdl.destroy_window w;
           Sdl.quit ()
+        if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) || (Screen.is_dirty s) then (
+          framebuffer_to_bigarray s updated_buffer bitmap;
+          (match render_texture r texture s bitmap with
+           | Error (`Msg e) -> Sdl.log "Boot error: %s" e
+           | Ok () -> ());
+          Framebuffer.clear_dirty updated_buffer;
+          Screen.clear_dirty s
+        );
+
+        match render_texture r texture s bitmap with
+        | Error (`Msg e) -> Sdl.log "Boot error: %s" e
+        | Ok () -> (
+          let exit, input =
+          match Sdl.poll_event (Some e) with
+          | true -> (
+            match Sdl.Event.(enum (get e typ)) with
+            | `Quit -> (true, input)
+            | `Key_down -> 
+                let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+                (false, { input with keys = KeyCodeSet.add key input.keys })
+            | `Key_up -> 
+              let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+              (false, { input with keys = KeyCodeSet.remove key input.keys })
+            | `Mouse_button_down | `Mouse_button_up | `Mouse_motion | `Mouse_wheel ->
+                let mouse = PlatformMouse.handle_event e input.mouse in
+                (false, { input with mouse })
+            | _ -> (false, input)
+          )
+          | false -> (false, input) in
+          match exit with
+          | true -> ()
+          | false -> loop (t + 1) updated_buffer input now
+        )
+      ) in loop 0 initial_buffer input Int32.zero;
+
+      Sdl.destroy_texture texture;
+      Sdl.destroy_renderer r;
+      Sdl.destroy_window w;
+      Sdl.quit ()
+
+let run_functional (title : string) (tick_f : functional_tick_func) (s : Screen.t) =
+  let wrap_tick (t : int) (screen : Screen.t) (prev_framebuffer : Framebuffer.t) (input : input_state) : Framebuffer.t =
+    let primitives : Primitives.t list = tick_f t screen input.keys in
+    if primitives = [] then
+      prev_framebuffer
+    else
+      let width, height = Screen.dimensions screen in
+      let new_framebuffer = Framebuffer.init (width, height) (fun _x _y -> 0) in
+      Framebuffer.render new_framebuffer primitives;
+      new_framebuffer
+  in
+  run title None wrap_tick s
+      
