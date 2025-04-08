@@ -93,28 +93,39 @@ let test_handle_event_wheel _ =
   | [Mouse.Wheel 1] -> ()
   | _ -> failwith "Expected Wheel event with positive value"
 
-let test_handle_drag_event _ =
+let test_drag_for_all_buttons _ =
   let event, mouse = setup 1 in
-  (* Simulate a button down first *)
-  Sdl.Event.set event Sdl.Event.mouse_button_button 1;
-  Sdl.Event.set event Sdl.Event.mouse_button_x 50;
-  Sdl.Event.set event Sdl.Event.mouse_button_y 60;
-  Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
-  let mouse = Mousesdl.handle_mouse_button_event event mouse in
-  
-  (* Simulate a motion event while the left button is held down *)
-  Sdl.Event.set event Sdl.Event.mouse_motion_x 70;
-  Sdl.Event.set event Sdl.Event.mouse_motion_y 80;
-  Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
-  let mouse = Mousesdl.handle_event event mouse in
-  
-  (* Check that the events list contains a Drag event *)
-  let events = Mouse.get_events mouse in
-  if List.exists (function
-    | Mouse.Drag (Mouse.Left, (70,80)) -> true
-    | _ -> false) events
-  then ()
-  else failwith "Expected Drag event for left button"
+  let buttons = [Mouse.Left; Mouse.Middle; Mouse.Right] in
+
+  List.iter (fun button ->
+    (* Press button *)
+    Sdl.Event.set event Sdl.Event.mouse_button_button (Mousesdl.to_sdl_button button);
+    Sdl.Event.set event Sdl.Event.mouse_button_x 10;
+    Sdl.Event.set event Sdl.Event.mouse_button_y 20;
+    Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
+    let mouse = Mousesdl.handle_mouse_button_event event mouse in
+
+    (* Drag motion *)
+    Sdl.Event.set event Sdl.Event.mouse_motion_x 30;
+    Sdl.Event.set event Sdl.Event.mouse_motion_y 40;
+    Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
+    let mouse = Mousesdl.handle_event event mouse in
+
+    let events = Mouse.get_events mouse in
+
+    (* Assert Drag exists *)
+    assert_bool (Printf.sprintf "Expected Drag event for %s button"
+      (match button with Left -> "Left" | Middle -> "Middle" | Right -> "Right"))
+      (List.exists (function
+        | Mouse.Drag (b, (30, 40)) when b = button -> true
+        | _ -> false) events);
+
+    (* Assert Motion is not present *)
+    assert_bool "Should not contain Motion event during drag"
+      (not (List.exists (function
+        | Mouse.Motion _ -> true
+        | _ -> false) events))
+  ) buttons
 
 let suite =
   "Mousesdl" >::: [
@@ -127,7 +138,7 @@ let suite =
     "test_handle_event_button" >:: test_handle_event_button;
     "test_handle_event_motion" >:: test_handle_event_motion;
     "test_handle_event_wheel" >:: test_handle_event_wheel;
-    "test_handle_drag_event" >:: test_handle_drag_event;
+    "test_drag_for_all_buttons" >:: test_drag_for_all_buttons;
   ]
 
 let () = run_test_tt_main suite
