@@ -11,6 +11,7 @@ type event =
   | Button_up of button * (int * int)       (** Button release event with position *)
   | Motion of (int * int)                   (** Mouse movement event *)
   | Wheel of int                            (** Scroll wheel event *)
+  | Drag of button * (int * int)            (** Drag event: button is held down while moving *)
   (** Represents a mouse event. *)
 
 type t

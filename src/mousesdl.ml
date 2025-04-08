@@ -6,7 +6,7 @@ let of_sdl_button (button: int) : button =
   | 1 -> Left
   | 2 -> Middle
   | 3 -> Right
-  | _ -> Left  (* if an unknown button is pressed, then left button will be considered *)
+  | _ -> Left
 
 let to_sdl_button (button: button) : int =
   match button with
@@ -29,7 +29,10 @@ let handle_mouse_motion_event (event: Sdl.event) (t: t) : t =
   let x = Sdl.Event.get event Sdl.Event.mouse_motion_x in
   let y = Sdl.Event.get event Sdl.Event.mouse_motion_y in
   let t = update_position t (x, y) in
-  add_event t (Motion (x, y))
+  if is_button_pressed t Left then
+    add_event t (Drag (Left, (x, y)))
+  else
+    add_event t (Motion (x, y))
 
 let handle_mouse_wheel_event (event: Sdl.event) (t: t) : t =
   let y = Sdl.Event.get event Sdl.Event.mouse_wheel_y in

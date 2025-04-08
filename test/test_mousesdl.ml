@@ -93,6 +93,29 @@ let test_handle_event_wheel _ =
   | [Mouse.Wheel 1] -> ()
   | _ -> failwith "Expected Wheel event with positive value"
 
+let test_handle_drag_event _ =
+  let event, mouse = setup 1 in
+  (* Simulate a button down first *)
+  Sdl.Event.set event Sdl.Event.mouse_button_button 1;
+  Sdl.Event.set event Sdl.Event.mouse_button_x 50;
+  Sdl.Event.set event Sdl.Event.mouse_button_y 60;
+  Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
+  let mouse = Mousesdl.handle_mouse_button_event event mouse in
+  
+  (* Simulate a motion event while the left button is held down *)
+  Sdl.Event.set event Sdl.Event.mouse_motion_x 70;
+  Sdl.Event.set event Sdl.Event.mouse_motion_y 80;
+  Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
+  let mouse = Mousesdl.handle_event event mouse in
+  
+  (* Check that the events list contains a Drag event *)
+  let events = Mouse.get_events mouse in
+  if List.exists (function
+    | Mouse.Drag (Mouse.Left, (70,80)) -> true
+    | _ -> false) events
+  then ()
+  else failwith "Expected Drag event for left button"
+
 let suite =
   "Mousesdl" >::: [
     "test_invalid_scale" >:: test_invalid_scale;
@@ -104,6 +127,7 @@ let suite =
     "test_handle_event_button" >:: test_handle_event_button;
     "test_handle_event_motion" >:: test_handle_event_motion;
     "test_handle_event_wheel" >:: test_handle_event_wheel;
+    "test_handle_drag_event" >:: test_handle_drag_event;
   ]
 
 let () = run_test_tt_main suite
