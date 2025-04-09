@@ -6,7 +6,7 @@ let of_sdl_button (button: int) : button =
   | 1 -> Left
   | 2 -> Middle
   | 3 -> Right
-  | _ -> Left  (* if an unknown button is pressed, then left button will be considered *)
+  | _ -> Left      (* if an unknown button is pressed, then left button will be considered *)
 
 let to_sdl_button (button: button) : int =
   match button with
@@ -25,11 +25,17 @@ let handle_mouse_button_event (event: Sdl.event) (t: t) : t =
   let event = if pressed then Button_down (button, (x, y)) else Button_up (button, (x, y)) in
   add_event t event
 
-let handle_mouse_motion_event (event: Sdl.event) (t: t) : t =
-  let x = Sdl.Event.get event Sdl.Event.mouse_motion_x in
-  let y = Sdl.Event.get event Sdl.Event.mouse_motion_y in
-  let t = update_position t (x, y) in
-  add_event t (Motion (x, y))
+  let handle_mouse_motion_event (event: Sdl.event) (t: t) : t =
+    let x = Sdl.Event.get event Sdl.Event.mouse_motion_x in
+    let y = Sdl.Event.get event Sdl.Event.mouse_motion_y in
+    let t = update_position t (x, y) in
+    let buttons = [Left; Middle; Right] in
+    let pressed_buttons = List.filter (fun b -> is_button_pressed t b) buttons in
+    if pressed_buttons = [] then
+      add_event t (Motion (x, y))
+    else
+      List.fold_left (fun acc b -> add_event acc (Drag (b, (x, y)))) t pressed_buttons  
+
 
 let handle_mouse_wheel_event (event: Sdl.event) (t: t) : t =
   let y = Sdl.Event.get event Sdl.Event.mouse_wheel_y in

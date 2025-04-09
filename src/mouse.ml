@@ -10,6 +10,7 @@ type event =
   | Button_up of button * (int * int)    (* button released with coordinates *)
   | Motion of (int * int)                (* mouse moved to coordinates *)
   | Wheel of int                         (* positive for upward scroll, negative for downward scroll *)
+  | Drag of button * (int * int)         (* Drag event *)
 
 type t = {
   events: event list;
@@ -40,6 +41,7 @@ let add_event t event =
     | Button_up (b, (x, y)) -> Button_up (b, scale_coords (x, y))
     | Motion (x, y) -> Motion (scale_coords (x, y))
     | Wheel _ as e -> e                   (* Wheel events remain unchanged *)
+    | Drag (b, (x, y)) -> Drag (b, scale_coords (x, y))
   in
 {
   t with
