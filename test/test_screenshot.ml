@@ -22,5 +22,6 @@ let () =
 
   test_palette "vapourwave" (Palette.generate_vapourwave_palette 64);
   test_palette "vga" (Palette.generate_microsoft_vga_palette ());
+  test_palette "monopalette" (Palette.generate_mono_palette 256);
 
 flush_all()
