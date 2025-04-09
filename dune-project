@@ -23,7 +23,7 @@
  (name claudius)
  (synopsis "A retro computer library")
  (description "A longer description")
- (depends ocaml dune tsdl ounit2 odoc giflib)
+ (depends ocaml dune tsdl ounit2 odoc giflib crunch)
  (tags
   (graphics rendering paletted)))
 

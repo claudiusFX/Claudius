@@ -5,21 +5,17 @@ type t
 
 (** {1 Initializations} *)
 
-val create: int -> int -> int -> Palette.t -> t
-(** [create width height scale palette] Creates a new screen of the specified size [width] x [height],
+val create: ?font:Font.t option -> int -> int -> int -> Palette.t -> t
+(** [create font width height scale palette] Creates a new screen of the specified size [width] x [height],
     and it will be rendered in a window scaled up by the [scale] factor provided. The framebuffers
     used when running will be indexed into the [palette] provided here. Raises [Invalid_argument] if
-   the dimensions or scale are either zero or negative. *)
+   the dimensions or scale are either zero or negative. If no [font] is provided then a default font is used. *)
 
 val update_palette: t -> Palette.t -> unit
 (**[update screen new_palette] creates a new screen with updated palette and marks the screen as dirty.*)
 
 val create_with_font: int -> int -> int -> Font.t -> Palette.t -> t
-(** [create width height scale font palette] Creates a new screen of the specified size [width] x [height],
-    and it will be rendered in a window scaled up by the [scale] factor provided. A font to be
-    used for future rendering of characters is provided here. The framebuffers  used when running
-    will be indexed into the [palette] provided here. Raises [Invalid_argument] if
-   the dimensions or scale are either zero or negative. *)
+(** [create width height scale font palette] Deprecated: now use create with the optional font. *)
 
 (** {1 Access} *)
 
@@ -32,7 +28,7 @@ val palette: t -> Palette.t
 val scale : t -> int
 (** [scale screen] Returns the scaling factor used when drawing [screen] to a window. *)
 
-val font : t -> Font.t option
+val font : t -> Font.t
 (** [font screen] Returns the font associated with the [screen] if one was provided, or [None] otherwise. *)
 
 val is_dirty : t -> bool

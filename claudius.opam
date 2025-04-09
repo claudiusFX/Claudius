@@ -16,6 +16,7 @@ depends: [
   "ounit2"
   "odoc"
   "giflib"
+  "crunch"
 ]
 build: [
   ["dune" "subst"] {dev}
@@ -32,6 +33,3 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/mdales/claudius.git"
-pin-depends: [
-  ["giflib.dev" "git+https://github.com/ClaudiusFX/ocaml-gif.git#main"]
-]

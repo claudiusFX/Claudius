@@ -6,7 +6,8 @@ let test_basic_screen_creation _ =
   let screen = Screen.create 640 480 2 palette in
   assert_equal ~msg:"Dimensions" (640, 480) (Screen.dimensions screen);
   assert_equal ~msg:"Scale" 2 (Screen.scale screen);
-  assert_equal ~msg:"Font" None (Screen.font screen);
+  let font = Screen.font screen in
+  assert_bool "Font" ((Font.glyph_count font) > 0);
   assert_equal ~msg:"Palette" palette (Screen.palette screen)
 
 let test_fail_invalid_scale _ =

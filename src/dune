@@ -1,4 +1,10 @@
+(rule
+ (targets builtins.ml)
+ (deps ../thirdparty/tamzen-font/psf/TamzenForPowerline10x20.psf)
+ (action
+  (run ocaml-crunch -m plain -o builtins.ml ../thirdparty/tamzen-font/psf)))
+
 (library
  (name claudius)
  (public_name claudius)
- (libraries tsdl giflib))
+ (libraries tsdl giflib crunch))
