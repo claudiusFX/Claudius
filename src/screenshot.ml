@@ -28,11 +28,14 @@ let pad_palette_to_power_of_two (colors : ColorTable.t) : ColorTable.t =
     if i < len then colors.(i) else (0, 0, 0)
   )
 
-let save_screenshot (fb : Framebuffer.t) (palette : Palette.t) =
+let save_screenshot ~(scale : int) (fb : Framebuffer.t) (palette : Palette.t) =
   let width = Array.length fb.data.(0) in
   let height = Array.length fb.data in
 
-  let size = width * height in
+  let scaled_width = width * scale in
+  let scaled_height = height * scale in
+
+  let size = scaled_width * scaled_height in
 
   let colors =
     palette
@@ -49,11 +52,13 @@ let save_screenshot (fb : Framebuffer.t) (palette : Palette.t) =
   let nulls_replaced = ref 0 in
   let pixels =
     List.init size (fun idx ->
-      let x = idx mod width in
-      let y = idx / width in
-      let v = fb.data.(y).(x) in
+      let x = idx mod scaled_width in
+      let y = idx / scaled_width in
+      let src_x = x / scale in
+      let src_y = y / scale in
+      let v = fb.data.(src_y).(src_x) in
       if v < 0 || v > 255 then
-        failwith (Printf.sprintf "Framebuffer value %d out of byte range at (%d,%d)" v x y);
+        failwith (Printf.sprintf "Framebuffer value %d out of byte range at (%d,%d)" v src_x src_y);
       if v = 0 then incr nulls_replaced;
       let max_index = Palette.size palette - 1 in
       let safe_v =
@@ -69,7 +74,7 @@ let save_screenshot (fb : Framebuffer.t) (palette : Palette.t) =
   let compressed = Lzw.encode flattened color_depth in
 
   let image = Image.v
-    (width, height)
+    (scaled_width, scaled_height)
     colors
     compressed
     color_depth
