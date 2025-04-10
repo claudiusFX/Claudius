@@ -113,7 +113,8 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
                 let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
                 if key = Key.F2 then (
                   let palette = Screen.palette s in
-                  Screenshot.save_screenshot prev_buffer palette;
+                  let scale = Screen.scale s in
+                  Screenshot.save_screenshot ~scale prev_buffer palette;
                   false, { input with keys = KeyCodeSet.add key input.keys }
                 ) else
                 (false, { input with keys = KeyCodeSet.add key input.keys })
