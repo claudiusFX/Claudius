@@ -3,6 +3,7 @@ open Screenshot
 
 let () =
   let width, height = 100, 100 in
+  let scale = 2 in 
 
   let test_palette name palette =
     let size = Palette.size palette in
@@ -17,7 +18,7 @@ let () =
     ) in
 
     Framebuffer.set_dirty fb;
-    save_screenshot fb palette
+    save_screenshot ~scale fb palette
   in
 
   test_palette "vapourwave" (Palette.generate_vapourwave_palette 64);
