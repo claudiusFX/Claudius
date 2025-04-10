@@ -9,8 +9,17 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
+type event =
+  | KeyDown of Key.t
+  | KeyUp of Key.t
+  | MouseButtonDown of int
+  | MouseButtonUp of int
+  | MouseMotion of { x : int; y : int; xrel : int; yrel : int }
+  | MouseWheel of { x : int; y : int }
+
 type input_state = {
   keys: KeyCodeSet.t;
+  events: event list;
   mouse: Mouse.t;
 }
 
@@ -50,18 +59,64 @@ let render_texture (r : Sdl.renderer) (texture : Sdl.texture) (s : Screen.t) (bi
   Sdl.render_copy ~dst:dst r texture >|= fun () ->
   Sdl.render_present r
 
-(* ----- *)
-
-let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Screen.t) =
-  let make_full = Array.to_list Sys.argv |> List.exists (fun a -> (String.compare a "-f") == 0) in
-
-  let s = match make_full with
-  | false -> s
+(** 3. A helper function [poll_all_events], 
+    collecting all SDL events each frame into our unified [event] list. *)
+let rec poll_all_events (keys : KeyCodeSet.t) (mouse : Mouse.t) (acc : event list)
+  : bool * KeyCodeSet.t * Mouse.t * event list =
+  let e = Sdl.Event.create () in
+  match Sdl.poll_event (Some e) with
   | true ->
-      let w, h = Screen.dimensions s and p = Screen.palette s in
-      (match Screen.font s with
-       | None -> Screen.create w h 1 p
-       | Some f -> Screen.create_with_font w h 1 f p)
+      begin match Sdl.Event.(enum (get e typ)) with
+      | `Quit ->
+          (true, keys, mouse, List.rev acc)
+      | `Key_down ->
+          let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+          poll_all_events (KeyCodeSet.add key keys) mouse (KeyDown key :: acc)
+      | `Key_up ->
+          let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
+          poll_all_events (KeyCodeSet.remove key keys) mouse (KeyUp key :: acc)
+      | `Mouse_button_down ->
+          let button = Sdl.Event.(get e mouse_button_button) in
+          let new_mouse = PlatformMouse.handle_event e mouse in
+          poll_all_events keys new_mouse (MouseButtonDown button :: acc)
+      | `Mouse_button_up ->
+          let button = Sdl.Event.(get e mouse_button_button) in
+          let new_mouse = PlatformMouse.handle_event e mouse in
+          poll_all_events keys new_mouse (MouseButtonUp button :: acc)
+      | `Mouse_motion ->
+          let x = Sdl.Event.(get e mouse_motion_x) in
+          let y = Sdl.Event.(get e mouse_motion_y) in
+          let xrel = Sdl.Event.(get e mouse_motion_xrel) in
+          let yrel = Sdl.Event.(get e mouse_motion_yrel) in
+          let new_mouse = PlatformMouse.handle_event e mouse in
+          poll_all_events keys new_mouse (MouseMotion { x; y; xrel; yrel } :: acc)
+      | `Mouse_wheel ->
+          let x = Sdl.Event.(get e mouse_wheel_x) in
+          let y = Sdl.Event.(get e mouse_wheel_y) in
+          let new_mouse = PlatformMouse.handle_event e mouse in
+          poll_all_events keys new_mouse (MouseWheel { x; y } :: acc)
+      | _ ->
+          poll_all_events keys mouse acc
+      end
+  | false ->
+      (false, keys, mouse, List.rev acc)
+
+let run (title : string) (boot : boot_func option)
+        (tick : tick_func) (s : Screen.t) =
+  let make_full = 
+    Array.to_list Sys.argv |> List.exists (fun a -> String.compare a "-f" == 0)
+  in
+
+  (* Optionally recreate the screen in fullscreen mode with scale=1, if requested. *)
+  let s =
+    match make_full with
+    | false -> s
+    | true ->
+        let w, h = Screen.dimensions s in
+        let p = Screen.palette s in
+        match Screen.font s with
+        | None -> Screen.create w h 1 p
+        | Some f -> Screen.create_with_font w h 1 f p
   in
 
   let width, height = Screen.dimensions s and scale = Screen.scale s in
@@ -81,60 +136,76 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
       | Some bfunc -> bfunc s
       in
 
-      let e = Sdl.Event.create () in
-      let input = { keys = KeyCodeSet.empty; mouse = Mouse.create scale } in
+      let initial_input = {
+        keys = KeyCodeSet.empty;
+        events = [];
+        mouse = Mouse.create scale;
+      } in
 
-      let rec loop (t : int) (prev_buffer : Framebuffer.t) (input : input_state) last_t = (
+      let rec loop (t : int)
+                   (prev_buffer : Framebuffer.t)
+                   (input : input_state)
+                   (last_t : int32) : unit =
         let now = Sdl.get_ticks () in
         let diff = Int32.(sub (of_int (1000 / 60)) (sub now last_t)) in
         if Int32.(compare diff zero) > 0 then Sdl.delay diff;
 
-        let updated_buffer = tick t s prev_buffer input in
-        let input = { input with mouse = Mouse.clear_events input.mouse } in
+        let exit, new_keys, new_mouse, unified_events =
+          poll_all_events input.keys input.mouse []
+        in
 
-        if (updated_buffer != prev_buffer) || (Framebuffer.is_dirty updated_buffer) || (Screen.is_dirty s) then (
-          framebuffer_to_bigarray s updated_buffer bitmap;
-          (match render_texture r texture s bitmap with
-           | Error (`Msg e) -> Sdl.log "Boot error: %s" e
-           | Ok () -> ());
-          Framebuffer.clear_dirty updated_buffer;
-          Screen.clear_dirty s
-        );
+        let current_input = {
+          keys = new_keys;
+          events = unified_events;
+          mouse = new_mouse;
+        } in
 
-        match render_texture r texture s bitmap with
-        | Error (`Msg e) -> Sdl.log "Boot error: %s" e
-        | Ok () -> (
-          let exit, input =
-          match Sdl.poll_event (Some e) with
-          | true -> (
-            match Sdl.Event.(enum (get e typ)) with
-            | `Quit -> (true, input)
-            | `Key_down -> 
-                let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-                (false, { input with keys = KeyCodeSet.add key input.keys })
-            | `Key_up -> 
-              let key = PlatformKey.of_backend_keycode (Sdl.Event.(get e keyboard_keycode)) in
-              (false, { input with keys = KeyCodeSet.remove key input.keys })
-            | `Mouse_button_down | `Mouse_button_up | `Mouse_motion | `Mouse_wheel ->
-                let mouse = PlatformMouse.handle_event e input.mouse in
-                (false, { input with mouse })
-            | _ -> (false, input)
-          )
-          | false -> (false, input) in
-          match exit with
-          | true -> ()
-          | false -> loop (t + 1) updated_buffer input now
-        )
-      ) in loop 0 initial_buffer input Int32.zero;
+        if exit then ()
+        else begin
+          let updated_buffer =
+            tick t s prev_buffer current_input
+          in
+
+          (* Redraw only if the buffer or screen is dirty (or changed). *)
+          if (updated_buffer != prev_buffer)
+             || (Framebuffer.is_dirty updated_buffer)
+             || (Screen.is_dirty s)
+          then (
+            framebuffer_to_bigarray s updated_buffer bitmap;
+            match render_texture r texture s bitmap with
+            | Error (`Msg e) ->
+                Sdl.log "Boot error: %s" e
+            | Ok () -> ();
+            Framebuffer.clear_dirty updated_buffer;
+            Screen.clear_dirty s
+          );
+
+          match render_texture r texture s bitmap with
+          | Error (`Msg e) ->
+              Sdl.log "Boot error: %s" e
+          | Ok () ->
+              loop (t + 1) updated_buffer current_input now
+        end
+      in
+
+      loop 0 initial_buffer initial_input Int32.zero;
 
       Sdl.destroy_texture texture;
       Sdl.destroy_renderer r;
       Sdl.destroy_window w;
       Sdl.quit ()
 
-let run_functional (title : string) (tick_f : functional_tick_func) (s : Screen.t) =
-  let wrap_tick (t : int) (screen : Screen.t) (prev_framebuffer : Framebuffer.t) (input : input_state) : Framebuffer.t =
-    let primitives : Primitives.t list = tick_f t screen input in
+(** 6. “Functional” style run that returns [Primitives.t list] instead of
+       a full [Framebuffer.t]. We wrap it to produce a [tick_func]. *)
+let run_functional (title : string)
+                   (tick_f : functional_tick_func)
+                   (s : Screen.t) =
+  let wrap_tick (t : int)
+                (screen : Screen.t)
+                (prev_framebuffer : Framebuffer.t)
+                (input : input_state)
+              : Framebuffer.t =
+    let primitives = tick_f t screen input in
     if primitives = [] then
       prev_framebuffer
     else
@@ -144,4 +215,3 @@ let run_functional (title : string) (tick_f : functional_tick_func) (s : Screen.
       new_framebuffer
   in
   run title None wrap_tick s
-      
