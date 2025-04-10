@@ -28,9 +28,10 @@ let pad_palette_to_power_of_two (colors : ColorTable.t) : ColorTable.t =
     if i < len then colors.(i) else (0, 0, 0)
   )
 
-let save_screenshot ~(scale : int) (fb : Framebuffer.t) (palette : Palette.t) =
-  let width = Array.length fb.data.(0) in
-  let height = Array.length fb.data in
+let save_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
+  let width, height = Screen.dimensions screen in
+  let scale = Screen.scale screen in
+  let palette = Screen.palette screen in
 
   let scaled_width = width * scale in
   let scaled_height = height * scale in
@@ -49,23 +50,19 @@ let save_screenshot ~(scale : int) (fb : Framebuffer.t) (palette : Palette.t) =
     min 8 (max 2 (bits_needed (len - 1) 1))
   in
 
-  let nulls_replaced = ref 0 in
   let pixels =
     List.init size (fun idx ->
       let x = idx mod scaled_width in
       let y = idx / scaled_width in
       let src_x = x / scale in
       let src_y = y / scale in
-      let v = fb.data.(src_y).(src_x) in
-      if v < 0 || v > 255 then
+      let v = 
+        match Framebuffer.pixel_read src_x src_y fb with
+        | Some v -> v
+        | None -> failwith (Printf.sprintf "Invalid pixel coordinate (%d,%d)" src_x src_y) in
+      if v < 0 || v > Palette.size palette then
         failwith (Printf.sprintf "Framebuffer value %d out of byte range at (%d,%d)" v src_x src_y);
-      if v = 0 then incr nulls_replaced;
-      let max_index = Palette.size palette - 1 in
-      let safe_v =
-        if v = 0 then 1
-        else if v > max_index then max_index
-        else v in
-      (Z.of_int safe_v, color_depth)
+      (Z.of_int v, color_depth)
     )
   in
 
@@ -84,4 +81,4 @@ let save_screenshot ~(scale : int) (fb : Framebuffer.t) (palette : Palette.t) =
   let gif = GIF.from_image image in
   let filename = now_string () ^ ".gif" in
   GIF.to_file gif filename;
-  Printf.printf "Screenshot saved to %s\n%!" filename
+  Printf.printf "Screenshot saved as %s\n%!" filename
