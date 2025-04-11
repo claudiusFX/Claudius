@@ -28,7 +28,7 @@ let pad_palette_to_power_of_two (colors : ColorTable.t) : ColorTable.t =
     if i < len then colors.(i) else (0, 0, 0)
   )
 
-let save_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
+let capture_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
   let width, height = Screen.dimensions screen in
   let scale = Screen.scale screen in
   let palette = Screen.palette screen in
@@ -85,14 +85,14 @@ let save_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
 
 let has_saved = ref false
 
-let maybe_save_screenshot (keys : Key.t list) (screen : Screen.t) (fb : Framebuffer.t) =
+let save_screenshot (keys : Key.t list) (screen : Screen.t) (fb : Framebuffer.t) =
 
   if Palette.size (Screen.palette screen) > 256 then
     failwith "GIF only supports up to 256 colors";
 
   let f2_down = List.mem Key.F2 keys in
   if f2_down && not !has_saved then (
-    save_screenshot screen fb;
+    capture_screenshot screen fb;
     has_saved := true
   ) else if not f2_down then (
     has_saved := false

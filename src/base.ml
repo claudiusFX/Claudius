@@ -90,7 +90,7 @@ let run (title : string) (boot : boot_func option) (tick : tick_func) (s : Scree
         if Int32.(compare diff zero) > 0 then Sdl.delay diff;
 
         let keys = KeyCodeSet.elements input.keys in
-        Screenshot.maybe_save_screenshot keys s prev_buffer;
+        Screenshot.save_screenshot keys s prev_buffer;
 
         let updated_buffer = tick t s prev_buffer input in
         let input = { input with mouse = Mouse.clear_events input.mouse } in
