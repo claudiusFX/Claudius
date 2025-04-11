@@ -82,3 +82,14 @@ let save_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
   let filename = now_string () ^ ".gif" in
   GIF.to_file gif filename;
   Printf.printf "Screenshot saved as %s\n%!" filename
+
+let has_saved = ref false
+
+let maybe_save_screenshot (keys : Key.t list) (screen : Screen.t) (fb : Framebuffer.t) =
+  let f2_down = List.mem Key.F2 keys in
+  if f2_down && not !has_saved then (
+    save_screenshot screen fb;
+    has_saved := true
+  ) else if not f2_down then (
+    has_saved := false
+  )
