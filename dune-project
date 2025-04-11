@@ -1,4 +1,4 @@
-(lang dune 3.14)
+(lang dune 3.17)
 
 (name claudius)
 
@@ -17,7 +17,7 @@
 
 (pin
  (url "git+https://github.com/claudiusFX/ocaml-gif.git")
- (package (name giflib.dev)))
+ (package (name giflib)))
 
 (package
  (name claudius)

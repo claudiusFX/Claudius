@@ -11,7 +11,7 @@ doc: "https://url/to/documentation"
 bug-reports: "https://github.com/mdales/claudius/issues"
 depends: [
   "ocaml"
-  "dune" {>= "3.14"}
+  "dune" {>= "3.17"}
   "tsdl"
   "ounit2"
   "odoc"
