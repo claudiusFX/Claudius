@@ -33,5 +33,5 @@ build: [
 ]
 dev-repo: "git+https://github.com/mdales/claudius.git"
 pin-depends: [
-  ["ocaml-gif.dev" "git+https://github.com/ClaudiusFX/ocaml-gif.git#main"]
+  ["giflib.dev" "git+https://github.com/ClaudiusFX/ocaml-gif.git#main"]
 ]
