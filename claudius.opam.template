@@ -1,3 +1,3 @@
 pin-depends: [
-  ["ocaml-gif.dev" "git+https://github.com/ClaudiusFX/ocaml-gif.git#main"]
+  ["giflib" "git+https://github.com/ClaudiusFX/ocaml-gif.git#main"]
 ]
