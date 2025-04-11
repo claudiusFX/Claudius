@@ -86,6 +86,10 @@ let save_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
 let has_saved = ref false
 
 let maybe_save_screenshot (keys : Key.t list) (screen : Screen.t) (fb : Framebuffer.t) =
+
+  if Palette.size (Screen.palette screen) > 256 then
+    failwith "GIF only supports up to 256 colors";
+
   let f2_down = List.mem Key.F2 keys in
   if f2_down && not !has_saved then (
     save_screenshot screen fb;
