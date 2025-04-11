@@ -15,6 +15,10 @@
 
 (documentation https://url/to/documentation)
 
+(pin
+ (url "git+https://github.com/claudiusFX/ocaml-gif.git")
+ (package (name giflib)))
+
 (package
  (name claudius)
  (synopsis "A retro computer library.")
