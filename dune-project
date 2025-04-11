@@ -1,4 +1,4 @@
-(lang dune 3.12)
+(lang dune 3.14)
 
 (name claudius)
 
@@ -17,11 +17,11 @@
 
 (pin
  (url "git+https://github.com/claudiusFX/ocaml-gif.git")
- (package (name giflib)))
+ (package (name giflib.dev)))
 
 (package
  (name claudius)
- (synopsis "A retro computer library.")
+ (synopsis "A retro computer library")
  (description "A longer description")
  (depends ocaml dune tsdl ounit2 odoc giflib)
  (tags
