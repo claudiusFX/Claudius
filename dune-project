@@ -17,13 +17,13 @@
 
 (pin
  (url "git+https://github.com/claudiusFX/ocaml-gif.git")
- (package (name giflib)))
+ (package (name giflib.dev)))
 
 (package
  (name claudius)
  (synopsis "A retro computer library")
  (description "A longer description")
- (depends ocaml dune tsdl ounit2 odoc giflib)
+ (depends ocaml dune tsdl ounit2 odoc giflib.dev)
  (tags
   (graphics rendering paletted)))
 
