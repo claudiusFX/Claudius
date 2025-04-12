@@ -17,7 +17,7 @@
 
 (pin
  (url "git+https://github.com/claudiusFX/ocaml-gif.git")
- (package (name giflib.dev)))
+ (package (name giflib)))
 
 (package
  (name claudius)
