@@ -9,6 +9,223 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
+(* FPS Calculation *)
+let last_time = ref 0.0
+let frame_count = ref 0
+let fps_counter = ref 0
+
+(* Stats toggle key *)
+let stats_toggle_key = Key.F
+let show_stats = ref false
+
+(* Calculate FPS *)
+let calculate_fps () =
+  let now = Unix.gettimeofday () in
+  let elapsed = now -. !last_time in
+  frame_count := !frame_count + 1;
+  if elapsed >= 1.0 then (
+    fps_counter := !frame_count;
+    frame_count := 0;
+    last_time := now
+  )
+
+(* Font rendering - optimized to cache character patterns *)
+let char_patterns = Hashtbl.create 36
+
+let get_char_pattern c =
+  match Hashtbl.find_opt char_patterns c with
+  | Some pattern -> pattern
+  | None ->
+      let pattern = match c with
+      | 'F' -> [
+          (0, 0); (1, 0); (2, 0); (3, 0);
+          (0, 1);
+          (0, 2); (1, 2); (2, 2);
+          (0, 3);
+          (0, 4)
+        ]
+      | 'P' -> [
+          (0, 0); (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (0, 2); (1, 2); (2, 2);
+          (0, 3);
+          (0, 4)
+        ]
+      | 'S' -> [
+          (1, 0); (2, 0); (3, 0);
+          (0, 1);
+          (1, 2); (2, 2);
+          (3, 3);
+          (0, 4); (1, 4); (2, 4)
+        ]
+      | 'R' -> [
+          (0, 0); (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (0, 2); (1, 2); (2, 2);
+          (0, 3); (2, 3);
+          (0, 4); (3, 4)
+        ]
+      | 'E' -> [
+          (0, 0); (1, 0); (2, 0); (3, 0);
+          (0, 1);
+          (0, 2); (1, 2); (2, 2);
+          (0, 3);
+          (0, 4); (1, 4); (2, 4); (3, 4)
+        ]
+      | 'D' -> [
+          (0, 0); (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (0, 2); (3, 2);
+          (0, 3); (3, 3);
+          (0, 4); (1, 4); (2, 4)
+        ]
+      | 'O' -> [
+          (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (0, 2); (3, 2);
+          (0, 3); (3, 3);
+          (1, 4); (2, 4)
+        ]
+      | 'T' -> [
+          (0, 0); (1, 0); (2, 0); (3, 0);
+          (1, 1); (2, 1);
+          (1, 2); (2, 2);
+          (1, 3); (2, 3);
+          (1, 4); (2, 4)
+        ]
+      | ':' -> [
+          (1, 1); (2, 1);
+          (1, 2); (2, 2);
+          (1, 3); (2, 3)
+        ]
+      | 'x' -> [
+          (0, 0); (3, 0);
+          (1, 1); (2, 1);
+          (1, 2); (2, 2);
+          (1, 3); (2, 3);
+          (0, 4); (3, 4)
+        ]
+      | ' ' -> []
+      | '0' -> [
+          (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (0, 2); (3, 2);
+          (0, 3); (3, 3);
+          (1, 4); (2, 4)
+        ]
+      | '1' -> [
+          (1, 0);
+          (0, 1); (1, 1);
+          (1, 2);
+          (1, 3);
+          (0, 4); (1, 4); (2, 4)
+        ]
+      | '2' -> [
+          (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (2, 2); (3, 2);
+          (1, 3);
+          (0, 4); (1, 4); (2, 4); (3, 4)
+        ]
+      | '3' -> [
+          (0, 0); (1, 0); (2, 0);
+          (3, 1);
+          (1, 2); (2, 2);
+          (3, 3);
+          (0, 4); (1, 4); (2, 4)
+        ]
+      | '4' -> [
+          (0, 0); (3, 0);
+          (0, 1); (3, 1);
+          (0, 2); (1, 2); (2, 2); (3, 2);
+          (3, 3);
+          (3, 4)
+        ]
+      | '5' -> [
+          (0, 0); (1, 0); (2, 0); (3, 0);
+          (0, 1);
+          (0, 2); (1, 2); (2, 2);
+          (3, 3);
+          (0, 4); (1, 4); (2, 4)
+        ]
+      | '6' -> [
+          (1, 0); (2, 0);
+          (0, 1);
+          (0, 2); (1, 2); (2, 2);
+          (0, 3); (3, 3);
+          (1, 4); (2, 4)
+        ]
+      | '7' -> [
+          (0, 0); (1, 0); (2, 0); (3, 0);
+          (3, 1);
+          (2, 2);
+          (1, 3);
+          (1, 4)
+        ]
+      | '8' -> [
+          (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (1, 2); (2, 2);
+          (0, 3); (3, 3);
+          (1, 4); (2, 4)
+        ]
+      | '9' -> [
+          (1, 0); (2, 0);
+          (0, 1); (3, 1);
+          (1, 2); (2, 2); (3, 2);
+          (3, 3);
+          (1, 4); (2, 4)
+        ]
+      | _ -> []
+      in
+      Hashtbl.add char_patterns c pattern;
+      pattern
+
+let draw_char x y c brightness create_pixel acc =
+  let pixels = get_char_pattern c in
+  List.fold_left (fun acc (px, py) ->
+    create_pixel ((x+px)*2) ((y+py)*2) brightness acc
+  ) acc pixels
+
+let draw_string x y text brightness create_pixel acc =
+  let chars = List.of_seq (String.to_seq text) in
+  let rec aux x y chars acc =
+    match chars with
+    | [] -> acc
+    | c :: cs ->
+      let new_acc = draw_char (x/2) (y/2) c brightness create_pixel acc in
+      aux (x + 10) y cs new_acc
+  in
+  aux x y chars acc
+
+let cached_fps_text = ref ""
+let cached_fps_value = ref (-1)
+let cached_res_text = ref ""
+let cached_width = ref (-1)
+let cached_height = ref (-1)
+
+let render_stats create_pixel width height =
+  if !fps_counter != !cached_fps_value then (
+    cached_fps_text := Printf.sprintf "FPS: %d" !fps_counter;
+    cached_fps_value := !fps_counter
+  );
+
+  if !cached_width != width || !cached_height != height then (
+    cached_res_text := Printf.sprintf "RES: %dx%d" width height;
+    cached_width := width;
+    cached_height := height
+  );
+
+  (* let entity_text = Printf.sprintf "DOTS: %d" entity_count in *)
+
+  let base_x = 2 in
+  let base_y = 2 in
+  let brightness = 15 in
+
+  let fps_primitives = draw_string (base_x*2) (base_y*2) !cached_fps_text brightness create_pixel [] in
+  (* let entity_primitives = draw_string (base_x*2) ((base_y + 14)*2) entity_text brightness create_pixel fps_primitives in *)
+  draw_string (base_x*2) ((base_y + 14)*2) !cached_res_text brightness create_pixel fps_primitives
+
 type input_state = {
   keys: KeyCodeSet.t;
   events: Event.t list;  (* Accumulated unified input events for the current frame. *)
@@ -18,6 +235,7 @@ type input_state = {
 type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
 type functional_tick_func = int -> Screen.t -> input_state -> Primitives.t list
+
 
 (* ----- *)
 
@@ -47,6 +265,16 @@ let render_texture r texture s bitmap =
   let dst = Sdl.Rect.create ~x:((ow - (width * scale)) / 2) ~y:((oh - (height * scale)) / 2) ~w:(width * scale) ~h:(height * scale) in
   Sdl.render_copy ~dst:dst r texture >|= fun () ->
   Sdl.render_present r
+
+let create_overlay_pixel x y brightness acc =
+    (Primitives.Pixel({ x = x; y = y }, brightness)) :: acc
+  (* ----- *)
+
+let cached_stats_primitives = ref []
+let last_stats_update = ref 0.0
+
+let last_f_key_state = ref false
+
 
 (* Poll SDL events and build the unified event queue.
    Mouse events are handled by PlatformMouse.handle_event, which returns
@@ -132,9 +360,37 @@ let run title boot tick s =
              } in
              if exit then ()
              else begin
+
+               calculate_fps ();
+
+               let current_f_pressed = KeyCodeSet.mem stats_toggle_key input.keys in
+               let toggle_stats = current_f_pressed && not !last_f_key_state in
+               last_f_key_state := current_f_pressed;
+
+               if toggle_stats then
+                 show_stats := not !show_stats;
+
+
                Screenshot.save_screenshot current_input.events s prev_buffer;
 
                let updated_buffer = tick t s prev_buffer current_input in
+
+               let updated_buffer =
+                 if !show_stats then
+                  let now = Unix.gettimeofday () in
+                  if now -. !last_stats_update > 0.5 then (
+                    (* Only update the visual stats every half second - using mli compatible function *)
+                    cached_stats_primitives := render_stats create_overlay_pixel width height;
+                    last_stats_update := now
+                  );
+
+                  Framebuffer.render updated_buffer !cached_stats_primitives;
+                  Framebuffer.set_dirty updated_buffer;
+                  updated_buffer
+                else
+                  updated_buffer
+               in
+
                if (updated_buffer != prev_buffer)
                   || (Framebuffer.is_dirty updated_buffer)
                   || (Screen.is_dirty s)
@@ -186,3 +442,4 @@ let was_key_just_released input key =
       | Event.KeyUp k when k = key -> true
       | _ -> false
     ) input.events
+
