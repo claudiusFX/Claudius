@@ -1,4 +1,4 @@
-(* open Graphics *)
+ (* open Graphics *)
 open Tsdl
 
 module KeyCodeSet = Set.Make(struct

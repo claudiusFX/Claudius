@@ -1,4 +1,5 @@
-(** Main Claudius entry point. *)
+ 
+ (** Main Claudius entry point. *)
 
 module KeyCodeSet : Set.S with type elt = Key.t
 (** A module representing a set of key codes. *)
