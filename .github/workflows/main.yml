@@ -29,10 +29,20 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - run: opam install . --deps-only --with-test
+      - name: Install requirements
+        run: sudo apt install -y libsdl2-dev
 
-      - run: opam exec -- dune build
+      - name: Install dune
+        run: opam install dune
 
-      - run: opam exec -- dune runtest
+      - name: Get packages
+        run: opam exec -- dune pkg lock
 
-      - run: opam exec -- dune build @doc
+      - name: Build check
+        run: opam exec -- dune build
+
+      - name: Run tests
+        run: opam exec -- dune runtest
+
+      - name: Build docs
+        run: opam exec -- dune build @doc

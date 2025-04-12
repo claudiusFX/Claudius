@@ -4,7 +4,30 @@ Claudius started out trying to be a functional library that works like a fantasy
 
 # Using Claudius
 
-Claudius is a library for OCaml to do retro-style graphics, and so you need to create a new project that uses Cladius. But because Claudius isn't currently in Opam, you'll need to add it into your project using a vendor directory:
+Claudius is a library for OCaml to do retro-style graphics, and so you need to create a new project that uses Cladius. But because Claudius isn't currently in Opam, you'll need to add it into your project using one of the two methods:
+
+## Using Claudius
+
+You should use dune to pin Claudius by adding it to the `dune-project` file for your repository - you can find an [example project here](https://github.com/gridbugs/hello-claudius). Basically you need to do two things:
+
+Add the following to your dune-project file:
+
+```
+(pin
+ (url "git+https://github.com/claudiusFX/Claudius.git")
+ (package
+  (name claudius)))
+```
+
+Then run:
+
+```shell
+$ dune pkg lock
+```
+
+## Developing Claudius
+
+If you're working on Claudius itself, then life is a bit easier using a vendor directory to add a version you can edit and commit to:
 
 ```shell
 $ dune init proj myprogram
@@ -40,7 +63,7 @@ Some users running programs built with Claudius on Ubuntu via WSL may experience
 $ export LIBGL_ALWAYS_SOFTWARE=1
 $ dune exec myprogram
  ```
-If you are using bash, you can add the above environment variable to your bashrc file: 
+If you are using bash, you can add the above environment variable to your bashrc file:
 
 ```shell
 $ echo 'export LIBGL_ALWAYS_SOFTWARE=1' >> ~/.bashrc
