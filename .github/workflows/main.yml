@@ -29,9 +29,7 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
-      - run: opam install dune
-
-      - run: dune pkg lock
+      - run: opam exec -- dune pkg lock
 
       - run: opam install . --deps-only --with-test
 
