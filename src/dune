@@ -7,4 +7,9 @@
 (library
  (name claudius)
  (public_name claudius)
+<<<<<<< HEAD
  (libraries tsdl giflib crunch))
+=======
+ (libraries tsdl giflib)
+ (modules_without_implementation sdl_api))
+>>>>>>> 264fc8e (Add unit test for run loop created a seperate module and interface to for mocking sdl)
