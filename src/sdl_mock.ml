@@ -1,3 +1,5 @@
+open Tsdl
+
 module MockSDL : SDL_API = struct
 
   (*Here, we define abstract types as trivial. For test, since real values are not used, we use [unit] 
