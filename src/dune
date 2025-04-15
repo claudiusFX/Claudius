@@ -2,4 +2,5 @@
  (name claudius)
  (public_name claudius)
  (libraries tsdl giflib)
+ (modules Base sdl_api)
  (modules_without_implementation sdl_api))
