@@ -1,5 +1,6 @@
 (* base.ml *)
 open Tsdl
+open Key
 
 module KeyCodeSet = Set.Make(struct
   type t = Key.t
