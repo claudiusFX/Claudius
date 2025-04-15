@@ -1,3 +1,5 @@
+open Tsdl
+
 module type SDL_API = sig
 
   (*These types will represents abstract sdl object*)
