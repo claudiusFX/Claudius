@@ -43,3 +43,6 @@ val was_key_just_pressed : input_state -> Key.t -> bool
 
 val was_key_just_released : input_state -> Key.t -> bool
 (** Returns [true] if [key] was released during the current frame. *)
+
+val poll_all_events : KeyCodeSet.t -> Mouse.t -> Event.t list -> (bool * KeyCodeSet.t * Mouse.t * Event.t list)
+(** Internal method exposed for testing *)
