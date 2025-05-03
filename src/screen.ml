@@ -16,10 +16,13 @@ let create ?font (width : int) (height : int) (scale : int) (palette : Palette.t
   let font = match font with
   | Some f -> f
   | None -> (
-    let default_font_data = Option.get (Builtins.read "TamzenForPowerline10x20.psf") in
+    let default_font_data = match (Builtins.read "TamzenForPowerline10x20.psf") with
+    | Some font -> font
+    | None -> failwith (Printf.sprintf "Default font file not found in builtins.")
+    in
     match (Font.of_bytes (Bytes.of_string default_font_data)) with
     | Ok f -> f
-    | Error e -> failwith (Printf.sprintf "failed to load font: %s" e)
+    | Error e -> failwith (Printf.sprintf "Failed to load default font: %s" e)
   )
   in
 
