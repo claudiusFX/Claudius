@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
 
       - name: Set-up OCaml ${{ matrix.ocaml-compiler }}
         uses: ocaml/setup-ocaml@v3

@@ -1,0 +1,8 @@
+;; copied for tests
+(rule
+ (alias runtest)
+ (deps thirdparty/tamzen-font/psf/Tamzen10x20.psf)
+ (targets Tamzen10x20.psf)
+ (action
+    (copy thirdparty/tamzen-font/psf/Tamzen10x20.psf Tamzen10x20.psf))
+)

@@ -22,10 +22,13 @@ end
 
 (** {1 Initializations} *)
 
-val load_psf_font: string -> (t, string) result
-(** [load_psf_font filepath result] Loads a bitmap font from a PSF file, or a description
-    of why the load failed. *)
+val of_file: string -> (t, string) result
+(** [of_file filepath] Loads a bitmap font from a PSF file, or a description
+  of why the load failed. *)
 
+val of_bytes: Bytes.t -> (t, string) result
+(** [of_bytes fontdata] Loads a bitmap font from a PSF file loaded into bytes, or a description
+  of why the load failed. *)
 
 (** {1 Using} *)
 

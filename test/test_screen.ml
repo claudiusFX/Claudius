@@ -6,7 +6,8 @@ let test_basic_screen_creation _ =
   let screen = Screen.create 640 480 2 palette in
   assert_equal ~msg:"Dimensions" (640, 480) (Screen.dimensions screen);
   assert_equal ~msg:"Scale" 2 (Screen.scale screen);
-  assert_equal ~msg:"Font" None (Screen.font screen);
+  let font = Screen.font screen in
+  assert_bool "Font" ((Font.glyph_count font) > 0);
   assert_equal ~msg:"Palette" palette (Screen.palette screen)
 
 let test_fail_invalid_scale _ =
@@ -32,12 +33,27 @@ let test_update_palette _ =
    Screen.clear_dirty screen;
    assert_equal ~msg:"Dirty flag should be cleared" false (Screen.is_dirty screen)
 
+let test_non_default_font _ =
+  (* the default font is the powerline version that should have more glyphs *)
+  let font = match Font.of_file "../thirdparty/tamzen-font/psf/Tamzen10x20.psf" with
+  | Ok f -> f
+  | Error msg -> assert_failure (Printf.sprintf "failed to load font: %s" msg)
+  in
+  let palette = Palette.generate_mono_palette 2 in
+  let screen_default = Screen.create 640 480 2 palette
+  and screen_with_font = Screen.create ~font 640 480 2 palette in
+  let default_font = Screen.font screen_default
+  and new_font = Screen.font screen_with_font in
+  assert_bool "default font not our font" (font != default_font);
+  assert_bool "non-default font is our font" (font == new_font)
+
 let suite =
   "Screen tests" >::: [
     "Test simple screen set up" >:: test_basic_screen_creation ;
     "Test fail with invalid scale" >:: test_fail_invalid_scale ;
     "Test fail with invalid dimensions" >:: test_fail_invalid_dimensions ;
-    "Test update palette">:: test_update_palette ;
+    "Test update palette" >:: test_update_palette ;
+    "Test loading non-default font" >:: test_non_default_font;
   ]
 
 let () =
