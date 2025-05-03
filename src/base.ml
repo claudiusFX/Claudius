@@ -82,8 +82,8 @@ let run title boot tick s =
     | true ->
         let w, h = Screen.dimensions s in
         let p = Screen.palette s in
-        let f = Screen.font s in
-        Screen.create_with_font w h 1 f p
+        let font = Screen.font s in
+        Screen.create ~font w h 1 p
   in
 
   let width, height = Screen.dimensions s and scale = Screen.scale s in

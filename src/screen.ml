@@ -8,7 +8,7 @@ type t = {
   mutable dirty           : bool;
 }
 
-let create ?(font=None) (width : int) (height : int) (scale : int) (palette : Palette.t) : t =
+let create ?font (width : int) (height : int) (scale : int) (palette : Palette.t) : t =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
@@ -30,7 +30,7 @@ let create ?(font=None) (width : int) (height : int) (scale : int) (palette : Pa
     screen.dirty <- true
 
 let create_with_font (width : int) (height : int) (scale : int) (font : Font.t) (palette : Palette.t) : t =
-  create ~font:(Some font) width height scale palette
+  create ~font width height scale palette
 
 let dimensions (screen : t) : int * int =
   screen.width, screen.height

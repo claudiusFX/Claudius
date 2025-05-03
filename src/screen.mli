@@ -5,7 +5,7 @@ type t
 
 (** {1 Initializations} *)
 
-val create: ?font:Font.t option -> int -> int -> int -> Palette.t -> t
+val create: ?font:Font.t -> int -> int -> int -> Palette.t -> t
 (** [create font width height scale palette] Creates a new screen of the specified size [width] x [height],
     and it will be rendered in a window scaled up by the [scale] factor provided. The framebuffers
     used when running will be indexed into the [palette] provided here. Raises [Invalid_argument] if
