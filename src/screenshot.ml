@@ -56,7 +56,7 @@ let capture_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
       let y = idx / scaled_width in
       let src_x = x / scale in
       let src_y = y / scale in
-      let v = 
+      let v =
         match Framebuffer.pixel_read src_x src_y fb with
         | Some v -> v
         | None -> failwith (Printf.sprintf "Invalid pixel coordinate (%d,%d)" src_x src_y) in
@@ -83,17 +83,16 @@ let capture_screenshot (screen : Screen.t) (fb : Framebuffer.t) =
   GIF.to_file gif filename;
   Printf.printf "Screenshot saved as %s\n%!" filename
 
-let has_saved = ref false
+let save_screenshot (events : Event.t list) (screen : Screen.t) (fb : Framebuffer.t) =
 
-let save_screenshot (keys : Key.t list) (screen : Screen.t) (fb : Framebuffer.t) =
+  let take_screenshot = List.fold_left (fun acc ev ->
+    match ev with
+    | Event.KeyDown Key.F2 -> true
+    | _ -> acc
+  ) false events in
 
-  if Palette.size (Screen.palette screen) > 256 then
-    failwith "GIF only supports up to 256 colors";
-
-  let f2_down = List.mem Key.F2 keys in
-  if f2_down && not !has_saved then (
+  if take_screenshot then (
+    if Palette.size (Screen.palette screen) > 256 then
+      failwith "GIF only supports up to 256 colors";
     capture_screenshot screen fb;
-    has_saved := true
-  ) else if not f2_down then (
-    has_saved := false
   )
