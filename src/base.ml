@@ -124,6 +124,8 @@ let run title boot tick s =
              } in
              if exit then ()
              else begin
+               Screenshot.save_screenshot current_input.events s prev_buffer;
+
                let updated_buffer = tick t s prev_buffer current_input in
                if (updated_buffer != prev_buffer)
                   || (Framebuffer.is_dirty updated_buffer)

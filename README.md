@@ -47,6 +47,12 @@ $ cd ..
 $ git submodule update --init --recursive
 ```
 
+## Standard keys
+
+Mostly Claudius doesn't have any interaction points beyond those you provide, but there are a few:
+
+* F2 - Save a screenshot to a GIF
+
 # Docs
 
 There are [odoc](https://github.com/ocaml/odoc) documentation for most of Claudius. You can build that documentation with:
