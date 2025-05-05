@@ -124,12 +124,12 @@ let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (bu
   let fx = Float.of_int x and fy = Float.of_int y in
   let my = Float.of_int ((Array.length buffer.data) - 1)
   and mx = Float.of_int ((Array.length buffer.data.(0)) - 1) in
-  
+
   let pminy = fy -. ry
   and pmaxy = fy +. ry in
   let miny = if pminy < 0. then 0. else pminy
   and maxy = if pmaxy > my then my else pmaxy in
-  
+
   for yi = (Int.of_float miny) to (Int.of_float maxy) do
     let dy = Float.of_int (yi - y) in
     let term = 1. -. ((dy *. dy) /. (ry *. ry)) in
@@ -139,7 +139,7 @@ let filled_ellipse (x : int) (y : int) (rx : float) (ry : float) (col : int) (bu
       and pmaxx = fx +. xw in
       let minx = if pminx < 0. then 0. else pminx
       and maxx = if pmaxx > mx then mx else pmaxx in
-      
+
       if (maxx > 0.0) && (minx < mx) then
         for xi = (Int.of_float minx) to (Int.of_float maxx) do
           pixel_write xi yi col buffer
@@ -325,40 +325,10 @@ let strand_direction (s : strand) : int =
     | x -> x
   ) s 0
 
-(* let rot l =
-   match l with
-   | [] -> []
-   | x :: [] -> [x]
-   | x :: tl -> List.rev (x :: (List.rev tl))
-
-let points_to_lines points =
-  List.combine points (rot points) *)
-
-(* let points_to_lines points =
-  match points with
-  | [] | [_] -> []
-  | p1 :: p2 :: ptl -> (
-    let rec point_list_to_lines p1 p2 pl acc =
-      match pl with
-      | [] -> (p1, p2) :: acc
-      | np :: tl -> point_list_to_lines p2 np tl ((p1, p2) :: acc)
-    in
-    point_list_to_lines p1 p2 ptl []
-  ) *)
-
-
 let poly_to_strands (points : (int * int) list) : strand list =
   match points with
   | [] | [_] -> []
-  (* | p1 :: p2 :: ptl -> ( *)
   | points -> (
-
-    (* let rec point_list_to_lines p1 p2 pl acc =
-      match pl with
-      | [] -> (p1, p2) :: acc
-      | np :: tl -> point_list_to_lines p2 np tl ((p1, p2) :: acc)
-    in
-    let lines = point_list_to_lines p1 p2 ptl [] in *)
     let lines = Utils.points_to_lines points in
 
     let rec loop
@@ -551,12 +521,11 @@ let mapi (f: shaderi_func) (buffer : t) : t =
         Array.iteri (fun i v -> row.(i) <- f v) row
       ) buffer.data;
       buffer.dirty <- true
-    
+
 
 let mapi_inplace (f: shaderi_func) (buffer : t) =
   Array.iteri (fun y row ->
     Array.iteri (fun x _v -> row.(x) <- f x y buffer) row
-    (* Array.mapi_inplace (fun x _p -> f x y buffer) row*)
   ) buffer.data;
   buffer.dirty <- true
 
@@ -605,7 +574,7 @@ let map2 (f : int -> int -> int) (origin : t) (delta : t) : t =
     with
     | Invalid_argument _ ->
         raise (Invalid_argument "Merging framebuffers requires both to have same dimensions")
-  
+
 
 
 let is_dirty (buffer : t) : bool =
