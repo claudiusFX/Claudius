@@ -9,3 +9,4 @@ type t =
   | MouseMotion of (int * int)
   | MouseWheel of int
   | MouseDrag of Mouse.button * (int * int)
+  | DropFile of string

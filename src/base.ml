@@ -67,6 +67,14 @@ let rec poll_all_events keys mouse acc =
        | `Mouse_button_down | `Mouse_button_up | `Mouse_motion | `Mouse_wheel ->
            let (new_mouse, mouse_events) = PlatformMouse.handle_event e mouse in
            poll_all_events keys new_mouse (List.rev_append mouse_events acc)
+       | `Drop_file ->
+          let filepath = Sdl.Event.drop_file_file e in
+          Sdl.Event.drop_file_free e;
+          let updated_events = match filepath with
+          | None -> acc
+          | Some filepath -> Event.DropFile filepath :: acc
+          in
+          poll_all_events keys mouse updated_events
        | _ ->
            poll_all_events keys mouse acc)
   | false ->
