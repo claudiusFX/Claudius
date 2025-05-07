@@ -17,7 +17,75 @@ type input_state = {
 
 type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
+
 type functional_tick_func = int -> Screen.t -> input_state -> Primitives.t list
+
+(* SDL operation  signature*)
+module type SDL_ops = sig
+  type window
+  type renderer
+  type texture
+  type event
+  
+  type bitmap_t = (int32, Bigarray.int32_elt, Bigarray.c_layout) Bigarray.Array1.t
+
+  (**This handle the initialization of SDL
+    parameters width, height, window title and fullscreen flag and onsuccess, 
+    this returns a window and a renderer and on failure we have an error message
+  *)
+  val init : int -> int -> string -> bool -> (window * renderer, string) Stdlib.result
+
+(* Create a texture, given a renderer, a pixel format and dimension of width and
+   height if successful, a texture is returned else an error*)
+  val create_texture : renderer -> int -> width:int -> height:int -> Sdl.Texture.access -> (texture, string) Stdlib.result
+
+   (* Update texture with pixel data from [bitmap] the integer parameter, represents pixel width *)
+  val update_texture : renderer -> texture -> bitmap_t -> int -> (unit, string) Stdlib.result
+  val renderer_clear : renderer -> (unit, string) Stdlib.result  
+  val render_copy    : renderer -> texture -> dst:Sdl.rect option -> (unit, string) Stdlib.result
+
+  val render_present : renderer -> unit
+  val poll_event_opt : unit -> event option
+  val get_ticks      : unit -> int32
+  val delay          : int32 -> unit
+  val mk_event       : unit -> event
+end
+
+module type Screenshot_ops = sig
+  val save : Event.t list -> Screen.t -> Framebuffer.t -> unit
+end
+
+(** SDL binding, wiring through  existing Tsdl calls *)
+module SDL_impl : SDL_ops = struct
+  type window   = Sdl.window
+  type renderer = Sdl.renderer
+  type texture  = Sdl.texture
+  type event    = Sdl.event
+
+  let init w h title fs =
+    Sdl.init Sdl.Init.(video + events) >>= fun () ->
+    Sdl.create_window ~w ~h title Sdl.Window.(if fs then fullscreen else windowed) >>= fun win ->
+    Sdl.create_renderer ~flags:Sdl.Renderer.(accelerated + presentvsync) win >|= fun r -> (win, r)
+
+  let create_texture = Sdl.create_texture
+
+  let render_clear   r          = Sdl.render_clear r
+  let update_texture r tx bm w  = Sdl.update_texture r tx bm w
+  let render_copy    r tx ~dst  = Sdl.render_copy ~dst r tx
+
+  let poll_event_opt () =
+    let e = Sdl.Event.create () in
+    if Sdl.poll_event (Some e) then Some e else None
+
+  let get_ticks () = Sdl.get_ticks ()
+  let delay      d = Sdl.delay d
+  let mk_event () = Sdl.Event.create ()
+end
+
+(* Default screenshot implementation *)
+module Screenshot_impl : Screenshot_ops = struct
+  let save = Screenshot.save_screenshot
+end
 
 (* ----- *)
 
@@ -80,7 +148,14 @@ let rec poll_all_events keys mouse acc =
   | false ->
       (false, keys, mouse, List.rev acc)
 
-let run title boot tick s =
+let run
+  ?(sdl_ops : (module SDL_ops) = (module SDL_impl)) 
+  ?(screenshot_ops : (module Screenshot_ops) = (module Screenshot_impl))
+  title boot tick s =
+
+  let module SDL = (val sdl_ops : SDL_ops) in
+  let module SS  = (val screenshot_ops : Screenshot_ops) in
+
   let make_full =
     Array.to_list Sys.argv |> List.exists (fun a -> String.compare a "-f" = 0)
   in
