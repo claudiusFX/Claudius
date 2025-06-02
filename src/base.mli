@@ -9,6 +9,13 @@ module PlatformKey : module type of Keysdl
 module PlatformMouse : module type of Mousesdl
 (** A module that provides platform-specific mouse handling, based on the {!Mousesdl} module. *)
 
+(** FPS Calculation and Stats Display *)
+val fps_counter : int ref
+(** The current frames per second count *)
+
+val show_stats : bool ref
+(** Whether stats display is currently enabled *)
+
 type input_state = {
   keys: KeyCodeSet.t;
   events: Event.t list;  (** Accumulated unified input events for the current frame. *)
@@ -31,7 +38,8 @@ val run: string -> boot_func option -> tick_func -> Screen.t -> unit
 (** [run title boot tick screen] Creates the runloop *)
 
 val run_functional : string -> functional_tick_func -> Screen.t -> unit
-(** [run_functional title tick_f screen] runs Claudius in a functional style. *)
+(** [run_functional title tick_f screen] runs Claudius in a functional style.
+- [tick_f] screen returns a list of primitives rather than a complete framebuffer.*)
 
 (* --- Utility function signatures for input handling --- *)
 

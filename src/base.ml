@@ -9,6 +9,39 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
+(* FPS Calculation *)
+let last_time = ref 0.0
+let frame_count = ref 0
+let fps_counter = ref 0
+
+let show_stats = ref false
+
+(* Calculate FPS *)
+let calculate_fps () =
+  let now = Unix.gettimeofday () in
+  let elapsed = now -. !last_time in
+  frame_count := !frame_count + 1;
+  if elapsed >= 1.0 then (
+    fps_counter := !frame_count;
+    frame_count := 0;
+    last_time := now
+  )
+
+let render_stats screen framebuffer =
+  let width, height = Screen.dimensions screen
+  and font = Screen.font screen in
+
+  let fps_text = Printf.sprintf "FPS: %d" !fps_counter in
+  let res_text = Printf.sprintf "RES: %dx%d" width height in
+
+  let base_x = 4 in
+  let base_y = 4 in
+
+  let palette_max = (Palette.size (Screen.palette screen)) - 1 in
+
+  ignore(Framebuffer.draw_string base_x base_y font fps_text palette_max framebuffer);
+  ignore(Framebuffer.draw_string base_x (base_y + 14) font res_text palette_max framebuffer)
+
 type input_state = {
   keys: KeyCodeSet.t;
   events: Event.t list;  (* Accumulated unified input events for the current frame. *)
@@ -18,6 +51,7 @@ type input_state = {
 type boot_func = Screen.t -> Framebuffer.t
 type tick_func = int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
 type functional_tick_func = int -> Screen.t -> input_state -> Primitives.t list
+
 
 (* ----- *)
 
@@ -132,9 +166,23 @@ let run title boot tick s =
              } in
              if exit then ()
              else begin
+
+               calculate_fps ();
+
+               show_stats := List.fold_left (fun acc ev ->
+                  match ev with
+                  | Event.KeyUp Key.F1 -> not acc
+                  | _ -> acc
+               ) !show_stats input.events;
+
                Screenshot.save_screenshot current_input.events s prev_buffer;
 
                let updated_buffer = tick t s prev_buffer current_input in
+
+               if !show_stats then (
+                 render_stats s updated_buffer
+               );
+
                if (updated_buffer != prev_buffer)
                   || (Framebuffer.is_dirty updated_buffer)
                   || (Screen.is_dirty s)
@@ -186,3 +234,4 @@ let was_key_just_released input key =
       | Event.KeyUp k when k = key -> true
       | _ -> false
     ) input.events
+
