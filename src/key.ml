@@ -6,7 +6,6 @@ type t =
   | Right
   | Up
   | Down
-
   (* Modifier keys *)
   | Shift_L
   | Shift_R
@@ -17,7 +16,6 @@ type t =
   | CapsLock
   | NumLock
   | ScrollLock
-
   (* Function keys *)
   | F1
   | F2
@@ -31,7 +29,6 @@ type t =
   | F10
   | F11
   | F12
-
   (* Navigation keys *)
   | Insert
   | Delete
@@ -39,7 +36,6 @@ type t =
   | End
   | PageUp
   | PageDown
-
   (* Special keys *)
   | Space
   | Escape
@@ -48,7 +44,6 @@ type t =
   | Tab
   | PrintScreen
   | Pause
-
   (* Alphabet keys (lowercase) *)
   | A
   | B
@@ -76,7 +71,6 @@ type t =
   | X
   | Y
   | Z
-
   (* Number keys *)
   | Num0
   | Num1
@@ -88,6 +82,5 @@ type t =
   | Num7
   | Num8
   | Num9
-
   (* Unknown key *)
   | Unknown

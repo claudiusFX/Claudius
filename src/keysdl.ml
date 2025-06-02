@@ -1,11 +1,10 @@
-let of_backend_keycode (keycode: int) : Key.t =
+let of_backend_keycode (keycode : int) : Key.t =
   match keycode with
   (* Arrow Keys *)
   | 0x4000004F -> Key.Right
   | 0x40000050 -> Key.Left
   | 0x40000051 -> Key.Down
   | 0x40000052 -> Key.Up
-
   (* Modifier Keys *)
   | 0x400000E1 -> Key.Shift_L
   | 0x400000E5 -> Key.Shift_R
@@ -16,7 +15,6 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x40000039 -> Key.CapsLock
   | 0x40000053 -> Key.NumLock
   | 0x40000047 -> Key.ScrollLock
-
   (* Function Keys *)
   | 0x4000003A -> Key.F1
   | 0x4000003B -> Key.F2
@@ -30,7 +28,6 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x40000043 -> Key.F10
   | 0x40000044 -> Key.F11
   | 0x40000045 -> Key.F12
-
   (* Navigation Keys *)
   | 0x40000049 -> Key.Insert
   | 0x4000007F -> Key.Delete
@@ -38,7 +35,6 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x4000004D -> Key.End
   | 0x4000004B -> Key.PageUp
   | 0x4000004E -> Key.PageDown
-
   (* Common Control Keys *)
   | 0x00000020 -> Key.Space
   | 0x0000001B -> Key.Escape
@@ -47,7 +43,6 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x00000009 -> Key.Tab
   | 0x40000046 -> Key.PrintScreen
   | 0x40000048 -> Key.Pause
-
   (* Alphabet Keys (Lowercase) *)
   | 0x00000061 -> Key.A
   | 0x00000062 -> Key.B
@@ -75,7 +70,6 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x00000078 -> Key.X
   | 0x00000079 -> Key.Y
   | 0x0000007A -> Key.Z
-
   (* Number Keys *)
   | 0x00000030 -> Key.Num0
   | 0x00000031 -> Key.Num1
@@ -87,18 +81,16 @@ let of_backend_keycode (keycode: int) : Key.t =
   | 0x00000037 -> Key.Num7
   | 0x00000038 -> Key.Num8
   | 0x00000039 -> Key.Num9
-
   (* Unknown Key *)
   | _ -> Key.Unknown
 
-let to_backend_keycode (key: Key.t) : int =
+let to_backend_keycode (key : Key.t) : int =
   match key with
   (* Arrow Keys *)
   | Key.Right -> 0x4000004F
   | Key.Left -> 0x40000050
   | Key.Down -> 0x40000051
   | Key.Up -> 0x40000052
-
   (* Modifier Keys *)
   | Key.Shift_L -> 0x400000E1
   | Key.Shift_R -> 0x400000E5
@@ -109,7 +101,6 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.CapsLock -> 0x40000039
   | Key.NumLock -> 0x40000053
   | Key.ScrollLock -> 0x40000047
-
   (* Function Keys *)
   | Key.F1 -> 0x4000003A
   | Key.F2 -> 0x4000003B
@@ -123,7 +114,6 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.F10 -> 0x40000043
   | Key.F11 -> 0x40000044
   | Key.F12 -> 0x40000045
-
   (* Navigation Keys *)
   | Key.Insert -> 0x40000049
   | Key.Delete -> 0x4000007F
@@ -131,7 +121,6 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.End -> 0x4000004D
   | Key.PageUp -> 0x4000004B
   | Key.PageDown -> 0x4000004E
-
   (* Common Control Keys *)
   | Key.Space -> 0x00000020
   | Key.Escape -> 0x0000001B
@@ -140,7 +129,6 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.Tab -> 0x00000009
   | Key.PrintScreen -> 0x40000046
   | Key.Pause -> 0x40000048
-
   (* Alphabet Keys (Lowercase) *)
   | Key.A -> 0x00000061
   | Key.B -> 0x00000062
@@ -168,7 +156,6 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.X -> 0x00000078
   | Key.Y -> 0x00000079
   | Key.Z -> 0x0000007A
-
   (* Number Keys *)
   | Key.Num0 -> 0x00000030
   | Key.Num1 -> 0x00000031
@@ -180,6 +167,5 @@ let to_backend_keycode (key: Key.t) : int =
   | Key.Num7 -> 0x00000037
   | Key.Num8 -> 0x00000038
   | Key.Num9 -> 0x00000039
-
   (* Unknown Key *)
   | Key.Unknown -> -1
