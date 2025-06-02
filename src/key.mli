@@ -1,12 +1,11 @@
-(** The Key module defines a platform-independent representation of keyboard keys. *)
+(** The Key module defines a platform-independent representation of keyboard
+    keys. *)
 
 type t =
   | Left
   | Right
   | Up
-  | Down
-  (** Arrow keys *)
-
+  | Down  (** Arrow keys *)
   | Shift_L
   | Shift_R
   | Control_L
@@ -15,9 +14,7 @@ type t =
   | Alt_R
   | CapsLock
   | NumLock
-  | ScrollLock
-  (** Modifier keys *)
-
+  | ScrollLock  (** Modifier keys *)
   | F1
   | F2
   | F3
@@ -29,26 +26,20 @@ type t =
   | F9
   | F10
   | F11
-  | F12
-  (** Function keys *)
-
+  | F12  (** Function keys *)
   | Insert
   | Delete
   | Home
   | End
   | PageUp
-  | PageDown
-  (** Navigation keys *)
-
+  | PageDown  (** Navigation keys *)
   | Space
   | Escape
   | Enter
   | Backspace
   | Tab
   | PrintScreen
-  | Pause
-  (** Special keys *)
-
+  | Pause  (** Special keys *)
   | A
   | B
   | C
@@ -74,9 +65,7 @@ type t =
   | W
   | X
   | Y
-  | Z
-  (** Alphabet keys (lowercase) *)
-
+  | Z  (** Alphabet keys (lowercase) *)
   | Num0
   | Num1
   | Num2
@@ -86,10 +75,7 @@ type t =
   | Num6
   | Num7
   | Num8
-  | Num9
-  (** Number keys *)
-
-  | Unknown
-  (** Unknown key *)
+  | Num9  (** Number keys *)
+  | Unknown  (** Unknown key *)
 
 (** Type representing generic keys across different backends. *)
