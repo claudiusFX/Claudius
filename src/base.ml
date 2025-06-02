@@ -14,8 +14,6 @@ let last_time = ref 0.0
 let frame_count = ref 0
 let fps_counter = ref 0
 
-(* Stats toggle key *)
-let stats_toggle_key = Key.F1
 let show_stats = ref false
 
 (* Calculate FPS *)
@@ -82,16 +80,6 @@ let render_texture r texture s bitmap =
   let dst = Sdl.Rect.create ~x:((ow - (width * scale)) / 2) ~y:((oh - (height * scale)) / 2) ~w:(width * scale) ~h:(height * scale) in
   Sdl.render_copy ~dst:dst r texture >|= fun () ->
   Sdl.render_present r
-
-let create_overlay_pixel x y brightness acc =
-    (Primitives.Pixel({ x = x; y = y }, brightness)) :: acc
-  (* ----- *)
-
-let cached_stats_primitives = ref []
-let last_stats_update = ref 0.0
-
-let last_f_key_state = ref false
-
 
 (* Poll SDL events and build the unified event queue.
    Mouse events are handled by PlatformMouse.handle_event, which returns
@@ -180,13 +168,11 @@ let run title boot tick s =
 
                calculate_fps ();
 
-               let current_f_pressed = KeyCodeSet.mem stats_toggle_key input.keys in
-               let toggle_stats = current_f_pressed && not !last_f_key_state in
-               last_f_key_state := current_f_pressed;
-
-               if toggle_stats then
-                 show_stats := not !show_stats;
-
+               show_stats := List.fold_left (fun acc ev ->
+                  match ev with
+                  | Event.KeyUp Key.F1 -> not acc
+                  | _ -> acc
+               ) !show_stats input.events;
 
                Screenshot.save_screenshot current_input.events s prev_buffer;
 

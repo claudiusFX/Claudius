@@ -13,9 +13,6 @@ module PlatformMouse : module type of Mousesdl
 val fps_counter : int ref
 (** The current frames per second count *)
 
-val stats_toggle_key : Key.t
-(** Key to toggle stats display *)
-
 val show_stats : bool ref
 (** Whether stats display is currently enabled *)
 
