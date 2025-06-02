@@ -51,6 +51,7 @@ $ git submodule update --init --recursive
 
 Mostly Claudius doesn't have any interaction points beyond those you provide, but there are a few:
 
+* F1 - Show debug overlay
 * F2 - Save a screenshot to a GIF
 
 # Docs

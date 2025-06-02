@@ -15,7 +15,7 @@ let frame_count = ref 0
 let fps_counter = ref 0
 
 (* Stats toggle key *)
-let stats_toggle_key = Key.F
+let stats_toggle_key = Key.F1
 let show_stats = ref false
 
 (* Calculate FPS *)
