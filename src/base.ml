@@ -36,10 +36,11 @@ let render_stats screen framebuffer =
 
   let base_x = 4 in
   let base_y = 4 in
-  let brightness = 15 in
 
-  ignore(Framebuffer.draw_string base_x base_y font fps_text brightness framebuffer);
-  ignore(Framebuffer.draw_string base_x (base_y + 14) font res_text brightness framebuffer)
+  let palette_max = (Palette.size (Screen.palette screen)) - 1 in
+
+  ignore(Framebuffer.draw_string base_x base_y font fps_text palette_max framebuffer);
+  ignore(Framebuffer.draw_string base_x (base_y + 14) font res_text palette_max framebuffer)
 
 type input_state = {
   keys: KeyCodeSet.t;
