@@ -19,16 +19,6 @@ val stats_toggle_key : Key.t
 val show_stats : bool ref
 (** Whether stats display is currently enabled *)
 
-val calculate_fps : unit -> unit
-(** Calculate and update the FPS counter *)
-
-val render_stats :
-  (int -> int -> int -> 'a list -> 'a list) ->  (* create_pixel function *)
-  int ->                                       (* width *)
-  int ->                                       (* height *)
-  'a list                                      (* returns a list of primitives *)
-(** Render stats with a create_pixel function that builds primitives *)
-
 type input_state = {
   keys: KeyCodeSet.t;
   events: Event.t list;  (** Accumulated unified input events for the current frame. *)
