@@ -11,7 +11,6 @@ module PlatformMouse : module type of Mousesdl
 (** A module that provides platform-specific mouse handling, based on the
     {!Mousesdl} module. *)
 
-(** FPS Calculation and Stats Display *)
 val show_stats : bool ref
 (** Whether stats display is currently enabled *)
 
