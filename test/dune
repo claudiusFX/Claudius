@@ -8,5 +8,6 @@
   test_keysdl
   test_mousesdl
   test_screenshot
-  test_events)
+  test_events
+  test_stats)
  (libraries claudius ounit2))
