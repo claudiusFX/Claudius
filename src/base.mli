@@ -12,9 +12,6 @@ module PlatformMouse : module type of Mousesdl
     {!Mousesdl} module. *)
 
 (** FPS Calculation and Stats Display *)
-val fps_counter : int ref
-(** The current frames per second count *)
-
 val show_stats : bool ref
 (** Whether stats display is currently enabled *)
 

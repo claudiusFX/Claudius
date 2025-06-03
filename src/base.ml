@@ -10,26 +10,24 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
-(* FPS Calculation *)
-let last_time = ref 0.0
-let frame_count = ref 0
-let fps_counter = ref 0
+type fps_t = { last_update : float; last_tick_count : int; average_fps : int }
+
 let show_stats = ref false
 
-(* Calculate FPS *)
-let calculate_fps () =
-  let now = Unix.gettimeofday () in
-  let elapsed = now -. !last_time in
-  frame_count := !frame_count + 1;
-  if elapsed >= 1.0 then (
-    fps_counter := !frame_count;
-    frame_count := 0;
-    last_time := now)
+let calculate_fps tick now previous =
+  let elapsed = now -. previous.last_update in
+  if elapsed >= 1.0 then
+    {
+      last_update = now;
+      last_tick_count = tick;
+      average_fps = tick - previous.last_tick_count;
+    }
+  else previous
 
-let render_stats screen framebuffer =
+let render_stats screen fps_stats framebuffer =
   let width, height = Screen.dimensions screen and font = Screen.font screen in
 
-  let fps_text = Printf.sprintf "FPS: %d" !fps_counter in
+  let fps_text = Printf.sprintf "FPS: %d" fps_stats.average_fps in
   let res_text = Printf.sprintf "RES: %dx%d" width height in
 
   let base_x = 4 in
@@ -174,6 +172,9 @@ let run title boot tick s =
           let initial_input =
             { keys = KeyCodeSet.empty; events = []; mouse = Mouse.create scale }
           in
+          let fps_stats =
+            ref { last_update = 0.0; last_tick_count = 0; average_fps = 0 }
+          in
           let rec loop t prev_buffer input last_t =
             let now = Sdl.get_ticks () in
             let diff =
@@ -188,7 +189,7 @@ let run title boot tick s =
             in
             if exit then ()
             else (
-              calculate_fps ();
+              fps_stats := calculate_fps t (Unix.gettimeofday ()) !fps_stats;
 
               show_stats :=
                 List.fold_left
@@ -200,7 +201,7 @@ let run title boot tick s =
 
               let updated_buffer = tick t s prev_buffer current_input in
 
-              if !show_stats then render_stats s updated_buffer;
+              if !show_stats then render_stats s !fps_stats updated_buffer;
 
               if
                 updated_buffer != prev_buffer
