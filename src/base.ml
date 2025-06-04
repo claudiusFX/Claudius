@@ -10,38 +10,7 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
-(* FPS Calculation *)
-let last_time = ref 0.0
-let frame_count = ref 0
-let fps_counter = ref 0
 let show_stats = ref false
-
-(* Calculate FPS *)
-let calculate_fps () =
-  let now = Unix.gettimeofday () in
-  let elapsed = now -. !last_time in
-  frame_count := !frame_count + 1;
-  if elapsed >= 1.0 then (
-    fps_counter := !frame_count;
-    frame_count := 0;
-    last_time := now)
-
-let render_stats screen framebuffer =
-  let width, height = Screen.dimensions screen and font = Screen.font screen in
-
-  let fps_text = Printf.sprintf "FPS: %d" !fps_counter in
-  let res_text = Printf.sprintf "RES: %dx%d" width height in
-
-  let base_x = 4 in
-  let base_y = 4 in
-
-  let palette_max = Palette.size (Screen.palette screen) - 1 in
-
-  ignore
-    (Framebuffer.draw_string base_x base_y font fps_text palette_max framebuffer);
-  ignore
-    (Framebuffer.draw_string base_x (base_y + 14) font res_text palette_max
-       framebuffer)
 
 type input_state = {
   keys : KeyCodeSet.t;
@@ -174,6 +143,7 @@ let run title boot tick s =
           let initial_input =
             { keys = KeyCodeSet.empty; events = []; mouse = Mouse.create scale }
           in
+          let fps_stats = ref (Stats.create ()) in
           let rec loop t prev_buffer input last_t =
             let now = Sdl.get_ticks () in
             let diff =
@@ -188,7 +158,8 @@ let run title boot tick s =
             in
             if exit then ()
             else (
-              calculate_fps ();
+              fps_stats :=
+                Stats.update ~now:(Unix.gettimeofday ()) ~tick:t !fps_stats;
 
               show_stats :=
                 List.fold_left
@@ -200,7 +171,7 @@ let run title boot tick s =
 
               let updated_buffer = tick t s prev_buffer current_input in
 
-              if !show_stats then render_stats s updated_buffer;
+              if !show_stats then Stats.render !fps_stats s updated_buffer;
 
               if
                 updated_buffer != prev_buffer
