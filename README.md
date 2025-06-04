@@ -42,7 +42,7 @@ $ cd myprogram
 $ mkdir vendor
 $ cd vendor
 $ echo "(vendored_dirs *)" > dune
-$ git clone https://github.com/claidiusFX/claudius.git
+$ git clone https://github.com/claudiusFX/Claudius.git
 $ cd ..
 $ git submodule update --init --recursive
 ```
