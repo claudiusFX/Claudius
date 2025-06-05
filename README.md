@@ -34,6 +34,8 @@ $ dune pkg lock
 
 ## Developing Claudius
 
+If you want make Open Source Contributions to Claudius, you are welcome to do so. For that you will need to use the below approach
+
 If you're working on Claudius itself, then life is a bit easier using a vendor directory to add a version you can edit and commit to:
 
 ```shell
