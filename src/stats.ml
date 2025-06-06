@@ -14,6 +14,7 @@ let update ~now ~tick previous =
   else previous
 
 let render fps_stats tick screen framebuffer =
+  let framebuffer = Framebuffer.map (fun i -> i) framebuffer in
   let width, height = Screen.dimensions screen
   and font = Screen.font screen
   and colour_count = Palette.size (Screen.palette screen) in
@@ -56,4 +57,6 @@ let render fps_stats tick screen framebuffer =
       (i mod columns * 10)
       (offset + (i / columns * 10))
       10 10 i framebuffer
-  done
+  done;
+
+  framebuffer
