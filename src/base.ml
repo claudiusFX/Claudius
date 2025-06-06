@@ -171,7 +171,7 @@ let run title boot tick s =
 
               let updated_buffer = tick t s prev_buffer current_input in
 
-              if !show_stats then Stats.render !fps_stats s updated_buffer;
+              if !show_stats then Stats.render !fps_stats t s updated_buffer;
 
               if
                 updated_buffer != prev_buffer
