@@ -46,4 +46,14 @@ let render fps_stats tick screen framebuffer =
       ignore
         (Framebuffer.draw_string (max_key_width + 10) y_offset font v
            palette_max framebuffer))
-    info
+    info;
+
+  let columns = width / 10 in
+  let rows = (palette_max / columns) + 1 in
+  let offset = height - (10 * rows) in
+  for i = 0 to palette_max do
+    Framebuffer.filled_rect
+      (i mod columns * 10)
+      (offset + (i / columns * 10))
+      10 10 i framebuffer
+  done
