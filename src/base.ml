@@ -171,14 +171,17 @@ let run title boot tick s =
 
               let updated_buffer = tick t s prev_buffer current_input in
 
-              if !show_stats then Stats.render !fps_stats s updated_buffer;
+              let display_buffer =
+                if !show_stats then Stats.render !fps_stats t s updated_buffer
+                else updated_buffer
+              in
 
               if
-                updated_buffer != prev_buffer
-                || Framebuffer.is_dirty updated_buffer
+                display_buffer != prev_buffer
+                || Framebuffer.is_dirty display_buffer
                 || Screen.is_dirty s
               then (
-                framebuffer_to_bigarray s updated_buffer bitmap;
+                framebuffer_to_bigarray s display_buffer bitmap;
                 (match render_texture r texture s bitmap with
                 | Error (`Msg e) -> Sdl.log "Render error: %s" e
                 | Ok () -> ());
