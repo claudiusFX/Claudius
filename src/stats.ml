@@ -13,19 +13,50 @@ let update ~now ~tick previous =
     }
   else previous
 
-let render fps_stats screen framebuffer =
-  let width, height = Screen.dimensions screen and font = Screen.font screen in
+let render fps_stats tick screen framebuffer =
+  let framebuffer = Framebuffer.map (fun i -> i) framebuffer in
+  let width, height = Screen.dimensions screen
+  and font = Screen.font screen
+  and colour_count = Palette.size (Screen.palette screen) in
 
-  let fps_text = Printf.sprintf "FPS: %d" fps_stats.average_fps in
-  let res_text = Printf.sprintf "RES: %dx%d" width height in
+  let info =
+    [
+      ("Tick:", string_of_int tick);
+      ("FPS:", string_of_int fps_stats.average_fps);
+      ("Resolution:", Printf.sprintf "%dx%d" width height);
+      ("Colours:", string_of_int colour_count);
+    ]
+  in
 
-  let base_x = 4 in
-  let base_y = 4 in
+  let max_key_width =
+    List.fold_left
+      (fun acc (k, _) ->
+        let width =
+          Framebuffer.draw_string (-1000) (-1000) font k 0 framebuffer
+        in
+        if width > acc then width else acc)
+      0 info
+  in
 
-  let palette_max = Palette.size (Screen.palette screen) - 1 in
+  let palette_max = colour_count - 1 in
 
-  ignore
-    (Framebuffer.draw_string base_x base_y font fps_text palette_max framebuffer);
-  ignore
-    (Framebuffer.draw_string base_x (base_y + 14) font res_text palette_max
-       framebuffer)
+  List.iteri
+    (fun i (k, v) ->
+      let y_offset = 4 + (14 * i) in
+      ignore (Framebuffer.draw_string 4 y_offset font k palette_max framebuffer);
+      ignore
+        (Framebuffer.draw_string (max_key_width + 10) y_offset font v
+           palette_max framebuffer))
+    info;
+
+  let columns = width / 10 in
+  let rows = (palette_max / columns) + 1 in
+  let offset = height - (10 * rows) in
+  for i = 0 to palette_max do
+    Framebuffer.filled_rect
+      (i mod columns * 10)
+      (offset + (i / columns * 10))
+      10 10 i framebuffer
+  done;
+
+  framebuffer
