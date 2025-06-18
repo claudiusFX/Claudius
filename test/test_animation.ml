@@ -56,4 +56,4 @@ let suite =
          "Test palette too big" >:: test_palette_too_big;
        ]
 
-let () = run_test_tt_main suite 
+let () = run_test_tt_main suite
