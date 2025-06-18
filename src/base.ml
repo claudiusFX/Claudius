@@ -195,10 +195,6 @@ let run title boot tick s =
               (* Record frame if recording is active *)
               Animation.record_frame s updated_buffer;
 
-              let updated_buffer = tick t s prev_buffer current_input in
-
-              if !show_stats then Stats.render !fps_stats s updated_buffer;
-
               if
                 updated_buffer != prev_buffer
                 || Framebuffer.is_dirty updated_buffer
