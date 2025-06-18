@@ -173,16 +173,18 @@ let run title boot tick s =
               List.iter
                 (function
                   | Event.KeyDown Key.F3 -> (
-                      Printf.printf "Enter number of frames to record (default 50): %!";
+                      Printf.printf
+                        "Enter number of frames to record (default 50): %!";
                       try
                         let line = read_line () in
                         let n =
-                          if String.trim line = "" then 50 else int_of_string line
+                          if String.trim line = "" then 50
+                          else int_of_string line
                         in
                         Animation.start_recording n
-                      with
-                      | Failure _ ->
-                          Printf.printf "Invalid input. Recording not started.\n%!")
+                      with Failure _ ->
+                        Printf.printf
+                          "Invalid input. Recording not started.\n%!")
                   | _ -> ())
                 input.events;
 

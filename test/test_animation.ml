@@ -6,7 +6,7 @@ let scale = 2
 
 let test_basic_recording _ =
   let palette = Palette.generate_vapourwave_palette 64 in
-  let fb = Framebuffer.init (width, height) (fun x y -> (x * y) mod 64) in
+  let fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
   let screen = Screen.create width height scale palette in
 
   (* Start recording *)
@@ -29,7 +29,7 @@ let test_invalid_frame_count _ =
 
 let test_double_recording _ =
   let palette = Palette.generate_vapourwave_palette 64 in
-  let _fb = Framebuffer.init (width, height) (fun x y -> (x * y) mod 64) in
+  let _fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
   let _screen = Screen.create width height scale palette in
 
   Animation.start_recording 10;
