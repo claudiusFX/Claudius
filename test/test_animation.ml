@@ -24,8 +24,8 @@ let test_basic_recording _ =
 let test_invalid_frame_count _ =
   assert_raises (Failure "Number of frames must be positive") (fun () ->
       Animation.start_recording 0);
-  assert_raises (Failure "Maximum 1000 frames allowed") (fun () ->
-      Animation.start_recording 1001)
+  assert_raises (Failure "Maximum 100 frames allowed") (fun () ->
+      Animation.start_recording 101)
 
 let test_double_recording _ =
   let palette = Palette.generate_vapourwave_palette 64 in
