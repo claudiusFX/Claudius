@@ -169,12 +169,34 @@ let run title boot tick s =
 
               Screenshot.save_screenshot current_input.events s prev_buffer;
 
+              (* Handles animation recording *)
+              List.iter
+                (function
+                  | Event.KeyDown Key.F3 -> (
+                      Printf.printf
+                        "Enter number of frames to record (default 50): %!";
+                      try
+                        let line = read_line () in
+                        let n =
+                          if String.trim line = "" then 50
+                          else int_of_string line
+                        in
+                        Animation.start_recording n
+                      with Failure _ ->
+                        Printf.printf
+                          "Invalid input. Recording not started.\n%!")
+                  | _ -> ())
+                input.events;
+
               let updated_buffer = tick t s prev_buffer current_input in
 
               let display_buffer =
                 if !show_stats then Stats.render !fps_stats t s updated_buffer
                 else updated_buffer
               in
+
+              (* Record frame if recording is active *)
+              Animation.record_frame s updated_buffer;
 
               if
                 display_buffer != prev_buffer
