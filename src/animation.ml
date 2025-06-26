@@ -1,14 +1,14 @@
 open Giflib
 open Unix
 
-type recording_state = {
+type recording_state_t = {
   mutable frames : Image.t list;
   mutable is_recording : bool;
   mutable frames_to_record : int;
   mutable current_frame : int;
 }
 
-let recording_state =
+let recording_state : recording_state_t =
   { frames = []; is_recording = false; frames_to_record = 0; current_frame = 0 }
 
 let now_string () =
