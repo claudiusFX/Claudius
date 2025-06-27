@@ -101,10 +101,8 @@ let stop_recording (recording_state : recording_state_t option ref) =
       Printf.printf "Animation saved as %s\n%!" filename;
       recording_state := None
 
-let record_frame
-    (recording_state : recording_state_t option ref)
-    (screen : Screen.t)
-    (fb : Framebuffer.t) =
+let record_frame (recording_state : recording_state_t option ref)
+    (screen : Screen.t) (fb : Framebuffer.t) =
   match !recording_state with
   | None -> ()
   | Some rs ->
