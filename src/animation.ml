@@ -3,13 +3,12 @@ open Unix
 
 type recording_state_t = {
   frames : Image.t list;
-  is_recording : bool;
   frames_to_record : int;
   current_frame : int;
 }
 
-let recording_state : recording_state_t ref =
-  ref { frames = []; is_recording = false; frames_to_record = 0; current_frame = 0 }
+(* let recording_state : recording_state_t ref =
+  ref { frames = []; is_recording = false; frames_to_record = 0; current_frame = 0 } *)
 
 let now_string () =
   let tm = Unix.localtime (Unix.time ()) in
@@ -81,44 +80,48 @@ let capture_frame (screen : Screen.t) (fb : Framebuffer.t) =
 
   Image.v (scaled_width, scaled_height) colors compressed color_depth true
 
-let start_recording n =
-  (* CHANGED: use ref dereferencing and record update *)
-  if !recording_state.current_frame <> 0 then
-    failwith "Already recording animation";
-  if n <= 0 then failwith "Number of frames must be positive";
-  if n > 100 then
-    failwith "Maximum 100 frames allowed";
+let start_recording (recording_state : recording_state_t option ref) n =
+  match !recording_state with
+  | Some _ -> failwith "Already recording animation"
+  | None ->
+      if n <= 0 then failwith "Number of frames must be positive";
+      if n > 100 then failwith "Maximum 100 frames allowed";
+      recording_state :=
+        Some { frames = []; frames_to_record = n; current_frame = 0 };
+      Printf.printf "Started recording %d frames\n%!" n
 
-  recording_state :=
-    { frames = []; frames_to_record = n; current_frame = 0 };
-  Printf.printf "Started recording %d frames\n%!" n
+let stop_recording (recording_state : recording_state_t option ref) =
+  match !recording_state with
+  | None -> failwith "Not recording animation"
+  | Some rs ->
+      let frames = List.rev rs.frames in
+      let gif = GIF.from_images frames in
+      let filename = now_string () ^ ".gif" in
+      GIF.to_file gif filename;
+      Printf.printf "Animation saved as %s\n%!" filename;
+      recording_state := None
 
-let stop_recording () =
-  let frames = List.rev !recording_state.frames in
-  let gif = GIF.from_images frames in
-  let filename = now_string () ^ ".gif" in
-  GIF.to_file gif filename;
-  Printf.printf "Animation saved as %s\n%!" filename;
-
-  recording_state := { frames = []; frames_to_record = 0; current_frame = 0 }
-
-let record_frame (screen : Screen.t) (fb : Framebuffer.t) =
-  if !recording_state.frames_to_record = 0 then ()
-  else if !recording_state.current_frame >= !recording_state.frames_to_record
-  then stop_recording ()
-  else (
-    if Palette.size (Screen.palette screen) > 256 then
-      failwith "GIF only supports up to 256 colors";
-    let frame = capture_frame screen fb in
-
-    recording_state :=
-      {
-        !recording_state with
-        frames = frame :: !recording_state.frames;
-        current_frame = !recording_state.current_frame + 1;
-      };
-
-    if !recording_state.current_frame = !recording_state.frames_to_record then
-      stop_recording ())
+let record_frame
+    (recording_state : recording_state_t option ref)
+    (screen : Screen.t)
+    (fb : Framebuffer.t) =
+  match !recording_state with
+  | None -> ()
+  | Some rs ->
+      if rs.current_frame >= rs.frames_to_record then
+        stop_recording recording_state
+      else (
+        if Palette.size (Screen.palette screen) > 256 then
+          failwith "GIF only supports up to 256 colors";
+        let frame = capture_frame screen fb in
+        recording_state :=
+          Some
+            {
+              rs with
+              frames = frame :: rs.frames;
+              current_frame = rs.current_frame + 1;
+            };
+        if rs.current_frame + 1 = rs.frames_to_record then
+          stop_recording recording_state)
 
 (* Note to self: We need to abstract a lot of functions here to utils_gif or so as they are being repeated here and in screenshot.ml*)

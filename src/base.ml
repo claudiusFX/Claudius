@@ -11,6 +11,7 @@ module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
 let show_stats = ref false
+let recording_state = ref None
 
 type input_state = {
   keys : KeyCodeSet.t;
@@ -181,7 +182,7 @@ let run title boot tick s =
                           if String.trim line = "" then 50
                           else int_of_string line
                         in
-                        Animation.start_recording n
+                        Animation.start_recording recording_state n
                       with Failure _ ->
                         Printf.printf
                           "Invalid input. Recording not started.\n%!")
@@ -196,8 +197,8 @@ let run title boot tick s =
               in
 
               (* Record frame if recording is active *)
-              Animation.record_frame s display_buffer;
-              
+              Animation.record_frame recording_state s display_buffer;
+
               if
                 display_buffer != prev_buffer
                 || Framebuffer.is_dirty display_buffer
