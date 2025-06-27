@@ -79,15 +79,15 @@ let capture_frame (screen : Screen.t) (fb : Framebuffer.t) =
 
   Image.v (scaled_width, scaled_height) colors compressed color_depth true
 
-let start_recording ?(max_frames = max_frames_default) (recording_state : recording_state_t option ref) n =
+let start_recording ?(max_frames = max_frames_default)
+    (recording_state : recording_state_t option ref) n =
   match !recording_state with
   | Some _ -> failwith "Already recording animation"
   | None ->
-      if max_frames <= 0 then
-        failwith "Number of frames must be positive";
+      if max_frames <= 0 then failwith "Number of frames must be positive";
       if n <= 0 then failwith "Number of frames must be positive";
-      if n > max_frames then failwith 
-        (Printf.sprintf "Maximum %d frames allowed" max_frames_default);
+      if n > max_frames then
+        failwith (Printf.sprintf "Maximum %d frames allowed" max_frames_default);
       recording_state :=
         Some { frames = []; frames_to_record = n; current_frame = 0 };
       Printf.printf "Started recording %d frames\n%!" n
