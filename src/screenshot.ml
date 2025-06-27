@@ -23,5 +23,4 @@ let save_screenshot (events : Event.t list) (screen : Screen.t)
     let gif = GIF.from_image image in
     let filename = now_string () ^ ".gif" in
     GIF.to_file gif filename;
-    Printf.printf "Screenshot saved as %s\n%!" filename
-  )
+    Printf.printf "Screenshot saved as %s\n%!" filename)

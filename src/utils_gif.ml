@@ -61,6 +61,6 @@ let capture_frame (screen : Screen.t) (fb : Framebuffer.t) =
   in
 
   let flattened = Lzw.flatten_codes 8 pixels in
-  let compressed = Lzw.encode flattened color_depth in 
+  let compressed = Lzw.encode flattened color_depth in
 
   Image.v (scaled_width, scaled_height) colors compressed color_depth true
