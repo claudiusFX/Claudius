@@ -7,7 +7,7 @@ type recording_state_t = {
   current_frame : int;
 }
 
-let max_frames_default = 100
+let max_frames_default = 500
 
 let now_string () =
   let tm = Unix.localtime (Unix.time ()) in
