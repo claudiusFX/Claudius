@@ -1,5 +1,4 @@
 open Giflib
-open Unix
 open Utils_gif
 
 type recording_state_t = {
@@ -9,11 +8,6 @@ type recording_state_t = {
 }
 
 let max_frames_default = 500
-
-let now_string () =
-  let tm = Unix.localtime (Unix.time ()) in
-  Printf.sprintf "animation_%02d%02d%02d_%02d%02d%02d" (tm.tm_year mod 100)
-    (tm.tm_mon + 1) tm.tm_mday tm.tm_hour tm.tm_min tm.tm_sec
 
 let start_recording ?(max_frames = max_frames_default)
     (recording_state : recording_state_t option ref) n =
@@ -34,7 +28,7 @@ let stop_recording (recording_state : recording_state_t option ref) =
   | Some rs ->
       let frames = List.rev rs.frames in
       let gif = GIF.from_images frames in
-      let filename = now_string () ^ ".gif" in
+      let filename = timestamp "animation" ^ ".gif" in
       GIF.to_file gif filename;
       Printf.printf "Animation saved as %s\n%!" filename;
       recording_state := None

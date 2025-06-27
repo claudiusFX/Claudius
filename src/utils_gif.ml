@@ -1,4 +1,10 @@
 open Giflib
+open Unix
+
+let timestamp prefix =
+  let tm = Unix.localtime (Unix.time ()) in
+  Printf.sprintf "%s_%02d%02d%02d_%02d%02d%02d" prefix (tm.tm_year mod 100)
+    (tm.tm_mon + 1) tm.tm_mday tm.tm_hour tm.tm_min tm.tm_sec
 
 let color_table_of_palette (p : Palette.t) : ColorTable.t =
   Array.init (Palette.size p) (fun i ->
