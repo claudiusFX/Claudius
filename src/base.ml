@@ -175,7 +175,7 @@ let run title boot tick s =
                 (function
                   | Event.KeyDown Key.F3 -> (
                       Printf.printf
-                        "Enter number of frames to record (default 50): %!";
+                        "Enter number of frames to record (default 500): %!";
                       try
                         let line = read_line () in
                         let n =
