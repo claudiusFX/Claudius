@@ -23,8 +23,9 @@ let test_invalid_frame_count _ =
   let recording_state = ref None in
   assert_raises (Failure "Number of frames must be positive") (fun () ->
       Animation.start_recording recording_state 0);
-  assert_raises (Failure "Maximum 100 frames allowed") (fun () ->
-      Animation.start_recording recording_state 101)
+  let msg = Printf.sprintf "Maximum %d frames allowed" Animation.max_frames_default in
+  assert_raises (Failure msg) (fun () ->
+      Animation.start_recording recording_state (Animation.max_frames_default + 1))
 
 let test_double_recording _ =
   let recording_state = ref None in

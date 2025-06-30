@@ -21,3 +21,6 @@ val record_frame :
 (** [record_frame screen framebuffer] records a single frame if recording is
     active. Automatically stops recording when the requested number of frames is
     reached. Raises [Failure] if the palette has more than 256 colors. *)
+
+val max_frames_default : int
+(** Default upper bound for number of frames to be recorded when recording is started. *)
