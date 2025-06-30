@@ -5,47 +5,48 @@ let width, height = (100, 100)
 let scale = 2
 
 let test_basic_recording _ =
+  let recording_state = ref None in 
   let palette = Palette.generate_vapourwave_palette 64 in
   let fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
   let screen = Screen.create width height scale palette in
 
-  (* Start recording *)
-  Animation.start_recording 10;
+  Animation.start_recording recording_state 10;
 
-  (* Record 10 frames *)
   for _ = 0 to 9 do
-    Animation.record_frame screen fb
+    Animation.record_frame recording_state screen fb
   done;
 
-  (* Verify recording stopped automatically *)
   assert_raises (Failure "Not recording animation") (fun () ->
-      Animation.stop_recording ())
+      Animation.stop_recording recording_state)
 
 let test_invalid_frame_count _ =
+  let recording_state = ref None in 
   assert_raises (Failure "Number of frames must be positive") (fun () ->
-      Animation.start_recording 0);
+      Animation.start_recording recording_state 0);
   assert_raises (Failure "Maximum 100 frames allowed") (fun () ->
-      Animation.start_recording 101)
+      Animation.start_recording recording_state 101)
 
 let test_double_recording _ =
+  let recording_state = ref None in 
   let palette = Palette.generate_vapourwave_palette 64 in
   let _fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
   let _screen = Screen.create width height scale palette in
 
-  Animation.start_recording 10;
+  Animation.start_recording recording_state 10;
   assert_raises (Failure "Already recording animation") (fun () ->
-      Animation.start_recording 10);
-  Animation.stop_recording ()
+      Animation.start_recording recording_state 10);
+  Animation.stop_recording recording_state
 
 let test_palette_too_big _ =
+  let recording_state = ref None in 
   let palette = Palette.generate_mono_palette 300 in
   let fb = Framebuffer.init (width, height) (fun _ _ -> 42) in
   let screen = Screen.create width height scale palette in
 
-  Animation.start_recording 10;
+  Animation.start_recording recording_state 10;
   assert_raises (Failure "GIF only supports up to 256 colors") (fun () ->
-      Animation.record_frame screen fb);
-  Animation.stop_recording ()
+      Animation.record_frame recording_state screen fb);
+  Animation.stop_recording recording_state
 
 let suite =
   "animation_tests"
