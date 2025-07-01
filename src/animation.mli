@@ -23,4 +23,5 @@ val record_frame :
     reached. Raises [Failure] if the palette has more than 256 colors. *)
 
 val max_frames_default : int
-(** Default upper bound for number of frames to be recorded when recording is started. *)
+(** Default upper bound for number of frames to be recorded when recording is
+    started. *)

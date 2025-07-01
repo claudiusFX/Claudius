@@ -23,17 +23,21 @@ let test_invalid_frame_count _ =
   let recording_state = ref None in
   assert_raises (Failure "Number of frames must be positive") (fun () ->
       Animation.start_recording recording_state 0);
-  let msg = Printf.sprintf "Maximum %d frames allowed" Animation.max_frames_default in
+  let msg =
+    Printf.sprintf "Maximum %d frames allowed" Animation.max_frames_default
+  in
   assert_raises (Failure msg) (fun () ->
-      Animation.start_recording recording_state (Animation.max_frames_default + 1))
+      Animation.start_recording recording_state
+        (Animation.max_frames_default + 1))
 
 let test_double_recording _ =
   let recording_state = ref None in
   let palette = Palette.generate_vapourwave_palette 64 in
-  let _fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
-  let _screen = Screen.create width height scale palette in
+  let fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
+  let screen = Screen.create width height scale palette in
 
   Animation.start_recording recording_state 10;
+  Animation.record_frame recording_state screen fb;
   assert_raises (Failure "Already recording animation") (fun () ->
       Animation.start_recording recording_state 10);
   Animation.stop_recording recording_state
@@ -47,7 +51,8 @@ let test_palette_too_big _ =
   Animation.start_recording recording_state 10;
   assert_raises (Failure "GIF only supports up to 256 colors") (fun () ->
       Animation.record_frame recording_state screen fb);
-  Animation.stop_recording recording_state
+  assert_raises (Giflib.GIF.Error "from_images: empty image list") (fun () ->
+      Animation.stop_recording recording_state)
 
 let suite =
   "animation_tests"
