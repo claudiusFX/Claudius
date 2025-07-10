@@ -10,11 +10,11 @@ let test_basic_recording _ =
   let screen = Screen.create width height scale palette in
   let mut_state = ref (Some (Animation.start_recording 10)) in
 
-    for _ = 1 to 10 do
-      match !mut_state with
-      | Some st -> mut_state := Animation.record_frame st screen fb
-      | None -> ()
-    done;
+  for _ = 1 to 10 do
+    match !mut_state with
+    | Some st -> mut_state := Animation.record_frame st screen fb
+    | None -> ()
+  done;
 
   assert_equal None !mut_state
 
@@ -50,9 +50,8 @@ let test_palette_too_big _ =
 
   assert_raises (Failure "GIF only supports up to 256 colors") (fun () ->
       ignore (Animation.record_frame state screen fb));
-  assert_raises
-    (Giflib.GIF.Error "from_images: empty image list")
-    (fun () -> ignore (Animation.stop_recording state))
+  assert_raises (Giflib.GIF.Error "from_images: empty image list") (fun () ->
+      ignore (Animation.stop_recording state))
 
 let suite =
   "animation_tests"

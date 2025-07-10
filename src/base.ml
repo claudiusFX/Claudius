@@ -12,6 +12,7 @@ module PlatformMouse = Mousesdl
 
 let show_stats = ref false
 let recording_state : Animation.recording_state_t option ref = ref None
+
 type input_state = {
   keys : KeyCodeSet.t;
   events : Event.t list;
@@ -177,7 +178,8 @@ let run title boot tick s =
                       try
                         let line = read_line () in
                         let n =
-                          if String.trim line = "" then Animation.max_frames_default
+                          if String.trim line = "" then
+                            Animation.max_frames_default
                           else int_of_string line
                         in
                         recording_state := Some (Animation.start_recording n)
