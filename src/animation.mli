@@ -7,18 +7,18 @@ type recording_state_t = {
 }
 
 val start_recording :
-  ?max_frames:int -> recording_state_t option ref -> int -> unit
-(** [start_recording ?max_frames state n] starts recording an animation with [n]
-    frames. Raises [Failure] if already recording, if n is non-positive or if
+  ?max_frames:int -> int -> recording_state_t
+(** [start_recording ?max_frames n] returns a new animation recording state that will
+    record [n] frames. Raises [Failure] if n is non-positive or if
     exceeding [max_frames]. *)
 
-val stop_recording : recording_state_t option ref -> unit
-(** [stop_recording ()] stops the current recording and saves the animation.
+val stop_recording : recording_state_t -> unit
+(** [stop_recording recording_state] stops the current recording and saves the animation.
     Raises [Failure] if not recording. *)
 
 val record_frame :
-  recording_state_t option ref -> Screen.t -> Framebuffer.t -> unit
-(** [record_frame screen framebuffer] records a single frame if recording is
+  recording_state_t -> Screen.t -> Framebuffer.t -> recording_state_t option
+(** [record_frame recording_state screen framebuffer] records a single frame if recording is
     active. Automatically stops recording when the requested number of frames is
     reached. Raises [Failure] if the palette has more than 256 colors. *)
 
