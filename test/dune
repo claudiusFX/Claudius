@@ -9,5 +9,6 @@
   test_mousesdl
   test_screenshot
   test_events
-  test_stats)
+  test_stats
+  test_animation)
  (libraries claudius ounit2))

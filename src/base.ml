@@ -11,6 +11,7 @@ module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
 let show_stats = ref false
+let recording_state : Animation.recording_state_t option ref = ref None
 
 type input_state = {
   keys : KeyCodeSet.t;
@@ -169,12 +170,35 @@ let run title boot tick s =
 
               Screenshot.save_screenshot current_input.events s prev_buffer;
 
+              List.iter
+                (function
+                  | Event.KeyDown Key.F3 -> (
+                      Printf.printf
+                        "Enter number of frames to record (default 500): %!";
+                      try
+                        let line = read_line () in
+                        let n =
+                          if String.trim line = "" then
+                            Animation.max_frames_default
+                          else int_of_string line
+                        in
+                        recording_state := Some (Animation.start_recording n)
+                      with Failure _ ->
+                        Printf.printf
+                          "Invalid input. Recording not started.\n%!")
+                  | _ -> ())
+                input.events;
+
               let updated_buffer = tick t s prev_buffer current_input in
 
               let display_buffer =
                 if !show_stats then Stats.render !fps_stats t s updated_buffer
                 else updated_buffer
               in
+
+              recording_state :=
+                Option.bind !recording_state (fun st ->
+                    Animation.record_frame st s display_buffer);
 
               if
                 display_buffer != prev_buffer
