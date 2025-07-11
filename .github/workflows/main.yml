@@ -31,6 +31,9 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
+      - name: Update base system
+        run: sudo apt update
+
       - name: Install requirements
         run: sudo apt install -y libsdl2-dev
 
