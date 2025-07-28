@@ -44,8 +44,9 @@ let test_update_palette _ =
 
 let test_non_default_font _ =
   (* the default font is the powerline version that should have more glyphs *)
+  (* after the removal of submodule, this test is made to match just the default font incase we go on to add more fonts and need to check for non-default ones*)
   let font =
-    match Font.of_file "../thirdparty/tamzen-font/psf/Tamzen10x20.psf" with
+    match Font.of_file "../fonts/TamzenForPowerline10x20.psf" with
     | Ok f -> f
     | Error msg -> assert_failure (Printf.sprintf "failed to load font: %s" msg)
   in

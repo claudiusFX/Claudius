@@ -2,7 +2,7 @@
 
 (rule
  (alias runtest)
- (deps thirdparty/tamzen-font/psf/Tamzen10x20.psf)
- (targets Tamzen10x20.psf)
+ (deps fonts/TamzenForPowerline10x20.psf)
+ (targets TamzenForPowerline10x20.psf)
  (action
-  (copy thirdparty/tamzen-font/psf/Tamzen10x20.psf Tamzen10x20.psf)))
+  (copy fonts/TamzenForPowerline10x20.psf TamzenForPowerline10x20.psf)))

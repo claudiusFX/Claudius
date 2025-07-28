@@ -1,8 +1,8 @@
 (rule
  (targets builtins.ml)
- (deps ../thirdparty/tamzen-font/psf/TamzenForPowerline10x20.psf)
+ (deps ../fonts/TamzenForPowerline10x20.psf)
  (action
-  (run ocaml-crunch -m plain -o builtins.ml ../thirdparty/tamzen-font/psf)))
+  (run ocaml-crunch -m plain -o builtins.ml ../fonts)))
 
 (library
  (name claudius)
