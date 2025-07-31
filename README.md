@@ -55,6 +55,7 @@ Mostly Claudius doesn't have any interaction points beyond those you provide, bu
 
 * F1 - Show debug overlay
 * F2 - Save a screenshot to a GIF
+* F3 - Save an animation to a GIF
 
 # Docs
 
