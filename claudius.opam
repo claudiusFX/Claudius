@@ -22,14 +22,14 @@ homepage: "https://github.com/claudiusFX/claudius"
 doc: "https://github.com/claudiusFX/claudius"
 bug-reports: "https://github.com/claudiusFX/claudius/issues"
 depends: [
-  "ocaml"
+  "ocaml" {>= "5.1"}
   "dune" {>= "3.17"}
   "tsdl"
-  "ounit2"
-  "odoc"
+  "ounit2" {with-test}
+  "odoc" {with-doc}
   "giflib"
   "crunch"
-  "ocamlformat"
+  "ocamlformat" {>= "0.27.0" & with-dev-setup}
 ]
 build: [
   ["dune" "subst"] {dev}
