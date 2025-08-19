@@ -16,7 +16,7 @@ authors: [
   "Vanisha1606 <vanishag1606@gmail.com>"
   "Wah Vanessa <wahvanessa22@gmail.com>"
 ]
-license: "ICS"
+license: "ISC"
 tags: ["graphics" "rendering" "paletted"]
 homepage: "https://github.com/claudiusFX/claudius"
 doc: "https://github.com/claudiusFX/claudius"

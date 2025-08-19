@@ -11,7 +11,7 @@
 
 (maintainers "Michael Dales <michael@digitalflapjack.com>" "Shreya Pawaskar <shreya.pawaskar.main@gmail.com>")
 
-(license ICS)
+(license ISC)
 
 (documentation https://github.com/claudiusFX/claudius)
 
