@@ -34,14 +34,11 @@ jobs:
       - name: Update base system
         run: sudo apt update
 
-      - name: Install requirements
+      - name: Install system requirements
         run: sudo apt install -y libsdl2-dev
 
-      - name: Install dune and ocamlformat
-        run: opam install dune ocamlformat
-
-      - name: Get packages
-        run: opam exec -- dune pkg lock
+      - name: Install ocaml requirements
+        run: opam install . --deps-only --with-test --with-dev-setup --with-doc
 
       - name: Build check
         run: opam exec -- dune build
