@@ -156,12 +156,10 @@ let of_file filename =
 
 let print_header (font : t) =
   let header = font.header in
-  Printf.printf "Magic:            0x%08x\n"
-    (Int32.to_int header.magic land 0xFFFFFFFF);
+  Printf.printf "Magic:            0x%08x\n" (Int32.to_int header.magic);
   Printf.printf "Version:          %d\n" (Int32.to_int header.version);
   Printf.printf "Header Size:      %d\n" (Int32.to_int header.headersize);
-  Printf.printf "Flags:            0x%08x\n"
-    (Int32.to_int header.flags land 0xFFFFFFFF);
+  Printf.printf "Flags:            0x%08x\n" (Int32.to_int header.flags);
   Printf.printf "Number of Glyphs: %d\n" (Int32.to_int header.number_of_glyphs);
   Printf.printf "Bytes per Glyph:  %d\n" (Int32.to_int header.bytes_per_glyph);
   Printf.printf "Width:            %d\n" (Int32.to_int header.width);
