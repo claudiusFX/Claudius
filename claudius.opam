@@ -24,11 +24,11 @@ bug-reports: "https://github.com/claudiusFX/claudius/issues"
 depends: [
   "ocaml" {>= "5.1"}
   "dune" {>= "3.17"}
-  "tsdl"
+  "tsdl" {>= "1.1.0"}
   "ounit2" {with-test}
   "odoc" {with-doc}
-  "giflib"
-  "crunch"
+  "giflib" {>= "1.0.3"}
+  "crunch" {>= "4.0.0"}
   "ocamlformat" {>= "0.27.0" & with-dev-setup}
 ]
 build: [
