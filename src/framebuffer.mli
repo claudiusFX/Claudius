@@ -89,6 +89,10 @@ val filled_polygon : (int * int) list -> int -> t -> unit
 (** [filled_polygon points colour framebuffer] Draws a filled polygon made from
     the list of [points] in the specified [colour] into [framebuffer]. *)
 
+val draw_picture : Picture.t -> int -> int -> t -> unit
+(** [draw_picture pic x y buffer] draws [pic] onto [buffer] at position (x, y).
+    Scaling defined in [pic] is applied. *)
+
 val draw_char : int -> int -> Font.t -> char -> int -> t -> int
 (** [draw_char x y font c colour framebuffer] Draws a single character [c] in
     the specified [colour] using [font]. The top left of the charcter is the
