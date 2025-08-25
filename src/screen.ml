@@ -5,9 +5,10 @@ type t = {
   mutable palette : Palette.t;
   font : Font.t;
   mutable dirty : bool;
+  pictures : Picture.t array;
 }
 
-let create ?font (width : int) (height : int) (scale : int)
+let create ?font ?(image_filenames = []) (width : int) (height : int) (scale : int)
     (palette : Palette.t) : t =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
@@ -30,7 +31,28 @@ let create ?font (width : int) (height : int) (scale : int)
             failwith (Printf.sprintf "Failed to load default font: %s" e))
   in
 
-  { width; height; scale; palette; font; dirty = true }
+  let pictures =
+    let offset = ref (Palette.size palette) in
+    List.map
+      (fun filename ->
+        let pic = Picture.load filename in
+        let shifted =
+          Picture.with_palette_offset pic !offset
+        in
+        offset := !offset + Palette.size (Picture.palette pic);
+        shifted)
+      image_filenames
+    |> Array.of_list
+  in
+
+  let final_palette =
+    let all_palettes =
+      palette :: (Array.to_list pictures |> List.map Picture.palette)
+    in
+    Palette.concat all_palettes
+  in
+
+  { width; height; scale; palette = final_palette; font; dirty = true; pictures }
 
 let update_palette (screen : t) (new_palette : Palette.t) : unit =
   screen.palette <- new_palette;
@@ -46,3 +68,4 @@ let font (screen : t) : Font.t = screen.font
 let scale (screen : t) : int = screen.scale
 let is_dirty (screen : t) : bool = screen.dirty
 let clear_dirty (screen : t) : unit = screen.dirty <- false
+let pictures (screen : t) : Picture.t array = screen.pictures
