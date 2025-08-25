@@ -5,8 +5,33 @@ type t = {
   pixels : int array;
   width : int;
   height : int;
-  scale : float;
 }
+
+let global_palette : int array = Array.make 256 0
+
+let picture_offsets : (int, int) Hashtbl.t = Hashtbl.create 16
+
+let next_palette_offset : int ref = ref 1
+
+(* To ensure a picture’s palette is assigned an offset in the global palette. *)
+let ensure_palette_offset (pic : t) : int =
+  (* Hash based on palette contents + dimensions, so same picture reuses offset. *)
+  let pal_list = Palette.to_list pic.palette in
+  let pid = Hashtbl.hash (pal_list, pic.width, pic.height) in
+  match Hashtbl.find_opt picture_offsets pid with
+  | Some offset -> offset
+  | None ->
+      let count = List.length pal_list in
+      let offset = !next_palette_offset in
+      if offset + count > Array.length global_palette then
+        failwith "Global palette overflow in Picture.ensure_palette_offset";
+
+      List.iteri (fun i rgb24 -> global_palette.(offset + i) <- rgb24) pal_list;
+
+      Hashtbl.add picture_offsets pid offset;
+
+      next_palette_offset := offset + count;
+      offset
 
 let load_png_as_indexed (filepath : string) : Palette.t * int array * int * int
     =
@@ -77,19 +102,18 @@ let load_png_as_indexed (filepath : string) : Palette.t * int array * int * int
   (pal, indexed_pixels, w, h)
 
 (* Public API, so real img data isn't tampered *)
-let load (filepath : string) (scale : float) : t =
-  if scale <= 0.0 then invalid_arg "Picture.load: scale must be > 0";
-  let palette, pixels, w, h = load_png_as_indexed filepath in
-  { palette; pixels; width = w; height = h; scale }
 
-let set_scale (pic : t) (s : float) : t =
-  if s <= 0.0 then invalid_arg "Picture.set_scale: scale must be > 0";
-  { pic with scale = s }
+let load (filepath : string) : t =
+  let palette, pixels, w, h = load_png_as_indexed filepath in
+  { palette; pixels; width = w; height = h }
 
 let original_width (pic : t) = pic.width
 let original_height (pic : t) = pic.height
-let scaled_width (pic : t) = int_of_float (float pic.width *. pic.scale)
-let scaled_height (pic : t) = int_of_float (float pic.height *. pic.scale)
-let scale (pic : t) = pic.scale
-let palette (pic : t) = pic.palette
 let pixels (pic : t) = pic.pixels
+let palette (pic : t) = pic.palette
+
+let with_palette_offset (pic : t) (offset : int) : t =
+  let shifted_pixels =
+    Array.map (fun idx -> if idx = 0 then 0 else idx + offset) pic.pixels
+  in
+  { pic with pixels = shifted_pixels }
