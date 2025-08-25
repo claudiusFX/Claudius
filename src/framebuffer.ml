@@ -461,15 +461,14 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
         map;
       buffer.dirty <- true
 
-let draw_picture (pic : Picture.t) (offset_x : int) (offset_y : int) (fb : t) :
+let draw_picture (pic : Picture.t) ?(scale=1.0) (offset_x : int) (offset_y : int) (fb : t) :
     unit =
   let src_w = Picture.original_width pic in
   let src_h = Picture.original_height pic in
-  let dst_w = Picture.scaled_width pic in
-  let dst_h = Picture.scaled_height pic in
-  let scale = Picture.scale pic in
+  let dst_w = int_of_float (float src_w *. scale) in
+  let dst_h = int_of_float (float src_h *. scale) in
   let pixels = Picture.pixels pic in
-
+  let palette_offset = Picture.ensure_palette_offset pic in
   for y = 0 to dst_h - 1 do
     for x = 0 to dst_w - 1 do
       let src_x = min (src_w - 1) (int_of_float (float x /. scale)) in
@@ -485,7 +484,7 @@ let draw_picture (pic : Picture.t) (offset_x : int) (offset_y : int) (fb : t) :
           && fb_x < Array.length fb.data.(0)
           && fb_y >= 0
           && fb_y < Array.length fb.data
-        then fb.data.(fb_y).(fb_x) <- color_index
+        then fb.data.(fb_y).(fb_x) <- color_index + palette_offset
     done
   done;
   fb.dirty <- true
@@ -589,7 +588,7 @@ let render (buffer : t) (draw : Primitives.t list) =
           ignore (draw_char p.x p.y font c col buffer)
       | Primitives.String (p, font, s, col) ->
           ignore (draw_string p.x p.y font s col buffer)
-      | Primitives.Picture (pos, pic) -> draw_picture pic pos.x pos.y buffer)
+      | Primitives.Picture (pos, pic) -> draw_picture pic ~scale:1.0 pos.x pos.y buffer)
     draw
 
 (* ----- *)
