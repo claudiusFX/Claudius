@@ -479,15 +479,7 @@ let draw_picture (pic : Picture.t) ?(scale = 1.0) (offset_x : int)
       if color_index <> 0 then
         let fb_x = x + offset_x in
         let fb_y = y + offset_y in
-
         pixel_write fb_x fb_y color_index fb
-
-        (* if
-          fb_x >= 0
-          && fb_x < Array.length fb.data.(0)
-          && fb_y >= 0
-          && fb_y < Array.length fb.data
-        then fb.data.(fb_y).(fb_x) <- color_index + palette_offset *)
     done
   done;
   fb.dirty <- true
