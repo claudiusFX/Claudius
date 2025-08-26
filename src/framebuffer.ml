@@ -461,8 +461,8 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
         map;
       buffer.dirty <- true
 
-let draw_picture (pic : Picture.t) ?(scale=1.0) (offset_x : int) (offset_y : int) (fb : t) :
-    unit =
+let draw_picture (pic : Picture.t) ?(scale = 1.0) (offset_x : int)
+    (offset_y : int) (fb : t) : unit =
   let src_w = Picture.original_width pic in
   let src_h = Picture.original_height pic in
   let dst_w = int_of_float (float src_w *. scale) in
@@ -588,7 +588,8 @@ let render (buffer : t) (draw : Primitives.t list) =
           ignore (draw_char p.x p.y font c col buffer)
       | Primitives.String (p, font, s, col) ->
           ignore (draw_string p.x p.y font s col buffer)
-      | Primitives.Picture (pos, pic) -> draw_picture pic ~scale:1.0 pos.x pos.y buffer)
+      | Primitives.Picture (pos, pic) ->
+          draw_picture pic ~scale:1.0 pos.x pos.y buffer)
     draw
 
 (* ----- *)

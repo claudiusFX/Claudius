@@ -1,16 +1,9 @@
 open Image
 
-type t = {
-  palette : Palette.t;
-  pixels : int array;
-  width : int;
-  height : int;
-}
+type t = { palette : Palette.t; pixels : int array; width : int; height : int }
 
 let global_palette : int array = Array.make 256 0
-
 let picture_offsets : (int, int) Hashtbl.t = Hashtbl.create 16
-
 let next_palette_offset : int ref = ref 1
 
 (* To ensure a picture’s palette is assigned an offset in the global palette. *)

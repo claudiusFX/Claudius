@@ -8,8 +8,8 @@ type t = {
   pictures : Picture.t array;
 }
 
-let create ?font ?(image_filenames = []) (width : int) (height : int) (scale : int)
-    (palette : Palette.t) : t =
+let create ?font ?(image_filenames = []) (width : int) (height : int)
+    (scale : int) (palette : Palette.t) : t =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
@@ -36,9 +36,7 @@ let create ?font ?(image_filenames = []) (width : int) (height : int) (scale : i
     List.map
       (fun filename ->
         let pic = Picture.load filename in
-        let shifted =
-          Picture.with_palette_offset pic !offset
-        in
+        let shifted = Picture.with_palette_offset pic !offset in
         offset := !offset + Palette.size (Picture.palette pic);
         shifted)
       image_filenames
@@ -52,7 +50,15 @@ let create ?font ?(image_filenames = []) (width : int) (height : int) (scale : i
     Palette.concat all_palettes
   in
 
-  { width; height; scale; palette = final_palette; font; dirty = true; pictures }
+  {
+    width;
+    height;
+    scale;
+    palette = final_palette;
+    font;
+    dirty = true;
+    pictures;
+  }
 
 let update_palette (screen : t) (new_palette : Palette.t) : unit =
   screen.palette <- new_palette;

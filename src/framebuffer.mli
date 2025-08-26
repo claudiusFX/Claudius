@@ -90,8 +90,9 @@ val filled_polygon : (int * int) list -> int -> t -> unit
     the list of [points] in the specified [colour] into [framebuffer]. *)
 
 val draw_picture : Picture.t -> ?scale:float -> int -> int -> t -> unit
-(** [draw_picture pic ?scale x y buffer] draws [pic] onto [buffer] at position (x, y).
-    The picture is scaled uniformly by [scale], which defaults to 1.0 if omitted. *)
+(** [draw_picture pic ?scale x y buffer] draws [pic] onto [buffer] at position
+    (x, y). The picture is scaled uniformly by [scale], which defaults to 1.0 if
+    omitted. *)
 
 val draw_char : int -> int -> Font.t -> char -> int -> t -> int
 (** [draw_char x y font c colour framebuffer] Draws a single character [c] in

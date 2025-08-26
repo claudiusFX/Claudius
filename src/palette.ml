@@ -234,12 +234,15 @@ let updated_entry (pal : t) (index : int) (new_color : int * int * int) : t =
     new_pal
 
 let concat (palettes : t list) : t =
-  let total_len = List.fold_left (fun acc pal -> acc + Array.length pal) 0 palettes in
+  let total_len =
+    List.fold_left (fun acc pal -> acc + Array.length pal) 0 palettes
+  in
   let result = Array.make total_len 0l in
   let _ =
-    List.fold_left (fun offset pal ->
-      Array.iteri (fun i v -> result.(offset + i) <- v) pal;
-      offset + Array.length pal
-    ) 0 palettes
+    List.fold_left
+      (fun offset pal ->
+        Array.iteri (fun i v -> result.(offset + i) <- v) pal;
+        offset + Array.length pal)
+      0 palettes
   in
   result
