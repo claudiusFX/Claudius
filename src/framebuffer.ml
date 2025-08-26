@@ -468,7 +468,7 @@ let draw_picture (pic : Picture.t) ?(scale = 1.0) (offset_x : int)
   let dst_w = int_of_float (float src_w *. scale) in
   let dst_h = int_of_float (float src_h *. scale) in
   let pixels = Picture.pixels pic in
-  let palette_offset = Picture.ensure_palette_offset pic in
+  (* let palette_offset = Picture.ensure_palette_offset pic in *)
   for y = 0 to dst_h - 1 do
     for x = 0 to dst_w - 1 do
       let src_x = min (src_w - 1) (int_of_float (float x /. scale)) in
@@ -479,12 +479,15 @@ let draw_picture (pic : Picture.t) ?(scale = 1.0) (offset_x : int)
       if color_index <> 0 then
         let fb_x = x + offset_x in
         let fb_y = y + offset_y in
-        if
+
+        pixel_write fb_x fb_y color_index fb
+
+        (* if
           fb_x >= 0
           && fb_x < Array.length fb.data.(0)
           && fb_y >= 0
           && fb_y < Array.length fb.data
-        then fb.data.(fb_y).(fb_x) <- color_index + palette_offset
+        then fb.data.(fb_y).(fb_x) <- color_index + palette_offset *)
     done
   done;
   fb.dirty <- true
