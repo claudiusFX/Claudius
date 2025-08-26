@@ -78,11 +78,6 @@ let load_png_as_indexed (filepath : string) : Palette.t * int array * int * int
     :: List.map (fun (r, g, b) -> (r lsl 16) lor (g lsl 8) lor b) palette_list
   in
 
-  if List.length palette_rgb_24 > 256 then
-    invalid_arg
-      (Printf.sprintf "PNG uses %d unique colors — exceeds the 256-color limit"
-         (List.length palette_rgb_24));
-
   let pal = Palette.of_list palette_rgb_24 in
 
   let indexed_pixels =
