@@ -29,7 +29,6 @@ depends: [
   "odoc" {with-doc}
   "giflib" {>= "1.0.3"}
   "imagelib" {>= "20221222"}
-  "imagelib.unix" {>= "20221222"}
   "crunch" {>= "4.0.0"}
   "ocamlformat" {>= "0.27.0" & with-dev-setup}
 ]
