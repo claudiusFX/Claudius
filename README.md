@@ -14,26 +14,26 @@ Claudius is a library for OCaml to do retro-style graphics, and so you need to c
 
 ## Using Claudius
 
-You should use dune to pin Claudius by adding it to the `dune-project` file for your repository - you can find an [example project here](https://github.com/gridbugs/hello-claudius). Basically you need to do two things:
-
-Add the following to your dune-project file:
-
-```
-(pin
- (url "git+https://github.com/claudiusFX/Claudius.git")
- (package
-  (name claudius)))
-```
-
-Then run:
+Claudius is [available via opam](https://opam.ocaml.org/packages/claudius/), and so you should be able to install it by simply running:
 
 ```shell
-$ dune pkg lock
+$ opam install cladius
 ```
+
+And then once that is installed, you can add it as a dependancy to your project in your dune file, like this:
+
+```
+(executable
+ (public_name my_program)
+ (name main)
+ (libraries claudius))
+```
+
+To see examples of how Claudius is used and learn how it works, we recommend you checkout the [examples library](https://github.com/claudiusFX/claudius-examples), run those, and then try editing the examples to make them do different things!
 
 ## Developing Claudius
 
-If you want to make opensource contributions to Claudius, you are welcome to do so. For that you will need to use the below approach
+If you want to make open-source contributions to Claudius, you are welcome to do so. For that you will need to use the below approach
 
 If you're working on Claudius itself, then life is a bit easier using a vendor directory to add a version you can edit and commit to:
 
@@ -64,7 +64,7 @@ There are [odoc](https://github.com/ocaml/odoc) documentation for most of Claudi
 $ dune build @doc
 $ open _build/default/_doc/_html/index.html
 ```
- 
+
 Or you can use whatever browser directly to open that index file.
 
 # Requirements
