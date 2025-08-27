@@ -468,7 +468,6 @@ let draw_picture (pic : Picture.t) ?(scale = 1.0) (offset_x : int)
   let dst_w = int_of_float (float src_w *. scale) in
   let dst_h = int_of_float (float src_h *. scale) in
   let pixels = Picture.pixels pic in
-  (* let palette_offset = Picture.ensure_palette_offset pic in *)
   for y = 0 to dst_h - 1 do
     for x = 0 to dst_w - 1 do
       let src_x = min (src_w - 1) (int_of_float (float x /. scale)) in

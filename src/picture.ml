@@ -2,30 +2,6 @@ open Image
 
 type t = { palette : Palette.t; pixels : int array; width : int; height : int }
 
-(* let global_palette : int array = Array.make 256 0
-let picture_offsets : (int, int) Hashtbl.t = Hashtbl.create 16
-let next_palette_offset : int ref = ref 1 *)
-
-(* To ensure a picture’s palette is assigned an offset in the global palette. *)
-(* let ensure_palette_offset (pic : t) : int =
-  (* Hash based on palette contents + dimensions, so same picture reuses offset. *)
-  let pal_list = Palette.to_list pic.palette in
-  let pid = Hashtbl.hash (pal_list, pic.width, pic.height) in
-  match Hashtbl.find_opt picture_offsets pid with
-  | Some offset -> offset
-  | None ->
-      let count = List.length pal_list in
-      let offset = !next_palette_offset in
-      if offset + count > Array.length global_palette then
-        failwith "Global palette overflow in Picture.ensure_palette_offset";
-
-      List.iteri (fun i rgb24 -> global_palette.(offset + i) <- rgb24) pal_list;
-
-      Hashtbl.add picture_offsets pid offset;
-
-      next_palette_offset := offset + count;
-      offset *)
-
 let load_png_as_indexed (filepath : string) : Palette.t * int array * int * int
     =
   let img = ImageLib_unix.openfile filepath in
