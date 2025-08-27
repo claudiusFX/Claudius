@@ -19,4 +19,3 @@ val palette : t -> Palette.t
 val with_palette_offset : t -> int -> t
 (** [with_palette_offset pic offset] returns a new picture with all pixel
     indices shifted by [offset]. Palette is unchanged. *)
-

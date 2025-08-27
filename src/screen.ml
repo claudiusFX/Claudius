@@ -33,7 +33,7 @@ let create ?font ?(image_filenames = []) (width : int) (height : int)
 
   let pictures, all_palettes =
     let init_offset = Palette.size palette in
-    let init_acc = ([], init_offset, [palette]) in
+    let init_acc = ([], init_offset, [ palette ]) in
     let pics_rev, _, palettes_rev =
       List.fold_left
         (fun (pics_acc, offset_acc, palettes_acc) filename ->
