@@ -20,9 +20,9 @@ val with_palette_offset : t -> int -> t
 (** [with_palette_offset pic offset] returns a new picture with all pixel
     indices shifted by [offset]. Palette is unchanged. *)
 
-val ensure_palette_offset : t -> int
+(* val ensure_palette_offset : t -> int *)
 (** [ensure_palette_offset pic] ensures that [pic]'s palette is installed into
     the global palette, and returns the assigned offset. *)
 
-val global_palette : int array
+(* val global_palette : int array *)
 (** The global 256-color palette shared by all pictures. *)

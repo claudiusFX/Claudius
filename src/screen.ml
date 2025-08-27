@@ -31,24 +31,22 @@ let create ?font ?(image_filenames = []) (width : int) (height : int)
             failwith (Printf.sprintf "Failed to load default font: %s" e))
   in
 
-  let pictures =
-    let offset = ref (Palette.size palette) in
-    List.map
-      (fun filename ->
-        let pic = Picture.load filename in
-        let shifted = Picture.with_palette_offset pic !offset in
-        offset := !offset + Palette.size (Picture.palette pic);
-        shifted)
-      image_filenames
-    |> Array.of_list
+  let pictures, all_palettes =
+    let init_offset = Palette.size palette in
+    let init_acc = ([], init_offset, [palette]) in
+    let pics_rev, _, palettes_rev =
+      List.fold_left
+        (fun (pics_acc, offset_acc, palettes_acc) filename ->
+          let pic = Picture.load filename in
+          let shifted = Picture.with_palette_offset pic offset_acc in
+          let next_offset = offset_acc + Palette.size (Picture.palette pic) in
+          (shifted :: pics_acc, next_offset, Picture.palette pic :: palettes_acc))
+        init_acc image_filenames
+    in
+    (List.rev pics_rev |> Array.of_list, List.rev palettes_rev)
   in
 
-  let final_palette =
-    let all_palettes =
-      palette :: (Array.to_list pictures |> List.map Picture.palette)
-    in
-    Palette.concat all_palettes
-  in
+  let final_palette = Palette.concat all_palettes in
 
   {
     width;
