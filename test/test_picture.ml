@@ -19,7 +19,7 @@ let test_draw_picture_normal _ =
   let pic = load "../test_assets/tetris.png" in
   let pal = palette pic in
   assert_bool "palette has entries" (Palette.size pal > 0);
-  assert_bool "pixels reference palette" (pixels pic |> Array.exists ((<>) 0))
+  assert_bool "pixels reference palette" (pixels pic |> Array.exists (( <> ) 0))
 
 let test_draw_picture_negative_offset _ =
   let pic = load "../test_assets/tetris.png" in
@@ -46,14 +46,15 @@ let test_load_png_as_indexed_transparent _ =
   assert_bool "image has height > 0" (h > 0);
   (* palette[0] reserved for transparency *)
   assert_equal 0x000000l (Palette.index_to_rgb pal 0);
-  assert_bool "transparent pixel present" (Array.exists ((=) 0) pixels)
+  assert_bool "transparent pixel present" (Array.exists (( = ) 0) pixels)
 
 let test_with_palette_offset _ =
   let pic = load "../test_assets/tetris.png" in
   let shifted = with_palette_offset pic 10 in
   Array.iteri
     (fun i idx ->
-      if idx = 0 then assert_equal 0 (pixels shifted).(i) (* transparency stays 0 *)
+      if idx = 0 then assert_equal 0 (pixels shifted).(i)
+        (* transparency stays 0 *)
       else assert_equal (idx + 10) (pixels shifted).(i))
     (pixels pic)
 
@@ -65,7 +66,8 @@ let suite =
          "draw_picture_normal" >:: test_draw_picture_normal;
          "draw_picture_negative_offset" >:: test_draw_picture_negative_offset;
          "draw_picture_scaled" >:: test_draw_picture_scaled;
-         "load_png_as_indexed transparent" >:: test_load_png_as_indexed_transparent;
+         "load_png_as_indexed transparent"
+         >:: test_load_png_as_indexed_transparent;
          "with_palette_offset" >:: test_with_palette_offset;
        ]
 
