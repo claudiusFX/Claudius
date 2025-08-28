@@ -83,3 +83,6 @@ val circle_palette : t -> int -> t
 val updated_entry : t -> int -> int * int * int -> t
 (** [updated_entry pal index new_color] checks for the index then returns a new
     palette with the entry at [index] updated to [new_color]. *)
+
+val concat : t list -> t
+(** [concat palettes] merges a list of palettes into a single palette. *)

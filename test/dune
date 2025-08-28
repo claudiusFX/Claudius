@@ -10,5 +10,8 @@
   test_screenshot
   test_events
   test_stats
-  test_animation)
+  test_animation
+  test_picture)
+ (deps
+  (source_tree ../test_assets))
  (libraries claudius ounit2))

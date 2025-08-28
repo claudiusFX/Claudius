@@ -5,10 +5,11 @@ type t = {
   mutable palette : Palette.t;
   font : Font.t;
   mutable dirty : bool;
+  pictures : Picture.t array;
 }
 
-let create ?font (width : int) (height : int) (scale : int)
-    (palette : Palette.t) : t =
+let create ?font ?(image_filenames = []) (width : int) (height : int)
+    (scale : int) (palette : Palette.t) : t =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
@@ -30,7 +31,32 @@ let create ?font (width : int) (height : int) (scale : int)
             failwith (Printf.sprintf "Failed to load default font: %s" e))
   in
 
-  { width; height; scale; palette; font; dirty = true }
+  let pictures, all_palettes =
+    let init_offset = Palette.size palette in
+    let init_acc = ([], init_offset, [ palette ]) in
+    let pics_rev, _, palettes_rev =
+      List.fold_left
+        (fun (pics_acc, offset_acc, palettes_acc) filename ->
+          let pic = Picture.load filename in
+          let shifted = Picture.with_palette_offset pic offset_acc in
+          let next_offset = offset_acc + Palette.size (Picture.palette pic) in
+          (shifted :: pics_acc, next_offset, Picture.palette pic :: palettes_acc))
+        init_acc image_filenames
+    in
+    (List.rev pics_rev |> Array.of_list, List.rev palettes_rev)
+  in
+
+  let final_palette = Palette.concat all_palettes in
+
+  {
+    width;
+    height;
+    scale;
+    palette = final_palette;
+    font;
+    dirty = true;
+    pictures;
+  }
 
 let update_palette (screen : t) (new_palette : Palette.t) : unit =
   screen.palette <- new_palette;
@@ -46,3 +72,4 @@ let font (screen : t) : Font.t = screen.font
 let scale (screen : t) : int = screen.scale
 let is_dirty (screen : t) : bool = screen.dirty
 let clear_dirty (screen : t) : unit = screen.dirty <- false
+let pictures (screen : t) : Picture.t array = screen.pictures

@@ -6,13 +6,22 @@ type t
 
 (** {1 Initializations} *)
 
-val create : ?font:Font.t -> int -> int -> int -> Palette.t -> t
+val create :
+  ?font:Font.t ->
+  ?image_filenames:string list ->
+  int ->
+  int ->
+  int ->
+  Palette.t ->
+  t
 (** [create font width height scale palette] Creates a new screen of the
     specified size [width] x [height], and it will be rendered in a window
     scaled up by the [scale] factor provided. The framebuffers used when running
     will be indexed into the [palette] provided here. Raises [Invalid_argument]
     if the dimensions or scale are either zero or negative. If no [font] is
-    provided then a default font is used. *)
+    provided then a default font is used. If [image_filenames] is provided, the
+    images will be loaded and their palettes merged into the screen's global
+    palette.*)
 
 val update_palette : t -> Palette.t -> unit
 (**[update screen new_palette] creates a new screen with updated palette and
@@ -44,3 +53,6 @@ val is_dirty : t -> bool
 
 val clear_dirty : t -> unit
 (** [clear_dirty screen] returns a new screen with the dirty flag cleared. *)
+
+val pictures : t -> Picture.t array
+(** [pictures screen] returns the array of pictures loaded into the screen. *)

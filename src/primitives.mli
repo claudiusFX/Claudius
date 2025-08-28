@@ -18,3 +18,4 @@ type t =
   | FilledTriangle of point * point * point * int
   | Char of point * Font.t * char * int
   | String of point * Font.t * string * int
+  | Picture of point * Picture.t

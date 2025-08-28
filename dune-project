@@ -19,7 +19,7 @@
  (name claudius)
  (synopsis "A retro-style graphics library")
  (description "An functional style retro-graphics library for OCaml for building generative art, demos, and games.")
- (depends (ocaml (>= 5.1)) dune (tsdl (>= 1.1.0)) (ounit2 :with-test) (odoc :with-doc) (giflib (>= 1.0.3)) (crunch (>= 4.0.0)) (ocamlformat (and (>= 0.27.0) :with-dev-setup )))
+ (depends (ocaml (>= 5.1)) dune (tsdl (>= 1.1.0)) (ounit2 :with-test) (odoc :with-doc) (giflib (>= 1.0.3)) (imagelib (>= 20221222)) (crunch (>= 4.0.0)) (ocamlformat (and (>= 0.27.0) :with-dev-setup )))
  (tags
   (graphics rendering paletted)))
 
