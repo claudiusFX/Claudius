@@ -8,6 +8,12 @@ Sincere thanks from Claudius team to all those who have contributed or made sugg
 
 Claudius uses [Tamzen font](https://github.com/sunaku/tamzen-font) as the default text font.
 
+# Docs
+
+There are [odoc](https://github.com/ocaml/odoc) documentation for most of Claudius. You can find an online version [on the Claudius website](https://claudiusfx.org/claudius/index.html).
+
+There is also a large range of [example programs using Claudius](https://github.com/claudiusFX/claudius-examples/) that you are encourage to experiment with: try running them and then changing the code to see what else you can get them to do!
+
 # Using Claudius
 
 Claudius is a library for OCaml to do retro-style graphics, and so you need to create a new project that uses Cladius. But because Claudius isn't currently in Opam, you'll need to add it into your project using one of the two methods:
@@ -31,6 +37,14 @@ And then once that is installed, you can add it as a dependancy to your project 
 
 To see examples of how Claudius is used and learn how it works, we recommend you checkout the [examples library](https://github.com/claudiusFX/claudius-examples), run those, and then try editing the examples to make them do different things!
 
+## Standard keys
+
+Mostly Claudius doesn't have any interaction points beyond those you provide, but there are a few:
+
+* F1 - Show debug overlay
+* F2 - Save a screenshot to a GIF
+* F3 - Save an animation to a GIF
+
 ## Developing Claudius
 
 If you want to make open-source contributions to Claudius, you are welcome to do so. For that you will need to use the below approach
@@ -48,17 +62,7 @@ $ cd ..
 $ git submodule update --init --recursive
 ```
 
-## Standard keys
-
-Mostly Claudius doesn't have any interaction points beyond those you provide, but there are a few:
-
-* F1 - Show debug overlay
-* F2 - Save a screenshot to a GIF
-* F3 - Save an animation to a GIF
-
-# Docs
-
-There are [odoc](https://github.com/ocaml/odoc) documentation for most of Claudius. You can build that documentation with:
+You can build that documentation with:
 
 ```shell
 $ dune build @doc
