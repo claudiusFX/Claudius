@@ -23,9 +23,6 @@ val create :
     images will be loaded and their palettes merged into the screen's global
     palette.*)
 
-val update_palette : t -> Palette.t -> unit
-(**[update screen new_palette] creates a new screen with updated palette and
-   marks the screen as dirty.*)
 
 val create_with_font : int -> int -> int -> Font.t -> Palette.t -> t
 (** [create width height scale font palette] Deprecated: now use create with the
@@ -38,6 +35,10 @@ val dimensions : t -> int * int
 
 val palette : t -> Palette.t
 (** [palette screen] Returns the palette associated with the [screen]. *)
+
+val update_palette : t -> Palette.t -> unit
+(**[update screen new_palette] updates the screen with provided palette and
+   marks the screen as dirty.*)
 
 val scale : t -> int
 (** [scale screen] Returns the scaling factor used when drawing [screen] to a

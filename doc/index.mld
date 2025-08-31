@@ -125,11 +125,10 @@ let = p Palette.generate_plasma_palette 14
 |> Palette.of_list
 ]}
 
-Aside: because you can't change the palette once Claudius has started, this may feel very restrictive compared to TIC-80 and other fantasy console systems, and you'd be correct. However, because a palette in Claudius allows for more than just 16 colours, you can take a functional approach and compose a palette that is the super set of the various palettes you will need and then use offsets when rendering to access the approapriate "bank" of colours.
 
 {2 Screens}
 
-Once you have a colour palette defined, you can now create the screen mode you want to use for this program's lifetime:
+Once you have a colour palette defined, you can now create the screen mode you want to use with {!Claudius.Screen.create}:
 
 {[
 let s = Screen.create 640 480 1 (Palette.generate_mono_palette 16)
@@ -142,6 +141,10 @@ let s = Screen.create 320 200 3 (Palette.generate_plasma_palette 256)
 ]}
 
 Claudius will use this information to generate the initial framebuffer state if you don't provide a boot function, and it is used to generate and render the window Claudius will display on the screen.
+
+In retro-graphics there are many effects that are powered by updating the palette, and to allow this Claudius supports updating the palette as your program is running. For example, it is a common to rotate the palette colours to get an on screen effect rather than rewriting all the pixels with new palette values. To update the palette you provide a new palette to the screen by calling {!Claudius.Screen.update_palette}.
+
+Screens also let you load a set of images ready to use in your program. By loading them at the start of your program Claudius can correctly allocate palette entries for the colours in the images, so the palette becomes the colours you specifed when you create the palette, plus the colours from any images you loaded.
 
 {1 Details}
 
