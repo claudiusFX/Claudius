@@ -4,14 +4,12 @@ type t
 val load : string -> t
 (** [load filename] loads a PNG file and returns a picture. *)
 
-val original_width : t -> int
-(** [original_width pic] returns the original width in pixels. *)
-
-val original_height : t -> int
-(** [original_height pic] returns the original height in pixels. *)
+val dimensions : t -> int * int
+(** [dimensions pic] returns the width and height of the image in pixels. *)
 
 val pixels : t -> int array
-(** [pixels pic] returns the indexed pixel array. *)
+(** [pixels pic] returns the indexed pixel array. The pixels are arranged in
+    consecutive rows, with the top left pixel of the image first. *)
 
 val palette : t -> Palette.t
 (** [palette pic] returns the color palette of the picture. *)

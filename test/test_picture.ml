@@ -5,14 +5,14 @@ open Picture
 let test_valid_png _ =
   (* Credits for tetris.png: https://publicdomainvectors.org/en/free-clipart/3D-Tetris-blocks-vector-illustration/6089.html *)
   let pic = load "../test_assets/tetris.png" in
-  assert_bool "width > 0" (original_width pic > 0);
-  assert_bool "height > 0" (original_height pic > 0);
+  let width, height = dimensions pic in
+  assert_bool "width > 0" (width > 0);
+  assert_bool "height > 0" (height > 0);
   assert_bool "has pixels" (Array.length (pixels pic) > 0)
 
 let test_scaled_dimensions _ =
   let pic = load "../test_assets/tetris.png" in
-  let w = original_width pic in
-  let h = original_height pic in
+  let w, h = dimensions pic in
   assert_equal w (Array.length (pixels pic) / h)
 
 let test_draw_picture_normal _ =
@@ -32,16 +32,14 @@ let test_draw_picture_negative_offset _ =
 
 let test_draw_picture_scaled _ =
   let pic = load "../test_assets/tetris.png" in
-  let w = original_width pic in
-  let h = original_height pic in
+  let w, h = dimensions pic in
   assert_equal (w * h) (Array.length (pixels pic))
 
 let test_load_png_as_indexed_transparent _ =
   let pic = Picture.load "../test_assets/tetris.png" in
   let pal = Picture.palette pic in
   let pixels = Picture.pixels pic in
-  let w = Picture.original_width pic in
-  let h = Picture.original_height pic in
+  let w, h = Picture.dimensions pic in
   assert_bool "image has width > 0" (w > 0);
   assert_bool "image has height > 0" (h > 0);
   (* palette[0] reserved for transparency *)
