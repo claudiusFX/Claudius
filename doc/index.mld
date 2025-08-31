@@ -144,7 +144,7 @@ Claudius will use this information to generate the initial framebuffer state if 
 
 In retro-graphics there are many effects that are powered by updating the palette, and to allow this Claudius supports updating the palette as your program is running. For example, it is a common to rotate the palette colours to get an on screen effect rather than rewriting all the pixels with new palette values. To update the palette you provide a new palette to the screen by calling {!Claudius.Screen.update_palette}.
 
-Screens also let you load a set of images ready to use in your program. By loading them at the start of your program Claudius can correctly allocate palette entries for the colours in the images, so the palette becomes the colours you specifed when you create the palette, plus the colours from any images you loaded.
+Screens also let you load a set of images ready to use in your program. By loading them at the start of your program, Claudius can correctly allocate palette entries for the colours in the images, so the palette becomes the colours you specifed when you create the palette, plus the colours from any images you loaded.
 
 {1 Details}
 

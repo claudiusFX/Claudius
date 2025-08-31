@@ -12,7 +12,7 @@ Claudius uses [Tamzen font](https://github.com/sunaku/tamzen-font) as the defaul
 
 There are [odoc](https://github.com/ocaml/odoc) documentation for most of Claudius. You can find an online version [on the Claudius website](https://claudiusfx.org/claudius/index.html).
 
-There is also a large range of [example programs using Claudius](https://github.com/claudiusFX/claudius-examples/) that you are encourage to experiment with: try running them and then changing the code to see what else you can get them to do!
+There is also a large range of [example programs using Claudius](https://github.com/claudiusFX/claudius-examples/) that you are encouraged to experiment with: try running them and then changing the code to see what else you can get them to do!
 
 # Using Claudius
 
