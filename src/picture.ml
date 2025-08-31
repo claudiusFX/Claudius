@@ -71,8 +71,7 @@ let load (filepath : string) : t =
   let palette, pixels, w, h = load_png_as_indexed filepath in
   { palette; pixels; width = w; height = h }
 
-let original_width (pic : t) = pic.width
-let original_height (pic : t) = pic.height
+let dimensions (pic : t) = (pic.width, pic.height)
 let pixels (pic : t) = pic.pixels
 let palette (pic : t) = pic.palette
 

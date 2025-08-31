@@ -23,7 +23,6 @@ val create :
     images will be loaded and their palettes merged into the screen's global
     palette.*)
 
-
 val create_with_font : int -> int -> int -> Font.t -> Palette.t -> t
 (** [create width height scale font palette] Deprecated: now use create with the
     optional font. *)

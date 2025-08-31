@@ -463,8 +463,7 @@ let filled_polygon (points : (int * int) list) (col : int) (buffer : t) =
 
 let draw_picture (pic : Picture.t) ?(scale = 1.0) (offset_x : int)
     (offset_y : int) (fb : t) : unit =
-  let src_w = Picture.original_width pic in
-  let src_h = Picture.original_height pic in
+  let src_w, src_h = Picture.dimensions pic in
   let dst_w = int_of_float (float src_w *. scale) in
   let dst_h = int_of_float (float src_h *. scale) in
   let pixels = Picture.pixels pic in
