@@ -23,7 +23,7 @@ doc: "https://github.com/claudiusFX/claudius"
 bug-reports: "https://github.com/claudiusFX/claudius/issues"
 depends: [
   "ocaml" {>= "5.1"}
-  "dune" {>= "3.17"}
+  "dune" {>= "3.18"}
   "tsdl" {>= "1.1.0"}
   "ounit2" {with-test}
   "odoc" {with-doc}
@@ -47,3 +47,4 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/claudiusFX/claudius.git"
+x-maintenance-intent: ["(latest)"]
