@@ -1,4 +1,4 @@
-(lang dune 3.17)
+(lang dune 3.18)
 
 (name claudius)
 
@@ -10,6 +10,8 @@
 (authors "3pleX-dev <afuadajoe@gmail.com>" "Adenuga Israel Abimbola <israelabimmbolaa@gmail.com>" "Michael Dales <michael@digitalflapjack.com>" "Seed Lu <dr.seed.lu@gmail.com>" "Shreya Pawaskar <shreya.pawaskar.main@gmail.com>" "Vanisha1606 <vanishag1606@gmail.com>" "Wah Vanessa <wahvanessa22@gmail.com>")
 
 (maintainers "Michael Dales <michael@digitalflapjack.com>" "Shreya Pawaskar <shreya.pawaskar.main@gmail.com>")
+
+(maintenance_intent "(latest)")
 
 (license ISC)
 
