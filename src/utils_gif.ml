@@ -48,4 +48,8 @@ let capture_frame (screen : Screen.t) (fb : Framebuffer.t) =
         v)
   in
 
-  Image.of_pixels (scaled_width, scaled_height) colors pixels
+  (* Claudius attempts to run at 60 fps, and GIF delay time is specified as multiples
+      of 1/100th of a second, so the closest we can do is 2 (50 FPS). *)
+  let delay_time = Some 2 in
+
+  Image.of_pixels ~delay_time (scaled_width, scaled_height) colors pixels
