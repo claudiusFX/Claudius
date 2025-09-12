@@ -11,9 +11,6 @@ module PlatformMouse : module type of Mousesdl
 (** A module that provides platform-specific mouse handling, based on the
     {!Mousesdl} module. *)
 
-val show_stats : bool ref
-(** Whether stats display is currently enabled *)
-
 type input_state = {
   keys : KeyCodeSet.t;
   events : Event.t list;
