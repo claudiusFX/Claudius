@@ -6,7 +6,8 @@ type recording_state_t = {
   current_frame : int;
 }
 
-val start_recording : ?max_frames:int -> int -> recording_state_t
+val start_recording :
+  ?max_frames:int -> int -> (recording_state_t, string) result
 (** [start_recording ?max_frames n] returns a new animation recording state that
     will record [n] frames. Raises [Failure] if n is non-positive or if
     exceeding [max_frames]. *)

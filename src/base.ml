@@ -20,6 +20,7 @@ type input_state = {
 type t = {
   show_stats : bool;
   recording_state : Animation.recording_state_t option;
+  log : (string * Int32.t) list;
 }
 
 type boot_func = Screen.t -> Framebuffer.t
@@ -149,7 +150,7 @@ let run title boot tick s =
           let fps_stats = ref (Stats.create ()) in
 
           let initial_internal_state =
-            { show_stats = false; recording_state = None }
+            { show_stats = false; recording_state = None; log = [] }
           in
 
           let rec loop internal_state t prev_buffer input last_t =
@@ -178,6 +179,17 @@ let run title boot tick s =
                           internal_state with
                           show_stats = not internal_state.show_stats;
                         }
+                    | Event.KeyUp Key.F2 ->
+                        let log_message =
+                          match Screenshot.save_screenshot s prev_buffer with
+                          | Result.Ok path ->
+                              Printf.sprintf "Screenshot saved as %s" path
+                          | Result.Error msg -> msg
+                        in
+                        {
+                          internal_state with
+                          log = (log_message, now) :: internal_state.log;
+                        }
                     | Event.KeyUp Key.F3 -> (
                         Printf.printf
                           "Enter number of frames to record (default 500): %!";
@@ -188,19 +200,27 @@ let run title boot tick s =
                               Animation.max_frames_default
                             else int_of_string line
                           in
+                          match Animation.start_recording n with
+                          | Result.Ok recording_state ->
+                              {
+                                internal_state with
+                                recording_state = Some recording_state;
+                              }
+                          | Result.Error msg ->
+                              {
+                                internal_state with
+                                log = (msg, now) :: internal_state.log;
+                              }
+                        with Failure _ ->
                           {
                             internal_state with
-                            recording_state = Some (Animation.start_recording n);
-                          }
-                        with Failure _ ->
-                          Printf.printf
-                            "Invalid input. Recording not started.\n%!";
-                          internal_state)
+                            log =
+                              ("Invalid input. Recording not started.", now)
+                              :: internal_state.log;
+                          })
                     | _ -> acc)
                   internal_state input.events
               in
-
-              Screenshot.save_screenshot current_input.events s prev_buffer;
 
               let updated_buffer = tick t s prev_buffer current_input in
 
