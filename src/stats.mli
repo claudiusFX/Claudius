@@ -12,6 +12,7 @@ val update : now:float -> tick:int -> t -> t
 (** Calculate the updated stats based on current time/tick *)
 
 val log : t -> string -> t
+(** Add a log message for display *)
 
 val render :
   t -> bool -> int -> Screen.t -> Framebuffer.t -> Framebuffer.t option

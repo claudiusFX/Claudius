@@ -18,6 +18,25 @@ let test_basic_palette_of_ints _ =
   assert_equal ~msg:"Colour distinctive_pair" ~printer:extreme_print (3, 1)
     distinctive_pair
 
+let test_single_entry_palette _ =
+  let cols = [ 0x000000 ] in
+  let pal = Palette.of_list cols in
+  assert_equal ~msg:"Palette size" (List.length cols) (Palette.size pal);
+  List.iteri
+    (fun i c ->
+      let v = Palette.index_to_rgb pal i in
+      assert_equal ~msg:"Colour match" (Int32.of_int c) v)
+    cols;
+  let rev = Palette.to_list pal in
+  assert_equal ~msg:"Back to ints" cols rev;
+  let distinctive_pair = Palette.distinctive_pair pal in
+  assert_equal ~msg:"Colour distinctive_pair" ~printer:extreme_print (0, 0)
+    distinctive_pair
+
+let test_zero_entry_palette _ =
+  assert_raises (Invalid_argument "Palette size must not be zero or negative")
+    (fun () -> Palette.of_list [])
+
 let test_generate_mac_palette_creation _ =
   let pal = Palette.generate_mac_palette () in
   assert_equal ~msg:"Palette size" 16 (Palette.size pal)
@@ -221,6 +240,8 @@ let suite =
   "PaletteTests"
   >::: [
          "Test simple palette set up" >:: test_basic_palette_of_ints;
+         "Test single entry palette set up" >:: test_single_entry_palette;
+         "Test zero entry palette" >:: test_zero_entry_palette;
          "Test generate mac palette" >:: test_generate_mac_palette_creation;
          "Test generate sweetie16 palette" >:: test_generate_sweetie16_palette;
          "Test linear palette" >:: test_generate_linear_palette;

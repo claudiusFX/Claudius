@@ -10,17 +10,17 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
+type t = {
+  show_stats : bool;
+  recording_state : Animation.recording_state_t option;
+  status : Stats.t;
+}
+
 type input_state = {
   keys : KeyCodeSet.t;
   events : Event.t list;
       (* Accumulated unified input events for the current frame. *)
   mouse : Mouse.t;
-}
-
-type t = {
-  show_stats : bool;
-  recording_state : Animation.recording_state_t option;
-  status : Stats.t;
 }
 
 type boot_func = Screen.t -> Framebuffer.t

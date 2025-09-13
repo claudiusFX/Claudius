@@ -21,9 +21,9 @@ let update ~now ~tick previous =
     }
   else previous
 
-let log previous msg =
-  let log = (msg, previous.last_update) :: previous.log in
-  { previous with log }
+let log t msg =
+  let log = (msg, t.last_update) :: t.log in
+  { t with log }
 
 let draw_string x y font msg fg_col bg_col fb =
   for j = -1 to 1 do
@@ -43,59 +43,61 @@ let render_log messages screen framebuffer =
       draw_string 10 (h - (20 + (i * 20))) font a fg_col bg_col framebuffer)
     messages
 
-let render fps_stats show_all tick screen framebuffer =
-  let log_threshold = fps_stats.last_update -. 5.0 in
-  let latest_messages =
-    List.filter (fun (_, a) -> a > log_threshold) fps_stats.log
+let render_stats status tick screen framebuffer =
+  let width, height = Screen.dimensions screen
+  and font = Screen.font screen
+  and colour_count = Palette.size (Screen.palette screen)
+  and bg_col, fg_col = Palette.distinctive_pair (Screen.palette screen) in
+  let info =
+    [
+      ("Tick:", string_of_int tick);
+      ("FPS:", string_of_int status.average_fps);
+      ("Resolution:", Printf.sprintf "%dx%d" width height);
+      ("Colours:", string_of_int colour_count);
+    ]
   in
-  let show_log = List.length latest_messages > 0 in
+
+  let max_key_width =
+    List.fold_left
+      (fun acc (k, _) ->
+        let width =
+          Framebuffer.draw_string (-1000) (-1000) font k 0 framebuffer
+        in
+        if width > acc then width else acc)
+      0 info
+  in
+
+  List.iteri
+    (fun i (k, v) ->
+      let y_offset = 4 + (14 * i) in
+      draw_string 4 y_offset font k fg_col bg_col framebuffer;
+      draw_string (max_key_width + 10) y_offset font v fg_col bg_col framebuffer)
+    info;
+
+  let columns = width / 10 in
+  let rows = (colour_count / columns) + 1 in
+  let offset = height - (10 * rows) in
+  for i = 0 to colour_count - 1 do
+    Framebuffer.filled_rect
+      (i mod columns * 10)
+      (offset + (i / columns * 10))
+      10 10 i framebuffer
+  done
+
+let render status show_all tick screen framebuffer =
+  let log_messages =
+    match show_all with
+    | false ->
+        let log_threshold = status.last_update -. 5.0 in
+        List.filter (fun (_, a) -> a > log_threshold) status.log
+    | true -> status.log
+  in
+  let show_log = List.length log_messages > 0 in
 
   match (show_all, show_log) with
   | false, false -> None
   | _, _ ->
       let framebuffer = Framebuffer.map (fun i -> i) framebuffer in
-      let width, height = Screen.dimensions screen
-      and font = Screen.font screen
-      and colour_count = Palette.size (Screen.palette screen)
-      and bg_col, fg_col = Palette.distinctive_pair (Screen.palette screen) in
-
-      if show_all then (
-        let info =
-          [
-            ("Tick:", string_of_int tick);
-            ("FPS:", string_of_int fps_stats.average_fps);
-            ("Resolution:", Printf.sprintf "%dx%d" width height);
-            ("Colours:", string_of_int colour_count);
-          ]
-        in
-
-        let max_key_width =
-          List.fold_left
-            (fun acc (k, _) ->
-              let width =
-                Framebuffer.draw_string (-1000) (-1000) font k 0 framebuffer
-              in
-              if width > acc then width else acc)
-            0 info
-        in
-
-        List.iteri
-          (fun i (k, v) ->
-            let y_offset = 4 + (14 * i) in
-            draw_string 4 y_offset font k fg_col bg_col framebuffer;
-            draw_string (max_key_width + 10) y_offset font v fg_col bg_col
-              framebuffer)
-          info;
-
-        let columns = width / 10 in
-        let rows = (colour_count / columns) + 1 in
-        let offset = height - (10 * rows) in
-        for i = 0 to colour_count - 1 do
-          Framebuffer.filled_rect
-            (i mod columns * 10)
-            (offset + (i / columns * 10))
-            10 10 i framebuffer
-        done);
-      if show_log then render_log latest_messages screen framebuffer;
-
+      if show_all then render_stats status tick screen framebuffer;
+      if show_log then render_log log_messages screen framebuffer;
       Some framebuffer
