@@ -106,6 +106,24 @@ let rec poll_all_events keys mouse acc =
       | _ -> poll_all_events keys mouse acc)
   | false -> (false, keys, mouse, List.rev acc)
 
+let render_log internal_state now screen framebuffer =
+  let time_limit = Int32.to_int now - 5000 in
+  let draw_messages =
+    List.filter (fun (_, a) -> Int32.to_int a > time_limit) internal_state.log
+  in
+  let _, h = Screen.dimensions screen in
+  let font = Screen.font screen in
+  let pal = Screen.palette screen in
+  let col = Palette.size pal in
+  List.iteri
+    (fun i (a, _) ->
+      ignore
+        (Framebuffer.draw_string 10
+           (h - (20 + (i * 20)))
+           font a (col - 1) framebuffer))
+    draw_messages;
+  framebuffer
+
 let run title boot tick s =
   let make_full =
     Array.to_list Sys.argv |> List.exists (fun a -> String.compare a "-f" = 0)
@@ -229,6 +247,8 @@ let run title boot tick s =
                   Stats.render !fps_stats t s updated_buffer
                 else updated_buffer
               in
+
+              ignore (render_log internal_state now s updated_buffer);
 
               let internal_state =
                 {

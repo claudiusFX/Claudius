@@ -86,3 +86,5 @@ val updated_entry : t -> int -> int * int * int -> t
 
 val concat : t list -> t
 (** [concat palettes] merges a list of palettes into a single palette. *)
+
+val extremes : t -> int * int

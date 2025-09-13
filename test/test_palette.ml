@@ -1,6 +1,8 @@
 open Claudius
 open OUnit2
 
+let extreme_print (a, b) = Printf.sprintf "%d, %d" a b
+
 let test_basic_palette_of_ints _ =
   let cols = [ 0x000000; 0xFF0000; 0x00FF00; 0x0000FF; 0xFFFFFF ] in
   let pal = Palette.of_list cols in
@@ -11,7 +13,9 @@ let test_basic_palette_of_ints _ =
       assert_equal ~msg:"Colour match" (Int32.of_int c) v)
     cols;
   let rev = Palette.to_list pal in
-  assert_equal ~msg:"Back to ints" cols rev
+  assert_equal ~msg:"Back to ints" cols rev;
+  let extremes = Palette.extremes pal in
+  assert_equal ~msg:"Colour extremes" ~printer:extreme_print (3, 1) extremes
 
 let test_generate_mac_palette_creation _ =
   let pal = Palette.generate_mac_palette () in
@@ -72,6 +76,8 @@ let test_mono_palette_creation _ =
   assert_equal ~msg:"Start with black" Int32.zero (Palette.index_to_rgb pal 0);
   assert_equal ~msg:"Wrap around to black" Int32.zero
     (Palette.index_to_rgb pal 16);
+  let extremes = Palette.extremes pal in
+  assert_equal ~msg:"Colour extremes" ~printer:extreme_print (0, 15) extremes;
   (* I originally tested that we ended on white, but due to rounding errors we might be slightly off *)
   List.iter
     (fun c ->

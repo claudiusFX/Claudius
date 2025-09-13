@@ -13,11 +13,20 @@ let update ~now ~tick previous =
     }
   else previous
 
+let draw_string x y font msg fg_col bg_col fb =
+  for j = -1 to 1 do
+    for i = -1 to 1 do
+      ignore (Framebuffer.draw_string (x + i) (y + j) font msg bg_col fb)
+    done
+  done;
+  ignore (Framebuffer.draw_string x y font msg fg_col fb)
+
 let render fps_stats tick screen framebuffer =
   let framebuffer = Framebuffer.map (fun i -> i) framebuffer in
   let width, height = Screen.dimensions screen
   and font = Screen.font screen
-  and colour_count = Palette.size (Screen.palette screen) in
+  and colour_count = Palette.size (Screen.palette screen)
+  and bg_col, fg_col = Palette.extremes (Screen.palette screen) in
 
   let info =
     [
@@ -38,21 +47,17 @@ let render fps_stats tick screen framebuffer =
       0 info
   in
 
-  let palette_max = colour_count - 1 in
-
   List.iteri
     (fun i (k, v) ->
       let y_offset = 4 + (14 * i) in
-      ignore (Framebuffer.draw_string 4 y_offset font k palette_max framebuffer);
-      ignore
-        (Framebuffer.draw_string (max_key_width + 10) y_offset font v
-           palette_max framebuffer))
+      draw_string 4 y_offset font k fg_col bg_col framebuffer;
+      draw_string (max_key_width + 10) y_offset font v fg_col bg_col framebuffer)
     info;
 
   let columns = width / 10 in
-  let rows = (palette_max / columns) + 1 in
+  let rows = (colour_count / columns) + 1 in
   let offset = height - (10 * rows) in
-  for i = 0 to palette_max do
+  for i = 0 to colour_count - 1 do
     Framebuffer.filled_rect
       (i mod columns * 10)
       (offset + (i / columns * 10))
