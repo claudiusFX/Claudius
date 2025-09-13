@@ -20,7 +20,7 @@ type input_state = {
 type t = {
   show_stats : bool;
   recording_state : Animation.recording_state_t option;
-  log : (string * Int32.t) list;
+  status : Stats.t;
 }
 
 type boot_func = Screen.t -> Framebuffer.t
@@ -106,24 +106,6 @@ let rec poll_all_events keys mouse acc =
       | _ -> poll_all_events keys mouse acc)
   | false -> (false, keys, mouse, List.rev acc)
 
-let render_log internal_state now screen framebuffer =
-  let time_limit = Int32.to_int now - 5000 in
-  let draw_messages =
-    List.filter (fun (_, a) -> Int32.to_int a > time_limit) internal_state.log
-  in
-  let _, h = Screen.dimensions screen in
-  let font = Screen.font screen in
-  let pal = Screen.palette screen in
-  let col = Palette.size pal in
-  List.iteri
-    (fun i (a, _) ->
-      ignore
-        (Framebuffer.draw_string 10
-           (h - (20 + (i * 20)))
-           font a (col - 1) framebuffer))
-    draw_messages;
-  framebuffer
-
 let run title boot tick s =
   let make_full =
     Array.to_list Sys.argv |> List.exists (fun a -> String.compare a "-f" = 0)
@@ -165,10 +147,13 @@ let run title boot tick s =
           let initial_input =
             { keys = KeyCodeSet.empty; events = []; mouse = Mouse.create scale }
           in
-          let fps_stats = ref (Stats.create ()) in
 
           let initial_internal_state =
-            { show_stats = false; recording_state = None; log = [] }
+            {
+              show_stats = false;
+              recording_state = None;
+              status = Stats.create ();
+            }
           in
 
           let rec loop internal_state t prev_buffer input last_t =
@@ -184,9 +169,15 @@ let run title boot tick s =
               { keys = new_keys; events = unified_events; mouse = new_mouse }
             in
             if exit then ()
-            else (
-              fps_stats :=
-                Stats.update ~now:(Unix.gettimeofday ()) ~tick:t !fps_stats;
+            else
+              let internal_state =
+                {
+                  internal_state with
+                  status =
+                    Stats.update ~now:(Unix.gettimeofday ()) ~tick:t
+                      internal_state.status;
+                }
+              in
 
               let internal_state =
                 List.fold_left
@@ -206,7 +197,7 @@ let run title boot tick s =
                         in
                         {
                           internal_state with
-                          log = (log_message, now) :: internal_state.log;
+                          status = Stats.log internal_state.status log_message;
                         }
                     | Event.KeyUp Key.F3 -> (
                         Printf.printf
@@ -227,14 +218,14 @@ let run title boot tick s =
                           | Result.Error msg ->
                               {
                                 internal_state with
-                                log = (msg, now) :: internal_state.log;
+                                status = Stats.log internal_state.status msg;
                               }
                         with Failure _ ->
                           {
                             internal_state with
-                            log =
-                              ("Invalid input. Recording not started.", now)
-                              :: internal_state.log;
+                            status =
+                              Stats.log internal_state.status
+                                "Invalid input. Recording not started.";
                           })
                     | _ -> acc)
                   internal_state input.events
@@ -242,13 +233,13 @@ let run title boot tick s =
 
               let updated_buffer = tick t s prev_buffer current_input in
 
-              let display_buffer =
-                if internal_state.show_stats then
-                  Stats.render !fps_stats t s updated_buffer
-                else updated_buffer
+              let stats_buffer =
+                Stats.render internal_state.status internal_state.show_stats t s
+                  updated_buffer
               in
-
-              ignore (render_log internal_state now s updated_buffer);
+              let display_buffer =
+                match stats_buffer with None -> updated_buffer | Some b -> b
+              in
 
               let internal_state =
                 {
@@ -273,7 +264,7 @@ let run title boot tick s =
               (match render_texture r texture s bitmap with
               | Error (`Msg e) -> Sdl.log "Render error: %s" e
               | Ok () -> ());
-              loop internal_state (t + 1) updated_buffer current_input now)
+              loop internal_state (t + 1) updated_buffer current_input now
           in
           loop initial_internal_state 0 initial_buffer initial_input Int32.zero;
           Sdl.destroy_texture texture;
