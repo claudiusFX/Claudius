@@ -37,7 +37,7 @@ let render_log messages screen framebuffer =
   let _, h = Screen.dimensions screen in
   let font = Screen.font screen in
   let pal = Screen.palette screen in
-  let bg_col, fg_col = Palette.extremes pal in
+  let bg_col, fg_col = Palette.distinctive_pair pal in
   List.iteri
     (fun i (a, _) ->
       draw_string 10 (h - (20 + (i * 20))) font a fg_col bg_col framebuffer)
@@ -57,7 +57,7 @@ let render fps_stats show_all tick screen framebuffer =
       let width, height = Screen.dimensions screen
       and font = Screen.font screen
       and colour_count = Palette.size (Screen.palette screen)
-      and bg_col, fg_col = Palette.extremes (Screen.palette screen) in
+      and bg_col, fg_col = Palette.distinctive_pair (Screen.palette screen) in
 
       if show_all then (
         let info =

@@ -14,8 +14,9 @@ let test_basic_palette_of_ints _ =
     cols;
   let rev = Palette.to_list pal in
   assert_equal ~msg:"Back to ints" cols rev;
-  let extremes = Palette.extremes pal in
-  assert_equal ~msg:"Colour extremes" ~printer:extreme_print (3, 1) extremes
+  let distinctive_pair = Palette.distinctive_pair pal in
+  assert_equal ~msg:"Colour distinctive_pair" ~printer:extreme_print (3, 1)
+    distinctive_pair
 
 let test_generate_mac_palette_creation _ =
   let pal = Palette.generate_mac_palette () in
@@ -76,8 +77,9 @@ let test_mono_palette_creation _ =
   assert_equal ~msg:"Start with black" Int32.zero (Palette.index_to_rgb pal 0);
   assert_equal ~msg:"Wrap around to black" Int32.zero
     (Palette.index_to_rgb pal 16);
-  let extremes = Palette.extremes pal in
-  assert_equal ~msg:"Colour extremes" ~printer:extreme_print (0, 15) extremes;
+  let distinctive_pair = Palette.distinctive_pair pal in
+  assert_equal ~msg:"Colour distinctive_pair" ~printer:extreme_print (0, 15)
+    distinctive_pair;
   (* I originally tested that we ended on white, but due to rounding errors we might be slightly off *)
   List.iter
     (fun c ->

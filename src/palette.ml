@@ -1,31 +1,21 @@
-type t = { colors : int32 array; extremes : int * int }
+type t = { colors : int32 array; distinctive_pair : int * int }
 
-let delta_e_luv (luv1 : Hsluv.luv) (luv2 : Hsluv.luv) =
+let delta_e (luv1 : Hsluv.luv) (luv2 : Hsluv.luv) =
   sqrt
     (((luv1.l -. luv2.l) ** 2.0)
     +. ((luv1.u -. luv2.u) ** 2.0)
     +. ((luv1.v -. luv2.v) ** 2.0))
 
-let find_most_distant_pair luv_list =
-  let max_dist = ref 0. in
-  let res = ref (0, 0) in
-  let count = Array.length luv_list in
-  for outer = 0 to count - 1 do
-    for inner = 0 to count - 1 do
-      let luv_1 = luv_list.(inner) and luv_2 = luv_list.(outer) in
-      let distance = delta_e_luv luv_1 luv_2 in
-      if distance > !max_dist then (
-        max_dist := distance;
-        res := (inner, outer))
-    done
-  done;
-  let index1, index2 = !res in
-  let luv1 = luv_list.(index1) and luv2 = luv_list.(index2) in
-  if luv1.l > luv2.l then (index2, index1) else (index1, index2)
+let find_most_distant_pair colors =
+  (* To find the most visually distinct colours we project the
+    colours from RGB into the LUV colour space:
 
-let v colors =
-  if Array.length colors == 0 then
-    raise (Invalid_argument "Palette size must not be zero or negative");
+    https://en.wikipedia.org/wiki/CIELUV
+
+    Once in this colour space you can calculate the "delta E", the
+    geometric distance between the colours, and that distance
+    corresponds to visual distance.
+  *)
   let luv_colors =
     Array.map
       (fun col ->
@@ -36,9 +26,31 @@ let v colors =
         Hsluv.conv_rgb_xyz rgb |> Hsluv.conv_xyz_luv)
       colors
   in
-  let extremes = find_most_distant_pair luv_colors in
+  let max_dist = ref 0. in
+  let res = ref (0, 0) in
+  let count = Array.length luv_colors in
+  for outer = 0 to count - 1 do
+    for inner = 0 to count - 1 do
+      let luv_1 = luv_colors.(inner) and luv_2 = luv_colors.(outer) in
+      let distance = delta_e luv_1 luv_2 in
+      if distance > !max_dist then (
+        max_dist := distance;
+        res := (inner, outer))
+    done
+  done;
+
+  (* In order to put some consistency on things, list the colours
+  based on the most dark colour first. *)
+  let index1, index2 = !res in
+  let luv1 = luv_colors.(index1) and luv2 = luv_colors.(index2) in
+  if luv1.l > luv2.l then (index2, index1) else (index1, index2)
+
+let v colors =
+  if Array.length colors == 0 then
+    raise (Invalid_argument "Palette size must not be zero or negative");
+  let distinctive_pair = find_most_distant_pair colors in
   let colors = Array.map Int32.of_int colors in
-  { colors; extremes }
+  { colors; distinctive_pair }
 
 let generate_mono_palette (size : int) : t =
   if size <= 0 then
@@ -314,4 +326,4 @@ let concat (palettes : t list) : t =
   in
   v result
 
-let extremes t = t.extremes
+let distinctive_pair t = t.distinctive_pair
