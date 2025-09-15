@@ -18,7 +18,8 @@ let test_palette name palette =
 
   Framebuffer.set_dirty fb;
   let screen = Screen.create width height scale palette in
-  Screenshot.save_screenshot [ Event.KeyDown Key.F2 ] screen fb
+  let res = Screenshot.save_screenshot screen fb in
+  match res with Result.Ok _ -> () | Result.Error _msg -> assert false
 
 let test_palette_too_big _ =
   let palette = Palette.generate_mono_palette 300 in
@@ -26,16 +27,9 @@ let test_palette_too_big _ =
   let fb = Framebuffer.init (width, height) (fun _ _ -> 42) in
   Framebuffer.set_dirty fb;
   let screen = Screen.create width height scale palette in
-  assert_raises (Failure "GIF only supports up to 256 colors") (fun () ->
-      Screenshot.save_screenshot [ Event.KeyDown Key.F2 ] screen fb)
-
-let test_palette_too_big_no_press _ =
-  let palette = Palette.generate_mono_palette 300 in
-  (* > 256 entries *)
-  let fb = Framebuffer.init (width, height) (fun _ _ -> 42) in
-  Framebuffer.set_dirty fb;
-  let screen = Screen.create width height scale palette in
-  Screenshot.save_screenshot [] screen fb
+  let res = Screenshot.save_screenshot screen fb in
+  let expected = Result.Error "GIF only supports up to 256 colors" in
+  assert_equal expected res
 
 let () =
   let suite =
@@ -46,8 +40,6 @@ let () =
            test_palette "monopalette" (Palette.generate_mono_palette 256);
            "raises error when palette exceeds 256 colors"
            >:: test_palette_too_big;
-           "raises error when palette exceeds 256 colors no press"
-           >:: test_palette_too_big_no_press;
          ]
   in
 

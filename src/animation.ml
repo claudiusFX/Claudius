@@ -10,13 +10,17 @@ type recording_state_t = {
 let max_frames_default = 500
 
 let start_recording ?(max_frames = max_frames_default) (n : int) :
-    recording_state_t =
+    (recording_state_t, string) result =
   if max_frames <= 0 then failwith "Number of frames must be positive";
-  if n <= 0 then failwith "Number of frames must be positive";
-  if n > max_frames then
-    failwith (Printf.sprintf "Maximum %d frames allowed" max_frames_default);
-  Printf.printf "Started recording %d frames\n%!" n;
-  { frames = []; frames_to_record = n; current_frame = 0 }
+  match n <= 0 with
+  | true -> Result.Error "Number of frames must be positive"
+  | false -> (
+      match n > max_frames with
+      | true ->
+          Result.Error
+            (Printf.sprintf "Maximum %d frames allowed" max_frames_default)
+      | false ->
+          Result.Ok { frames = []; frames_to_record = n; current_frame = 0 })
 
 let stop_recording (recording_state : recording_state_t) : unit =
   let frames = List.rev recording_state.frames in

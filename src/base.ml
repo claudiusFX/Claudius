@@ -10,8 +10,11 @@ end)
 module PlatformKey = Keysdl
 module PlatformMouse = Mousesdl
 
-let show_stats = ref false
-let recording_state : Animation.recording_state_t option ref = ref None
+type t = {
+  show_stats : bool;
+  recording_state : Animation.recording_state_t option;
+  status : Stats.t;
+}
 
 type input_state = {
   keys : KeyCodeSet.t;
@@ -144,8 +147,16 @@ let run title boot tick s =
           let initial_input =
             { keys = KeyCodeSet.empty; events = []; mouse = Mouse.create scale }
           in
-          let fps_stats = ref (Stats.create ()) in
-          let rec loop t prev_buffer input last_t =
+
+          let initial_internal_state =
+            {
+              show_stats = false;
+              recording_state = None;
+              status = Stats.create ();
+            }
+          in
+
+          let rec loop internal_state t prev_buffer input last_t =
             let now = Sdl.get_ticks () in
             let diff =
               Int32.sub (Int32.of_int (1000 / 60)) (Int32.sub now last_t)
@@ -158,47 +169,86 @@ let run title boot tick s =
               { keys = new_keys; events = unified_events; mouse = new_mouse }
             in
             if exit then ()
-            else (
-              fps_stats :=
-                Stats.update ~now:(Unix.gettimeofday ()) ~tick:t !fps_stats;
+            else
+              let internal_state =
+                {
+                  internal_state with
+                  status =
+                    Stats.update ~now:(Unix.gettimeofday ()) ~tick:t
+                      internal_state.status;
+                }
+              in
 
-              show_stats :=
+              let internal_state =
                 List.fold_left
                   (fun acc ev ->
-                    match ev with Event.KeyUp Key.F1 -> not acc | _ -> acc)
-                  !show_stats input.events;
-
-              Screenshot.save_screenshot current_input.events s prev_buffer;
-
-              List.iter
-                (function
-                  | Event.KeyDown Key.F3 -> (
-                      Printf.printf
-                        "Enter number of frames to record (default 500): %!";
-                      try
-                        let line = read_line () in
-                        let n =
-                          if String.trim line = "" then
-                            Animation.max_frames_default
-                          else int_of_string line
+                    match ev with
+                    | Event.KeyUp Key.F1 ->
+                        {
+                          internal_state with
+                          show_stats = not internal_state.show_stats;
+                        }
+                    | Event.KeyUp Key.F2 ->
+                        let log_message =
+                          match Screenshot.save_screenshot s prev_buffer with
+                          | Result.Ok path ->
+                              Printf.sprintf "Screenshot saved as %s" path
+                          | Result.Error msg -> msg
                         in
-                        recording_state := Some (Animation.start_recording n)
-                      with Failure _ ->
+                        {
+                          internal_state with
+                          status = Stats.log internal_state.status log_message;
+                        }
+                    | Event.KeyUp Key.F3 -> (
                         Printf.printf
-                          "Invalid input. Recording not started.\n%!")
-                  | _ -> ())
-                input.events;
+                          "Enter number of frames to record (default 500): %!";
+                        try
+                          let line = read_line () in
+                          let n =
+                            if String.trim line = "" then
+                              Animation.max_frames_default
+                            else int_of_string line
+                          in
+                          match Animation.start_recording n with
+                          | Result.Ok recording_state ->
+                              {
+                                internal_state with
+                                recording_state = Some recording_state;
+                              }
+                          | Result.Error msg ->
+                              {
+                                internal_state with
+                                status = Stats.log internal_state.status msg;
+                              }
+                        with Failure _ ->
+                          {
+                            internal_state with
+                            status =
+                              Stats.log internal_state.status
+                                "Invalid input. Recording not started.";
+                          })
+                    | _ -> acc)
+                  internal_state input.events
+              in
 
               let updated_buffer = tick t s prev_buffer current_input in
 
+              let stats_buffer =
+                Stats.render internal_state.status internal_state.show_stats t s
+                  updated_buffer
+              in
               let display_buffer =
-                if !show_stats then Stats.render !fps_stats t s updated_buffer
-                else updated_buffer
+                match stats_buffer with None -> updated_buffer | Some b -> b
               in
 
-              recording_state :=
-                Option.bind !recording_state (fun st ->
-                    Animation.record_frame st s display_buffer);
+              let internal_state =
+                {
+                  internal_state with
+                  recording_state =
+                    Option.bind internal_state.recording_state (fun st ->
+                        Animation.record_frame st s display_buffer);
+                }
+              in
 
               if
                 display_buffer != prev_buffer
@@ -214,9 +264,9 @@ let run title boot tick s =
               (match render_texture r texture s bitmap with
               | Error (`Msg e) -> Sdl.log "Render error: %s" e
               | Ok () -> ());
-              loop (t + 1) updated_buffer current_input now)
+              loop internal_state (t + 1) updated_buffer current_input now
           in
-          loop 0 initial_buffer initial_input Int32.zero;
+          loop initial_internal_state 0 initial_buffer initial_input Int32.zero;
           Sdl.destroy_texture texture;
           Sdl.destroy_renderer r;
           Sdl.destroy_window w;

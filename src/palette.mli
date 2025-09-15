@@ -86,3 +86,7 @@ val updated_entry : t -> int -> int * int * int -> t
 
 val concat : t list -> t
 (** [concat palettes] merges a list of palettes into a single palette. *)
+
+val distinctive_pair : t -> int * int
+(** [distintive_pair palette] returns two colours that are the most visually
+    distinct in the palette. *)
