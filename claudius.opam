@@ -27,7 +27,7 @@ depends: [
   "tsdl" {>= "1.1.0"}
   "ounit2" {with-test}
   "odoc" {with-doc}
-  "giflib" {>= "1.0.3"}
+  "giflib" {>= "1.1.0"}
   "imagelib" {>= "20221222"}
   "crunch" {>= "4.0.0"}
   "hsluv" {>= "0.1.0"}
