@@ -6,6 +6,11 @@ on:
       - main
   pull_request:
 
+env:
+  OPAMCRITERIA: +removed,+count[version-lag,solution]
+  OPAMFIXUPCRITERIA: +removed,+count[version-lag,solution]
+  OPAMUPGRADECRITERIA: +removed,+count[version-lag,solution]
+
 permissions: read-all
 
 jobs:
