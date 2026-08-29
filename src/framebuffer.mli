@@ -119,16 +119,16 @@ val draw_string : int -> int -> Font.t -> string -> int -> t -> int
     screen:
 
     {[
-      Framebuffer.map_inplace (fun _ -> 0) existing_framebuffer
+    Framebuffer.map_inplace (fun _ -> 0) existing_framebuffer
     ]}
 
     Or to fade out the previous frame (assuming you have a palette where lower
     values are darker):
 
     {[
-      Framebuffer.map_inplace
-        (fun x -> match pixel with 0 -> 0 | x -> x - 1)
-        existing_framebuffer
+    Framebuffer.map_inplace
+      (fun x -> match pixel with 0 -> 0 | x -> x - 1)
+      existing_framebuffer
     ]}
 
     All of these functions have a inplace and non_implace version: the

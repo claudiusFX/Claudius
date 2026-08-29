@@ -84,3 +84,9 @@ type t =
   | Num9
   (* Unknown key *)
   | Unknown
+
+module KeyCodeSet = Set.Make (struct
+  type nonrec t = t
+
+  let compare = compare
+end)

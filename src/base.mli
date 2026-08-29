@@ -1,18 +1,7 @@
 (** Main Claudius entry point. *)
 
-module KeyCodeSet : Set.S with type elt = Key.t
-(** A module representing a set of key codes. *)
-
-module PlatformKey : module type of Keysdl
-(** A module that provides platform-specific key handling, based on the [Keysdl]
-    module. *)
-
-module PlatformMouse : module type of Mousesdl
-(** A module that provides platform-specific mouse handling, based on the
-    {!Mousesdl} module. *)
-
 type input_state = {
-  keys : KeyCodeSet.t;
+  keys : Key.KeyCodeSet.t;
   events : Event.t list;
       (** Accumulated unified input events for the current frame. *)
   mouse : Mouse.t;
@@ -50,10 +39,3 @@ val was_key_just_pressed : input_state -> Key.t -> bool
 
 val was_key_just_released : input_state -> Key.t -> bool
 (** Returns [true] if [key] was released during the current frame. *)
-
-val poll_all_events :
-  KeyCodeSet.t ->
-  Mouse.t ->
-  Event.t list ->
-  bool * KeyCodeSet.t * Mouse.t * Event.t list
-(** Internal method exposed for testing *)
