@@ -1,6 +1,5 @@
 (* base.ml *)
-
-module Platform = Sdl_backend
+open Claudius
 
 type t = {
   show_stats : bool;
@@ -24,17 +23,6 @@ type functional_tick_func = int -> Screen.t -> input_state -> Primitives.t list
 
 (* ----- *)
 
-let framebuffer_to_bigarray s buffer bitmap =
-  let palette = Screen.palette s in
-  Array.iteri
-    (fun y row ->
-      Array.iteri
-        (fun x pixel ->
-          bitmap.{x + (y * Array.length row)} <-
-            Palette.index_to_rgb palette pixel)
-        row)
-    (Framebuffer.to_array buffer)
-
 let run title boot tick s =
   let make_full =
     Array.to_list Sys.argv |> List.exists (fun a -> String.compare a "-f" = 0)
@@ -51,14 +39,11 @@ let run title boot tick s =
 
   let width, height = Screen.dimensions s and scale = Screen.scale s in
 
-  match Platform.v s title make_full with
+  match Backend.v s title make_full with
   | Error (`Msg e) ->
-      Platform.log "Init error: %s" e;
+      Backend.log "Init error: %s" e;
       exit 1
   | Ok backend ->
-      let bitmap =
-        Bigarray.Array1.create Bigarray.int32 Bigarray.c_layout (width * height)
-      in
       let initial_buffer =
         match boot with
         | None -> Framebuffer.init (width, height) (fun _ _ -> 0)
@@ -73,13 +58,13 @@ let run title boot tick s =
       in
 
       let rec loop internal_state t prev_buffer input last_t =
-        let now = Platform.get_ticks () in
+        let now = Backend.get_ticks () in
         let diff =
           Int32.sub (Int32.of_int (1000 / 60)) (Int32.sub now last_t)
         in
-        if Int32.compare diff Int32.zero > 0 then Platform.delay diff;
+        if Int32.compare diff Int32.zero > 0 then Backend.delay diff;
         let exit, new_keys, new_mouse, unified_events =
-          Platform.poll_all_events input.keys input.mouse []
+          Backend.poll_all_events input.keys input.mouse []
         in
         let current_input =
           { keys = new_keys; events = unified_events; mouse = new_mouse }
@@ -171,19 +156,18 @@ let run title boot tick s =
             || Framebuffer.is_dirty display_buffer
             || Screen.is_dirty s
           then (
-            framebuffer_to_bigarray s display_buffer bitmap;
-            (match Platform.render backend s bitmap with
-            | Error (`Msg e) -> Platform.log "Render error: %s" e
+            (match Backend.render backend s display_buffer with
+            | Error (`Msg e) -> Backend.log "Render error: %s" e
             | Ok () -> ());
             Framebuffer.clear_dirty updated_buffer;
             Screen.clear_dirty s);
-          (match Platform.render backend s bitmap with
-          | Error (`Msg e) -> Platform.log "Render error: %s" e
+          (match Backend.render backend s display_buffer with
+          | Error (`Msg e) -> Backend.log "Render error: %s" e
           | Ok () -> ());
           loop internal_state (t + 1) updated_buffer current_input now
       in
       loop initial_internal_state 0 initial_buffer initial_input Int32.zero;
-      Platform.shutdown backend
+      Backend.shutdown backend
 
 let run_functional title tick_f s =
   let wrap_tick t screen prev_framebuffer input =

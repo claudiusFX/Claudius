@@ -77,15 +77,18 @@ let test_bidirectional _ =
   in
   List.iter
     (fun (code, key) ->
-      assert_equal ~msg:"key mapping" key (Keysdl.of_backend_keycode code);
-      assert_equal ~msg:"key mapping" code (Keysdl.to_backend_keycode key))
+      assert_equal ~msg:"key mapping" key
+        (Claudius_sdl.Keysdl.of_backend_keycode code);
+      assert_equal ~msg:"key mapping" code
+        (Claudius_sdl.Keysdl.to_backend_keycode key))
     keycodes
 
 let test_unknown _ =
   let neg = -1 in
   assert_equal ~msg:"unknown key" Key.Unknown
-    (Keysdl.of_backend_keycode 0x00000000);
-  assert_equal ~msg:"unknown key" neg (Keysdl.to_backend_keycode Key.Unknown)
+    (Claudius_sdl.Keysdl.of_backend_keycode 0x00000000);
+  assert_equal ~msg:"unknown key" neg
+    (Claudius_sdl.Keysdl.to_backend_keycode Key.Unknown)
 
 let suite =
   "Keysdl Tests"

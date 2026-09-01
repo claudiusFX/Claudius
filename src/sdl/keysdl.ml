@@ -1,3 +1,5 @@
+open Claudius
+
 let of_backend_keycode (keycode : int) : Key.t =
   match keycode with
   (* Arrow Keys *)
