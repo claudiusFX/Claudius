@@ -31,7 +31,7 @@ depends: [
   "imagelib" {>= "20221222"}
   "crunch" {>= "4.0.0"}
   "hsluv" {>= "0.1.0"}
-  "ocamlformat" {>= "0.27.0" & with-dev-setup}
+  "ocamlformat" {>= "0.29.0" & with-dev-setup}
 ]
 build: [
   ["dune" "subst"] {dev}
