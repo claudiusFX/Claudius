@@ -7,20 +7,6 @@ type t = {
   status : Stats.t;
 }
 
-type input_state = {
-  keys : Key.KeyCodeSet.t;
-  events : Event.t list;
-      (* Accumulated unified input events for the current frame. *)
-  mouse : Mouse.t;
-}
-
-type boot_func = Screen.t -> Framebuffer.t
-
-type tick_func =
-  int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
-
-type functional_tick_func = int -> Screen.t -> input_state -> Primitives.t list
-
 (* ----- *)
 
 let run title boot tick s =
@@ -180,17 +166,3 @@ let run_functional title tick_f s =
       new_framebuffer
   in
   run title None wrap_tick s
-
-(* --- Utility functions for input handling --- *)
-
-let is_key_pressed input key = Key.KeyCodeSet.mem key input.keys
-
-let was_key_just_pressed input key =
-  List.exists
-    (function Event.KeyDown k when k = key -> true | _ -> false)
-    input.events
-
-let was_key_just_released input key =
-  List.exists
-    (function Event.KeyUp k when k = key -> true | _ -> false)
-    input.events

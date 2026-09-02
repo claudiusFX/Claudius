@@ -4,21 +4,7 @@ open Claudius
 
 type t = { show_stats : bool; status : Stats.t }
 
-type input_state = {
-  keys : Key.KeyCodeSet.t;
-  events : Event.t list;
-      (* Accumulated unified input events for the current frame. *)
-  mouse : Mouse.t;
-}
-
-type boot_func = Screen.t -> Framebuffer.t
-
-type tick_func =
-  int -> Screen.t -> Framebuffer.t -> input_state -> Framebuffer.t
-
-type functional_tick_func = int -> Screen.t -> input_state -> Primitives.t list
-
-let run title boot tick s =
+let inner_run title boot tick s =
   let width, height = Screen.dimensions s in
 
   match Backend.v s title false with
@@ -102,15 +88,7 @@ let run title boot tick s =
         let display_buffer =
           match stats_buffer with None -> updated_buffer | Some b -> b
         in
-
-        (* let internal_state =
-        {
-          internal_state with
-          recording_state =
-            Option.bind internal_state.recording_state (fun st ->
-                Animation.record_frame st s display_buffer);
-        }
-      in *)
+        (* SDL version deals with recording animations here *)
         if
           display_buffer != prev_buffer
           || Framebuffer.is_dirty display_buffer
@@ -128,6 +106,9 @@ let run title boot tick s =
       ignore
         (Dom_html.window##requestAnimationFrame
            (Js.wrap_callback (loop initial_internal_state initial_buffer 0)))
+
+let run title boot tick s =
+  Dom_html.onload (fun () -> inner_run title boot tick s)
 
 let run_functional title tick_f s =
   let wrap_tick t screen prev_framebuffer input =

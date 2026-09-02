@@ -1,7 +1,7 @@
 (library
- (name claudius_jsoo)
+ (name claudius_js)
  (optional)
- (public_name claudius.jsoo)
+ (public_name claudius.js)
  (libraries claudius.core js_of_ocaml)
  (preprocess
   (pps js_of_ocaml-ppx)))
