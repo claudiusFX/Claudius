@@ -1,6 +1,7 @@
 (* mousesdl.mli *)
 open Tsdl
-open Mouse
+open Claudius
+open Claudius.Mouse
 
 val of_sdl_button : int -> button
 (** Convert an SDL button code to a [Mouse.button]. *)

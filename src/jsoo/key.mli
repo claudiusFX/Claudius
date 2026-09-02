@@ -1,3 +1,5 @@
+open Claudius
+
 (** This module provides a mapping between Claudius's key representation and the
     backend-specific integer keycodes used by SDL. *)
 

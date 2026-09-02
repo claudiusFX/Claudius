@@ -1,5 +1,6 @@
 open Tsdl
-open Mouse
+open Claudius
+open Claudius.Mouse
 open Event
 
 let of_sdl_button (button : int) : button =

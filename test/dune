@@ -14,4 +14,4 @@
   test_picture)
  (deps
   (source_tree ../test_assets))
- (libraries claudius ounit2))
+ (libraries claudius.core claudius.sdl ounit2))
