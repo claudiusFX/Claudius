@@ -79,3 +79,6 @@ type t =
   | Unknown  (** Unknown key *)
 
 (** Type representing generic keys across different backends. *)
+
+module KeyCodeSet : Set.S with type elt = t
+(** A module representing a set of key codes. *)

@@ -9,15 +9,15 @@ let test_invalid_scale _ =
   assert_raises (Invalid_argument "Invalid scale") (fun () -> Mouse.create (-1))
 
 let test_of_sdl_button _ =
-  assert_equal Mouse.Left (Mousesdl.of_sdl_button 1);
-  assert_equal Mouse.Middle (Mousesdl.of_sdl_button 2);
-  assert_equal Mouse.Right (Mousesdl.of_sdl_button 3);
-  assert_equal Mouse.Left (Mousesdl.of_sdl_button 0)
+  assert_equal Mouse.Left (Claudius_sdl.Mousesdl.of_sdl_button 1);
+  assert_equal Mouse.Middle (Claudius_sdl.Mousesdl.of_sdl_button 2);
+  assert_equal Mouse.Right (Claudius_sdl.Mousesdl.of_sdl_button 3);
+  assert_equal Mouse.Left (Claudius_sdl.Mousesdl.of_sdl_button 0)
 
 let test_to_sdl_button _ =
-  assert_equal 1 (Mousesdl.to_sdl_button Mouse.Left);
-  assert_equal 2 (Mousesdl.to_sdl_button Mouse.Middle);
-  assert_equal 3 (Mousesdl.to_sdl_button Mouse.Right)
+  assert_equal 1 (Claudius_sdl.Mousesdl.to_sdl_button Mouse.Left);
+  assert_equal 2 (Claudius_sdl.Mousesdl.to_sdl_button Mouse.Middle);
+  assert_equal 3 (Claudius_sdl.Mousesdl.to_sdl_button Mouse.Right)
 
 let test_handle_mouse_button_event _ =
   let event, mouse = setup 1 in
@@ -26,13 +26,15 @@ let test_handle_mouse_button_event _ =
   Sdl.Event.set event Sdl.Event.mouse_button_x 100;
   Sdl.Event.set event Sdl.Event.mouse_button_y 200;
   Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
-  let updated_mouse, _ = Mousesdl.handle_mouse_button_event event mouse in
+  let updated_mouse, _ =
+    Claudius_sdl.Mousesdl.handle_mouse_button_event event mouse
+  in
   assert_equal (100, 200) (Mouse.get_position updated_mouse);
   assert_equal true (Mouse.is_button_pressed updated_mouse Mouse.Left);
   (* Test button up *)
   Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.released;
   let updated_mouse2, _ =
-    Mousesdl.handle_mouse_button_event event updated_mouse
+    Claudius_sdl.Mousesdl.handle_mouse_button_event event updated_mouse
   in
   assert_equal false (Mouse.is_button_pressed updated_mouse2 Mouse.Left)
 
@@ -41,7 +43,9 @@ let test_handle_mouse_motion_event _ =
 
   Sdl.Event.set event Sdl.Event.mouse_motion_x 150;
   Sdl.Event.set event Sdl.Event.mouse_motion_y 250;
-  let updated_mouse, _ = Mousesdl.handle_mouse_motion_event event mouse in
+  let updated_mouse, _ =
+    Claudius_sdl.Mousesdl.handle_mouse_motion_event event mouse
+  in
   (* For scale 2, (150,250) becomes (75,125) *)
   assert_equal (75, 125) (Mouse.get_position updated_mouse)
 
@@ -50,7 +54,9 @@ let test_handle_mouse_wheel_event _ =
 
   Sdl.Event.set event Sdl.Event.mouse_wheel_y 1;
   (* Scroll up *)
-  let _updated_mouse, events = Mousesdl.handle_mouse_wheel_event event mouse in
+  let _updated_mouse, events =
+    Claudius_sdl.Mousesdl.handle_mouse_wheel_event event mouse
+  in
   match events with
   | [ Event.MouseWheel 1 ] -> ()
   | _ -> failwith "Expected Wheel event with positive value"
@@ -64,7 +70,7 @@ let test_handle_event_button _ =
   Sdl.Event.set event Sdl.Event.mouse_button_y 200;
   Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
   Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_button_down;
-  let updated_mouse, _ = Mousesdl.handle_event event mouse in
+  let updated_mouse, _ = Claudius_sdl.Mousesdl.handle_event event mouse in
   assert_equal (100, 200) (Mouse.get_position updated_mouse);
   assert_equal true (Mouse.is_button_pressed updated_mouse Mouse.Left)
 
@@ -74,7 +80,7 @@ let test_handle_event_motion _ =
   Sdl.Event.set event Sdl.Event.mouse_motion_x 150;
   Sdl.Event.set event Sdl.Event.mouse_motion_y 250;
   Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
-  let updated_mouse, _ = Mousesdl.handle_event event mouse in
+  let updated_mouse, _ = Claudius_sdl.Mousesdl.handle_event event mouse in
   assert_equal (150, 250) (Mouse.get_position updated_mouse)
 
 let test_handle_event_wheel _ =
@@ -82,7 +88,7 @@ let test_handle_event_wheel _ =
 
   Sdl.Event.set event Sdl.Event.mouse_wheel_y 1;
   Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_wheel;
-  let _updated_mouse, events = Mousesdl.handle_event event mouse in
+  let _updated_mouse, events = Claudius_sdl.Mousesdl.handle_event event mouse in
   match events with
   | [ Event.MouseWheel 1 ] -> ()
   | _ -> failwith "Expected Wheel event with positive value"
@@ -95,19 +101,19 @@ let test_drag_for_all_buttons _ =
     (fun button ->
       (* Press button *)
       Sdl.Event.set event Sdl.Event.mouse_button_button
-        (Mousesdl.to_sdl_button button);
+        (Claudius_sdl.Mousesdl.to_sdl_button button);
       Sdl.Event.set event Sdl.Event.mouse_button_x 10;
       Sdl.Event.set event Sdl.Event.mouse_button_y 20;
       Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
       let mouse_after_press, _ =
-        Mousesdl.handle_mouse_button_event event mouse
+        Claudius_sdl.Mousesdl.handle_mouse_button_event event mouse
       in
       (* Drag motion *)
       Sdl.Event.set event Sdl.Event.mouse_motion_x 30;
       Sdl.Event.set event Sdl.Event.mouse_motion_y 40;
       Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
       let _mouse_after_drag, events =
-        Mousesdl.handle_event event mouse_after_press
+        Claudius_sdl.Mousesdl.handle_event event mouse_after_press
       in
       (* Assert Drag exists *)
       assert_bool
@@ -137,26 +143,28 @@ let test_motion_after_drag_release _ =
       let event, mouse = setup 1 in
       (* Press current button *)
       Sdl.Event.set event Sdl.Event.mouse_button_button
-        (Mousesdl.to_sdl_button button);
+        (Claudius_sdl.Mousesdl.to_sdl_button button);
       Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
       let mouse_after_press, _ =
-        Mousesdl.handle_mouse_button_event event mouse
+        Claudius_sdl.Mousesdl.handle_mouse_button_event event mouse
       in
       (* Simulate a motion event to produce a Drag event *)
       Sdl.Event.set event Sdl.Event.mouse_motion_x 30;
       Sdl.Event.set event Sdl.Event.mouse_motion_y 40;
       Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
-      let mouse_after_drag, _ = Mousesdl.handle_event event mouse_after_press in
+      let mouse_after_drag, _ =
+        Claudius_sdl.Mousesdl.handle_event event mouse_after_press
+      in
       (* Release the button *)
       Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.released;
       let mouse_after_release, _ =
-        Mousesdl.handle_mouse_button_event event mouse_after_drag
+        Claudius_sdl.Mousesdl.handle_mouse_button_event event mouse_after_drag
       in
       (* Simulate another motion event → should be Motion, not Drag *)
       Sdl.Event.set event Sdl.Event.mouse_motion_x 50;
       Sdl.Event.set event Sdl.Event.mouse_motion_y 60;
       let _mouse_after_motion, events =
-        Mousesdl.handle_event event mouse_after_release
+        Claudius_sdl.Mousesdl.handle_event event mouse_after_release
       in
       assert_bool
         (Printf.sprintf "Expected Motion event for %s button after release"
@@ -188,19 +196,21 @@ let test_multiple_drag_events _ =
 
   (* Press Left button *)
   Sdl.Event.set event Sdl.Event.mouse_button_button
-    (Mousesdl.to_sdl_button Mouse.Left);
+    (Claudius_sdl.Mousesdl.to_sdl_button Mouse.Left);
   Sdl.Event.set event Sdl.Event.mouse_button_x 10;
   Sdl.Event.set event Sdl.Event.mouse_button_y 20;
   Sdl.Event.set event Sdl.Event.mouse_button_state Sdl.pressed;
-  let mouse_after_left, _ = Mousesdl.handle_mouse_button_event event mouse in
+  let mouse_after_left, _ =
+    Claudius_sdl.Mousesdl.handle_mouse_button_event event mouse
+  in
   (* Press Middle button using a second event *)
   Sdl.Event.set event2 Sdl.Event.mouse_button_button
-    (Mousesdl.to_sdl_button Mouse.Middle);
+    (Claudius_sdl.Mousesdl.to_sdl_button Mouse.Middle);
   Sdl.Event.set event2 Sdl.Event.mouse_button_x 10;
   Sdl.Event.set event2 Sdl.Event.mouse_button_y 20;
   Sdl.Event.set event2 Sdl.Event.mouse_button_state Sdl.pressed;
   let mouse_after_middle, _ =
-    Mousesdl.handle_mouse_button_event event2 mouse_after_left
+    Claudius_sdl.Mousesdl.handle_mouse_button_event event2 mouse_after_left
   in
   (* Assert both buttons are pressed *)
   assert_bool "Expected Left button to be pressed"
@@ -212,7 +222,7 @@ let test_multiple_drag_events _ =
   Sdl.Event.set event Sdl.Event.mouse_motion_y 40;
   Sdl.Event.set event Sdl.Event.typ Sdl.Event.mouse_motion;
   let _mouse_after_drag, events =
-    Mousesdl.handle_mouse_motion_event event mouse_after_middle
+    Claudius_sdl.Mousesdl.handle_mouse_motion_event event mouse_after_middle
   in
   (* Check drag events for both Left and Middle buttons *)
   assert_bool "Expected Drag event for Left button"

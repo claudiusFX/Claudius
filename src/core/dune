@@ -1,0 +1,10 @@
+(rule
+ (targets builtins.ml)
+ (deps ../../fonts/TamzenForPowerline10x20.psf)
+ (action
+  (run ocaml-crunch -m plain -o builtins.ml ../../fonts)))
+
+(library
+ (name claudius)
+ (public_name claudius.core)
+ (libraries giflib crunch imagelib imagelib.unix hsluv))

@@ -2,6 +2,8 @@
 
 Claudius started out trying to be a functional library that works like a fantasy console system like [TIC-80](https://tic80.com) or [PICO-8](https://www.lexaloffle.com/pico-8.php): A way to do some retro-style demo graphics programming but in OCaml rather than in LUA. In its current form it doesn't do nearly as much as those fantasy consoles, instead just concentrates on enabling you to make graphical demos, and lacks things like audio, expressive input support, sprite editors and so forth. But if your goal is to enter something like [Tiny Code Christmas](https://tcc.lovebyte.party) or [Genuary](https://genuary.art), then Claudius is designed for that use case.
 
+Claudius supports two different rendering  backends: one aimed at running locally in a dedicated window (the SDL backend) and another aimed at running in a browser as part of a web page (the JS backend). The SDL backend tends to be more performant and easier to develop new code with, and the JS backend is easier to share your creations with by putting them on a web page. But you don't need to choose one or the the other: with just one or two lines changed you can run in either, and all the actual drawing code is identical between the two backends.
+
 ## Credits
 
 Sincere thanks from Claudius team to all those who have contributed or made suggestions - Claudius is made infinitely better for having diversity of influences!
@@ -32,8 +34,10 @@ And then once that is installed, you can add it as a dependancy to your project 
 (executable
  (public_name my_program)
  (name main)
- (libraries claudius))
+ (libraries claudius.sdl))
 ```
+
+If you're planning to target the browser version, you need to change `claudius.sdl` to `claudius.js` in that libraries definition.
 
 To see examples of how Claudius is used and learn how it works, we recommend you checkout the [examples library](https://github.com/claudiusFX/claudius-examples), run those, and then try editing the examples to make them do different things!
 
@@ -72,6 +76,8 @@ $ open _build/default/_doc/_html/index.html
 Or you can use whatever browser directly to open that index file.
 
 # Requirements
+
+## The SDL backend
 
 Claudius has been tested under macOS, Linux, and Windows via WSL, and requires that you have [SDL](https://www.libsdl.org) 2 installed.
 

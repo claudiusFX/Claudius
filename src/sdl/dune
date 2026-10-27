@@ -1,0 +1,5 @@
+(library
+ (name claudius_sdl)
+ (optional)
+ (public_name claudius.sdl)
+ (libraries claudius.core tsdl))
