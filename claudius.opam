@@ -24,7 +24,6 @@ bug-reports: "https://github.com/claudiusFX/claudius/issues"
 depends: [
   "ocaml" {>= "5.1"}
   "dune" {>= "3.18"}
-  "tsdl" {>= "1.1.0"}
   "ounit2" {with-test}
   "odoc" {with-doc}
   "giflib" {>= "1.1.0"}
@@ -32,6 +31,10 @@ depends: [
   "crunch" {>= "4.0.0"}
   "hsluv" {>= "0.1.0"}
   "ocamlformat" {>= "0.29.0" & with-dev-setup}
+]
+depopts: [
+  "tsdl" {>= "1.1.0"}
+  "js_of_ocaml"
 ]
 build: [
   ["dune" "subst"] {dev}
