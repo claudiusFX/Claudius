@@ -30,6 +30,8 @@ depends: [
   "imagelib" {>= "20221222"}
   "crunch" {>= "4.0.0"}
   "hsluv" {>= "0.1.0"}
+  "tsdl" {>= "1.1.0" & with-test}
+  "js_of_ocaml" {with-test}
   "ocamlformat" {>= "0.29.0" & with-dev-setup}
 ]
 depopts: [
