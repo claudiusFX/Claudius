@@ -24,13 +24,9 @@ depends: [
   "dune" {>= "3.18"}
   "js_of_ocaml" {>= "6.5.0"}
   "js_of_ocaml-ppx"
-  "ounit2" {with-test}
   "odoc" {with-doc}
-  "giflib" {>= "1.1.0"}
-  "imagelib" {>= "20221222"}
-  "crunch" {>= "4.0.0"}
-  "hsluv" {>= "0.1.0"}
   "ocamlformat" {>= "0.29.0" & with-dev-setup}
+  "claudius" {>= "2.0"}
 ]
 build: [
   ["dune" "subst"] {dev}
