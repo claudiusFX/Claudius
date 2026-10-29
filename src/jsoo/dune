@@ -1,6 +1,5 @@
 (library
  (name claudius_js)
- (optional)
  (public_name claudius_js)
  (libraries claudius js_of_ocaml)
  (preprocess
