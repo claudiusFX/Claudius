@@ -2,19 +2,17 @@
 opam-version: "2.0"
 synopsis: "A retro-style graphics library"
 description:
-  "A functional style retro-graphics library for OCaml for building generative art, demos, and games."
-maintainer: [
-  "Michael Dales <michael@digitalflapjack.com>"
-  "Shreya Pawaskar <shreya.pawaskar.main@gmail.com>"
-]
+  "A functional style retro-graphics library for OCaml for building generative art, demos, and games. This is the core feature library, must be used with either the SDL or Javascript backends."
+maintainer: ["Michael Dales <michael@digitalflapjack.com>"]
 authors: [
-  "3pleX-dev <afuadajoe@gmail.com>"
-  "Adenuga Israel Abimbola <israelabimmbolaa@gmail.com>"
-  "Michael Dales <michael@digitalflapjack.com>"
-  "Seed Lu <dr.seed.lu@gmail.com>"
-  "Shreya Pawaskar <shreya.pawaskar.main@gmail.com>"
-  "Vanisha1606 <vanishag1606@gmail.com>"
-  "Wah Vanessa <wahvanessa22@gmail.com>"
+  "3pleX-dev"
+  "Adenuga Israel Abimbola"
+  "Michael Dales"
+  "Patrick Ferris"
+  "Seed Lu"
+  "Shreya Pawaskar"
+  "Vanisha1606"
+  "Wah Vanessa"
 ]
 license: "ISC"
 tags: ["graphics" "rendering" "paletted"]
@@ -30,13 +28,7 @@ depends: [
   "imagelib" {>= "20221222"}
   "crunch" {>= "4.0.0"}
   "hsluv" {>= "0.1.0"}
-  "tsdl" {>= "1.1.0" & with-test}
-  "js_of_ocaml" {with-test}
   "ocamlformat" {>= "0.29.0" & with-dev-setup}
-]
-depopts: [
-  "tsdl" {>= "1.1.0"}
-  "js_of_ocaml"
 ]
 build: [
   ["dune" "subst"] {dev}

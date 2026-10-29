@@ -6,5 +6,5 @@
 
 (library
  (name claudius)
- (public_name claudius.core)
+ (public_name claudius)
  (libraries giflib crunch imagelib imagelib.unix hsluv))
