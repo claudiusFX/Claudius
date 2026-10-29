@@ -45,7 +45,7 @@
     (ounit2 :with-test)
     (odoc :with-doc)
     (ocamlformat (and (>= 0.29.0) :with-dev-setup ))
-    (claudius (>= 2.0))
+    (claudius :version)
    )
  (tags
   (graphics rendering paletted)))
@@ -62,7 +62,7 @@
         js_of_ocaml-ppx
         (odoc :with-doc)
         (ocamlformat (and (>= 0.29.0) :with-dev-setup ))
-        (claudius (>= 2.0))
+        (claudius :version)
    )
    (tags
     (graphics rendering paletted))
