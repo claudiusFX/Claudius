@@ -38,6 +38,6 @@
    (documentation https://github.com/claudiusFX/claudius)
    (synopsis "A Claudius implementation for Browsers")
    (description "A functional style retro-graphics library for OCaml for building generative art, demos, and games.")
-   (depends (ocaml (>= 5.1)) dune (js_of_ocaml (>= 6.5.0)) (ounit2 :with-test) (odoc :with-doc) (giflib (>= 1.1.0)) (imagelib (>= 20221222)) (crunch (>= 4.0.0)) (hsluv (>= 0.1.0)) (ocamlformat (and (>= 0.29.0) :with-dev-setup )))
+   (depends (ocaml (>= 5.1)) dune (js_of_ocaml (>= 6.5.0)) js_of_ocaml-ppx (ounit2 :with-test) (odoc :with-doc) (giflib (>= 1.1.0)) (imagelib (>= 20221222)) (crunch (>= 4.0.0)) (hsluv (>= 0.1.0)) (ocamlformat (and (>= 0.29.0) :with-dev-setup )))
    (tags
     (graphics rendering paletted)))
