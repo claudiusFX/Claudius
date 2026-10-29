@@ -34,10 +34,10 @@ And then once that is installed, you can add it as a dependancy to your project 
 (executable
  (public_name my_program)
  (name main)
- (libraries claudius.sdl))
+ (libraries claudius_sdl))
 ```
 
-If you're planning to target the browser version, you need to change `claudius.sdl` to `claudius.js` in that libraries definition.
+If you're planning to target the browser version, you need to change `claudius_sdl` to `claudius_js` in that libraries definition.
 
 To see examples of how Claudius is used and learn how it works, we recommend you checkout the [examples library](https://github.com/claudiusFX/claudius-examples), run those, and then try editing the examples to make them do different things!
 
