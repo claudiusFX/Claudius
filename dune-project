@@ -58,7 +58,7 @@
    (depends
         (ocaml (>= 5.1))
         dune
-        (js_of_ocaml (>= 6.5.0))
+        js_of_ocaml
         js_of_ocaml-ppx
         (odoc :with-doc)
         (ocamlformat (and (>= 0.29.0) :with-dev-setup ))
