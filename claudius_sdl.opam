@@ -25,7 +25,8 @@ depends: [
   "ounit2" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {>= "0.29.0" & with-dev-setup}
-  "claudius" {version}
+  "claudius" {= version}
+  "tsdl" {>= "1.1.0"}
 ]
 build: [
   ["dune" "subst"] {dev}
