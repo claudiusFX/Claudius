@@ -1,4 +1,5 @@
 type t = {
+  title : string;
   width : int;
   height : int;
   scale : int;
@@ -8,8 +9,8 @@ type t = {
   pictures : Picture.t array;
 }
 
-let create ?font ?(image_filenames = []) (width : int) (height : int)
-    (scale : int) (palette : Palette.t) : t =
+let create ?font ?(image_filenames = []) ?(scale = 1) title (width, height)
+    palette =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");
@@ -49,6 +50,7 @@ let create ?font ?(image_filenames = []) (width : int) (height : int)
   let final_palette = Palette.concat all_palettes in
 
   {
+    title;
     width;
     height;
     scale;
@@ -62,14 +64,11 @@ let update_palette (screen : t) (new_palette : Palette.t) : unit =
   screen.palette <- new_palette;
   screen.dirty <- true
 
-let create_with_font (width : int) (height : int) (scale : int) (font : Font.t)
-    (palette : Palette.t) : t =
-  create ~font width height scale palette
-
-let dimensions (screen : t) : int * int = (screen.width, screen.height)
-let palette (screen : t) : Palette.t = screen.palette
-let font (screen : t) : Font.t = screen.font
-let scale (screen : t) : int = screen.scale
-let is_dirty (screen : t) : bool = screen.dirty
-let clear_dirty (screen : t) : unit = screen.dirty <- false
-let pictures (screen : t) : Picture.t array = screen.pictures
+let title t = t.title
+let dimensions t = (t.width, t.height)
+let palette t = t.palette
+let font t = t.font
+let scale t = t.scale
+let is_dirty t = t.dirty
+let clear_dirty t = t.dirty <- false
+let pictures t = t.pictures

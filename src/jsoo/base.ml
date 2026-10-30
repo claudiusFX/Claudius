@@ -4,10 +4,32 @@ open Claudius
 
 type t = { show_stats : bool; status : Stats.t }
 
-let inner_run title boot tick s =
+let screen_of_canvas ?font ?(scale = 1) title palette =
+  (* A canvas always starts with the dimensions of 300x150, so you want to
+  ask not what its dimensions are, but what its parent's dimensions are. *)
+  if scale <= 0 then raise (Invalid_argument "Invalid scale");
+  let canvas =
+    Js.Opt.get
+      (Dom_html.CoerceTo.canvas (Dom_html.getElementById title))
+      (fun () -> raise (Invalid_argument "Element not a canvas"))
+  in
+  let untyped_parent =
+    Js.Opt.get canvas##.parentNode (fun () ->
+        raise (Invalid_argument "Canvas parent not found"))
+  in
+  let parent =
+    Js.Opt.get (Dom_html.CoerceTo.element untyped_parent) (fun () ->
+        raise (Invalid_argument "Canvas parent not an element"))
+  in
+  let raw_width = parent##.clientWidth and raw_height = parent##.clientHeight in
+  Screen.create ?font ~scale title
+    (raw_width / scale, raw_height / scale)
+    palette
+
+let inner_run boot tick s =
   let width, height = Screen.dimensions s in
 
-  match Backend.v s title false with
+  match Backend.v s false with
   | Error (`Msg e) ->
       (*Backend.log "Init error: %s" e;*)
       (*exit 1*)
@@ -107,10 +129,9 @@ let inner_run title boot tick s =
         (Dom_html.window##requestAnimationFrame
            (Js.wrap_callback (loop initial_internal_state initial_buffer 0)))
 
-let run title boot tick s =
-  Dom_html.onload (fun () -> inner_run title boot tick s)
+let run ?boot tick s = Dom_html.onload (fun () -> inner_run boot tick s)
 
-let run_functional title tick_f s =
+let run_functional tick_f s =
   let wrap_tick t screen prev_framebuffer input =
     let primitives = tick_f t screen input in
     if primitives = [] then prev_framebuffer
@@ -120,4 +141,4 @@ let run_functional title tick_f s =
       Framebuffer.render new_framebuffer primitives;
       new_framebuffer
   in
-  run title None wrap_tick s
+  run wrap_tick s

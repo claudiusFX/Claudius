@@ -2,7 +2,7 @@ open Claudius
 
 type t
 
-val v : Screen.t -> string -> bool -> (t, [ `Msg of string ]) result
+val v : Screen.t -> bool -> (t, [ `Msg of string ]) result
 (* Create a backend instance *)
 
 val shutdown : t -> unit

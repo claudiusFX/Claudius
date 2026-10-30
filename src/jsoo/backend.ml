@@ -7,8 +7,10 @@ type t = {
   pixels : Dom_html.canvasPixelArray Js.t;
 }
 
-let v s title _make_fullscreen =
-  let width, height = Screen.dimensions s and scale = Screen.scale s in
+let v s _make_fullscreen =
+  let width, height = Screen.dimensions s
+  and scale = Screen.scale s
+  and title = Screen.title s in
   let canvas =
     Js.Opt.get
       (Dom_html.CoerceTo.canvas (Dom_html.getElementById title))

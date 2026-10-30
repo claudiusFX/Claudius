@@ -7,7 +7,7 @@ let scale = 2
 let test_basic_recording _ =
   let palette = Palette.generate_vapourwave_palette 64 in
   let fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
-  let screen = Screen.create width height scale palette in
+  let screen = Screen.create ~scale "title" (width, height) palette in
   let initial_state = Animation.start_recording 10 in
   match initial_state with
   | Result.Error _msg -> assert false
@@ -36,7 +36,7 @@ let test_too_many_frames _ =
 let test_double_recording _ =
   let palette = Palette.generate_vapourwave_palette 64 in
   let fb = Framebuffer.init (width, height) (fun x y -> x * y mod 64) in
-  let screen = Screen.create width height scale palette in
+  let screen = Screen.create ~scale "title" (width, height) palette in
   let initial_state = Animation.start_recording 10 in
   match initial_state with
   | Result.Error _msg -> assert false
@@ -54,7 +54,7 @@ let test_double_recording _ =
 let test_palette_too_big _ =
   let palette = Palette.generate_mono_palette 300 in
   let fb = Framebuffer.init (width, height) (fun _ _ -> 42) in
-  let screen = Screen.create width height scale palette in
+  let screen = Screen.create ~scale "title" (width, height) palette in
 
   let initial_state = Animation.start_recording 10 in
   match initial_state with

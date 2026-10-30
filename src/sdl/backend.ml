@@ -11,8 +11,10 @@ type t = {
 let ( >>= ) = Result.bind
 let ( >|= ) v f = Result.map f v
 
-let v s title make_fullscreen =
-  let width, height = Screen.dimensions s and scale = Screen.scale s in
+let v s make_fullscreen =
+  let width, height = Screen.dimensions s
+  and scale = Screen.scale s
+  and title = Screen.title s in
   Sdl.init Sdl.Init.(video + events) >>= fun () ->
   Sdl.create_window ~w:(width * scale) ~h:(height * scale) title
     Sdl.Window.(if make_fullscreen then fullscreen else windowed)

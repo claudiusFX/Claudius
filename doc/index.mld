@@ -131,20 +131,22 @@ let = p Palette.generate_plasma_palette 14
 Once you have a colour palette defined, you can now create the screen mode you want to use with {!Claudius.Screen.create}:
 
 {[
-let s = Screen.create 640 480 1 (Palette.generate_mono_palette 16)
+let s = Screen.create "my screen" (640, 480) (Palette.generate_mono_palette 16)
 ]}
 
-The first two arguments are the width and height of the emulated screen mode, and final argument is the palette. The third argument is a scaling factor when displayed; if you're trying to work at resolutions like 320x200 (old-school VGA 256 colour), then things can get quite small on modern displays, so you might want to bump that up a bit, for example making it display at three times the size:
+The first parameter is the title of the screen: in the SDL backend this drawn in the window title, and in the Javascript backend this is the ID of the canvas HTML element to draw to on the page. The next two arguments are the width and height of the emulated screen mode, and final argument is the palette.
+
+There is an optional argument for adjusting scaling factor when displayed; if you're trying to work at resolutions like 320x200 (old-school VGA 256 colour), then things can get quite small on modern displays, so you might want to bump that up a bit, for example making it display at three times the size:
 
 {[
-let s = Screen.create 320 200 3 (Palette.generate_plasma_palette 256)
+let s = Screen.create ~scale:3 "my old school VGA screen" (320, 200) (Palette.generate_plasma_palette 256)
 ]}
 
 Claudius will use this information to generate the initial framebuffer state if you don't provide a boot function, and it is used to generate and render the window Claudius will display on the screen.
 
 In retro-graphics there are many effects that are powered by updating the palette, and to allow this Claudius supports updating the palette as your program is running. For example, it is a common to rotate the palette colours to get an on screen effect rather than rewriting all the pixels with new palette values. To update the palette you provide a new palette to the screen by calling {!Claudius.Screen.update_palette}.
 
-Screens also let you load a set of images ready to use in your program. By loading them at the start of your program, Claudius can correctly allocate palette entries for the colours in the images, so the palette becomes the colours you specifed when you create the palette, plus the colours from any images you loaded.
+Screens also let you load a set of images ready to use in your program. By loading them at the start of your program, Claudius can correctly allocate palette entries for the colours in the images, so the palette becomes the colours you specified when you create the palette, plus the colours from any images you loaded.
 
 {1 Details}
 
@@ -173,6 +175,6 @@ let tick t s _p _i =
 
 let () =
   Palette.generate_plasma_palette 1024
-  |> Screen.create 640 480 1
-  |> Base.run "Plasma effect" None tick
+  |> Screen.create "Plasma effect" (640, 480)
+  |> Base.run tick
 ]}
