@@ -4,6 +4,17 @@ open Claudius
 
 type t = { show_stats : bool; status : Stats.t }
 
+let screen_of_canvas ?font ?(scale = 1) title palette =
+  if scale <= 0 then raise (Invalid_argument "Invalid scale");
+  let canvas =
+    Js.Opt.get
+      (Dom_html.CoerceTo.canvas (Dom_html.getElementById title))
+      (fun () -> raise (Invalid_argument "Canvas not found"))
+  in
+  let raw_width = canvas##.width and raw_height = canvas##.height in
+  Screen.create ?font ~scale title (raw_width / scale) (raw_height / scale)
+    palette
+
 let inner_run title boot tick s =
   let width, height = Screen.dimensions s in
 

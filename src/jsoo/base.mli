@@ -1,5 +1,9 @@
 open Claudius
 
+val screen_of_canvas :
+  ?font:Font.t -> ?scale:int -> string -> Palette.t -> Screen.t
+(** Generate a new screen object from a named canvas element. *)
+
 val run : string -> boot_func option -> tick_func -> Screen.t -> unit
 (** [run title boot tick screen] Creates the runloop *)
 
