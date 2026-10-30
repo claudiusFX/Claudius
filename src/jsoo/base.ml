@@ -5,13 +5,23 @@ open Claudius
 type t = { show_stats : bool; status : Stats.t }
 
 let screen_of_canvas ?font ?(scale = 1) title palette =
+  (* A canvas always starts with the dimensions of 300x150, so you want to
+  ask not what its dimensions are, but what its parent's dimensions are. *)
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   let canvas =
     Js.Opt.get
       (Dom_html.CoerceTo.canvas (Dom_html.getElementById title))
-      (fun () -> raise (Invalid_argument "Canvas not found"))
+      (fun () -> raise (Invalid_argument "Element not a canvas"))
   in
-  let raw_width = canvas##.width and raw_height = canvas##.height in
+  let untyped_parent =
+    Js.Opt.get canvas##.parentNode (fun () ->
+        raise (Invalid_argument "Canvas parent not found"))
+  in
+  let parent =
+    Js.Opt.get (Dom_html.CoerceTo.element untyped_parent) (fun () ->
+        raise (Invalid_argument "Canvas parent not an element"))
+  in
+  let raw_width = parent##.clientWidth and raw_height = parent##.clientHeight in
   Screen.create ?font ~scale title (raw_width / scale) (raw_height / scale)
     palette
 
