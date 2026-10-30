@@ -17,11 +17,11 @@ let run ?boot tick s =
     match make_full with
     | false -> s
     | true ->
-        let w, h = Screen.dimensions s in
+        let d = Screen.dimensions s in
         let title = Screen.title s in
         let p = Screen.palette s in
         let font = Screen.font s in
-        Screen.create ~font title w h p
+        Screen.create ~font title d p
   in
 
   let width, height = Screen.dimensions s and scale = Screen.scale s in

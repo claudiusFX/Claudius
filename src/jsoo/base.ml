@@ -22,7 +22,8 @@ let screen_of_canvas ?font ?(scale = 1) title palette =
         raise (Invalid_argument "Canvas parent not an element"))
   in
   let raw_width = parent##.clientWidth and raw_height = parent##.clientHeight in
-  Screen.create ?font ~scale title (raw_width / scale) (raw_height / scale)
+  Screen.create ?font ~scale title
+    (raw_width / scale, raw_height / scale)
     palette
 
 let inner_run boot tick s =

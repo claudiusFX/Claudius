@@ -9,8 +9,8 @@ type t = {
   pictures : Picture.t array;
 }
 
-let create ?font ?(image_filenames = []) ?(scale = 1) title width height palette
-    =
+let create ?font ?(image_filenames = []) ?(scale = 1) title (width, height)
+    palette =
   if scale <= 0 then raise (Invalid_argument "Invalid scale");
   if width <= 0 then raise (Invalid_argument "Invalid width");
   if height <= 0 then raise (Invalid_argument "Invalid height");

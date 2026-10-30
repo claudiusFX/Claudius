@@ -17,7 +17,7 @@ let test_palette name palette =
   in
 
   Framebuffer.set_dirty fb;
-  let screen = Screen.create ~scale "title" width height palette in
+  let screen = Screen.create ~scale "title" (width, height) palette in
   let res = Screenshot.save_screenshot screen fb in
   match res with Result.Ok _ -> () | Result.Error _msg -> assert false
 
@@ -26,7 +26,7 @@ let test_palette_too_big _ =
   (* > 256 entries *)
   let fb = Framebuffer.init (width, height) (fun _ _ -> 42) in
   Framebuffer.set_dirty fb;
-  let screen = Screen.create ~scale "title" width height palette in
+  let screen = Screen.create ~scale "title" (width, height) palette in
   let res = Screenshot.save_screenshot screen fb in
   let expected = Result.Error "GIF only supports up to 256 colors" in
   assert_equal expected res
