@@ -9,7 +9,7 @@ type t = {
 
 (* ----- *)
 
-let run title boot tick s =
+let run ?boot tick s =
   let make_full =
     Array.to_list Sys.argv |> List.exists (fun a -> String.compare a "-f" = 0)
   in
@@ -26,7 +26,7 @@ let run title boot tick s =
 
   let width, height = Screen.dimensions s and scale = Screen.scale s in
 
-  match Backend.v s title make_full with
+  match Backend.v s (Screen.title s) make_full with
   | Error (`Msg e) ->
       Backend.log "Init error: %s" e;
       exit 1
@@ -156,7 +156,7 @@ let run title boot tick s =
       loop initial_internal_state 0 initial_buffer initial_input Int32.zero;
       Backend.shutdown backend
 
-let run_functional title tick_f s =
+let run_functional tick_f s =
   let wrap_tick t screen prev_framebuffer input =
     let primitives = tick_f t screen input in
     if primitives = [] then prev_framebuffer
@@ -166,4 +166,4 @@ let run_functional title tick_f s =
       Framebuffer.render new_framebuffer primitives;
       new_framebuffer
   in
-  run title None wrap_tick s
+  run wrap_tick s

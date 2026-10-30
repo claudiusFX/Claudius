@@ -176,5 +176,5 @@ let tick t s _p _i =
 let () =
   Palette.generate_plasma_palette 1024
   |> Screen.create "Plasma effect" 640 480 1
-  |> Base.run None tick
+  |> Base.run tick
 ]}
