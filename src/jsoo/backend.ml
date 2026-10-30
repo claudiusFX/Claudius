@@ -46,9 +46,9 @@ let render t s fb =
       let row = contents.(y) in
       let p = row.(x) in
       let rgb = Int32.to_int (Palette.index_to_rgb pal p) in
-      Dom_html.pixel_set t.pixels (base + 0) ((rgb lsl 16) land 0xff);
+      Dom_html.pixel_set t.pixels (base + 0) ((rgb lsl 0) land 0xff);
       Dom_html.pixel_set t.pixels (base + 1) ((rgb lsr 8) land 0xff);
-      Dom_html.pixel_set t.pixels (base + 2) ((rgb lsr 0) land 0xff)
+      Dom_html.pixel_set t.pixels (base + 2) ((rgb lsr 16) land 0xff)
     done
   done;
   t.ctx##putImageData t.image_data (Js.float 0.) (Js.float 0.);
