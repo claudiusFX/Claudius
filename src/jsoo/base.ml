@@ -15,10 +15,10 @@ let screen_of_canvas ?font ?(scale = 1) title palette =
   Screen.create ?font ~scale title (raw_width / scale) (raw_height / scale)
     palette
 
-let inner_run title boot tick s =
+let inner_run boot tick s =
   let width, height = Screen.dimensions s in
 
-  match Backend.v s title false with
+  match Backend.v s false with
   | Error (`Msg e) ->
       (*Backend.log "Init error: %s" e;*)
       (*exit 1*)
@@ -118,10 +118,9 @@ let inner_run title boot tick s =
         (Dom_html.window##requestAnimationFrame
            (Js.wrap_callback (loop initial_internal_state initial_buffer 0)))
 
-let run title boot tick s =
-  Dom_html.onload (fun () -> inner_run title boot tick s)
+let run ?boot tick s = Dom_html.onload (fun () -> inner_run boot tick s)
 
-let run_functional title tick_f s =
+let run_functional tick_f s =
   let wrap_tick t screen prev_framebuffer input =
     let primitives = tick_f t screen input in
     if primitives = [] then prev_framebuffer
@@ -131,4 +130,4 @@ let run_functional title tick_f s =
       Framebuffer.render new_framebuffer primitives;
       new_framebuffer
   in
-  run title None wrap_tick s
+  run wrap_tick s

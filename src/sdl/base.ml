@@ -26,7 +26,7 @@ let run ?boot tick s =
 
   let width, height = Screen.dimensions s and scale = Screen.scale s in
 
-  match Backend.v s (Screen.title s) make_full with
+  match Backend.v s make_full with
   | Error (`Msg e) ->
       Backend.log "Init error: %s" e;
       exit 1
