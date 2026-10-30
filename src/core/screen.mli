@@ -9,25 +9,27 @@ type t
 val create :
   ?font:Font.t ->
   ?image_filenames:string list ->
-  int ->
+  ?scale:int ->
+  string ->
   int ->
   int ->
   Palette.t ->
   t
-(** [create font width height scale palette] Creates a new screen of the
+(** [create font scale title width height palette] Creates a new screen of the
     specified size [width] x [height], and it will be rendered in a window
     scaled up by the [scale] factor provided. The framebuffers used when running
     will be indexed into the [palette] provided here. Raises [Invalid_argument]
     if the dimensions or scale are either zero or negative. If no [font] is
     provided then a default font is used. If [image_filenames] is provided, the
     images will be loaded and their palettes merged into the screen's global
-    palette.*)
-
-val create_with_font : int -> int -> int -> Font.t -> Palette.t -> t
-(** [create width height scale font palette] Deprecated: now use create with the
-    optional font. *)
+    palette. The title will be used depending on the backend: in SDL it will be
+    used as the Window title, in Javascript it is the ID of the canvas element.
+*)
 
 (** {1 Access} *)
+
+val title : t -> string
+(** [title screen] Returns the passed in title of the screen. *)
 
 val dimensions : t -> int * int
 (** [dimensions screen] Returns the width and height of the [screen]. *)
